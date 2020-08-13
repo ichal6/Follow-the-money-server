@@ -1,4 +1,4 @@
-package com.example.followthemoney;
+package com.example.mlkb;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
