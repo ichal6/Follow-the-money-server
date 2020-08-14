@@ -31,11 +31,11 @@
             <h1 id="login-label">Log in:</h1>
         </header>
         <form id="login-form">
-            <div>
+            <div class="login-input">
                 <img src="${pageContext.request.contextPath}/assets/icons/login-email.svg">
                 <input placeholder="Your email">
             </div>
-            <div>
+            <div class="login-input">
                 <img src="${pageContext.request.contextPath}/assets/icons/login-password.svg">
                 <input placeholder="Your password">
             </div>
