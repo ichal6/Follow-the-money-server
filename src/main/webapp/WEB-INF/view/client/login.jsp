@@ -30,7 +30,7 @@
             <img id="background-img" src="${pageContext.request.contextPath}/assets/img/login-background.svg">
             <h1 id="login-label">Log in:</h1>
         </header>
-        <form>
+        <form id="login-form">
             <div>
                 <img src="${pageContext.request.contextPath}/assets/icons/login-email.svg">
                 <input placeholder="Your email">
@@ -42,8 +42,8 @@
 
             <p>forgot your password?</p>
 
-            <button type="submit">Ready to go</button>
+            <button type="submit">Ready to go!</button>
+            <button onclick="location.href='#'">No account? Sign up!</button>
         </form>
-        <button onclick="location.href='#'">No account? Sign up!</button>
     </body>
 </html>
