@@ -29,8 +29,17 @@
             </div>
             <img id="background-img" src="${pageContext.request.contextPath}/assets/img/login-background.svg">
             <h1 id="login-label">Log in:</h1>
+            <div id="login-label-tablet">
+                <h1>We’re glad to see you back!</h1>
+                <p>Making saving a habit is a key to succeed in controlling your money.</p>
+                <p>You don’t have an account?</p>
+                <button class="button" id="button-sign-up-tablet" onclick="location.href='#'">Sign up. It's free</button>
+            </div>
+
         </header>
+
         <form id="login-form">
+            <h1 id="login-header-tablet">Log in:</h1>
             <div class="login-input">
                 <img src="${pageContext.request.contextPath}/assets/icons/login-email.svg">
                 <input placeholder="Your email">
@@ -41,7 +50,6 @@
             </div>
 
             <a id="forgot-password" href="#forgot-password">forgot your password?</a>
-
             <button class="button" id="button-login" type="submit">Ready to go!</button>
             <button class="button" id="button-sign-up" onclick="location.href='#'">No account? Sign up!</button>
         </form>
