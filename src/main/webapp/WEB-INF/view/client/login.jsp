@@ -9,10 +9,13 @@
 <html>
     <head>
         <title>Follow the money login</title>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/client/menu.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/client/login.css">
+
     </head>
     <body>
         <header>
+            <img src="${pageContext.request.contextPath}/assets/img/login-background.svg">
             <div class="menu-wrapper">
                 <div class="menu-header">
                     <a href="#home" class="logo"><img src="${pageContext.request.contextPath}/assets/icons/logo.svg"></a>

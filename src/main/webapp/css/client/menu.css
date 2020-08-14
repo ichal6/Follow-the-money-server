@@ -1,5 +1,5 @@
 .menu-header {
-    background-color: #414141;
+    background-color: #57537d;
     box-shadow: 1px 1px 4px 0 rgba(0,0,0,.1);
     position: relative;
     width: 100%;
@@ -120,7 +120,7 @@
 
 @media only screen and (min-width: 768px) {
     .menu-wrapper{
-        background: #414141;
+        background: #57537d;
         height: 55px;
         line-height: 55px;
         width: 100%;
