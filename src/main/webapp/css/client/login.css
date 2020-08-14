@@ -37,7 +37,7 @@ header{
 #login-form{
     display: flex;
     position: absolute;
-    bottom: 15%;
+    bottom: 10%;
     width: 98%;
     flex-direction: column;
     align-items: center;
@@ -48,10 +48,14 @@ header{
     display: flex;
     flex-direction: row;
     width: 100%;
+    margin: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #CAC9CE !important;
 }
 
 .login-input input{
     margin-left: 15px;
     margin-right: 15px;
     width: 90%;
+    border: none;
 }
