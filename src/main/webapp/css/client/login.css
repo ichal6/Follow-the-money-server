@@ -1,0 +1,28 @@
+body{
+    width: 100%;
+}
+header{
+    display: flex;
+    flex-direction: column;
+}
+#background-img{
+    position: fixed;
+    top: 0px;
+    left:0px;
+    width: 100%;
+}
+
+#login-label{
+    position: absolute;
+    top: 15%;
+    left: 40%;
+    font-family: Poppins, sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 36px;
+    line-height: 54px;
+
+    /* identical to box height */
+
+    color: #FFFFFF;
+}

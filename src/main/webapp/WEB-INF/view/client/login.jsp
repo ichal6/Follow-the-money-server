@@ -15,7 +15,6 @@
     </head>
     <body>
         <header>
-            <img src="${pageContext.request.contextPath}/assets/img/login-background.svg">
             <div class="menu-wrapper">
                 <div class="menu-header">
                     <a href="#home" class="logo"><img src="${pageContext.request.contextPath}/assets/icons/logo.svg"></a>
@@ -28,8 +27,9 @@
                     </ul>
                 </div>
             </div>
+            <img id="background-img" src="${pageContext.request.contextPath}/assets/img/login-background.svg">
+            <h1 id="login-label">Log in:</h1>
         </header>
-        <h1>Log in:</h1>
         <form>
             <div>
                 <img src="${pageContext.request.contextPath}/assets/icons/login-email.svg">
