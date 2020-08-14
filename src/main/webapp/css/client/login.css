@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Source Sans Pro";
+    src: url("/assets/fonts/SourceSansPro-SemiBold.ttf");
+}
+
 body{
     width: 98%;
     display: flex;
@@ -58,4 +63,16 @@ header{
     margin-right: 15px;
     width: 90%;
     border: none;
+}
+
+#forgot-password{
+    color: #F37944;
+    text-decoration: none;
+    font-family: Source Sans Pro, serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 23px;
+
+    margin: 20px;
 }

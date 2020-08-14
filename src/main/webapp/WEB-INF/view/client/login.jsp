@@ -40,7 +40,7 @@
                 <input placeholder="Your password">
             </div>
 
-            <p>forgot your password?</p>
+            <a id="forgot-password" href="#forgot-password">forgot your password?</a>
 
             <button type="submit">Ready to go!</button>
             <button onclick="location.href='#'">No account? Sign up!</button>
