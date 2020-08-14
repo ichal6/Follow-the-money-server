@@ -42,8 +42,8 @@
 
             <a id="forgot-password" href="#forgot-password">forgot your password?</a>
 
-            <button type="submit">Ready to go!</button>
-            <button onclick="location.href='#'">No account? Sign up!</button>
+            <button class="button" id="button-login" type="submit">Ready to go!</button>
+            <button class="button" id="button-sign-up" onclick="location.href='#'">No account? Sign up!</button>
         </form>
     </body>
 </html>

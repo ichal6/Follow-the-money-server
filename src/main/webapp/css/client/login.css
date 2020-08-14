@@ -22,6 +22,8 @@ header{
     top: 0px;
     left:0px;
     width: 100%;
+    /*max-height: 100px;*/
+    /*height: 80%;*/
 }
 
 #login-label{
@@ -42,7 +44,7 @@ header{
 #login-form{
     display: flex;
     position: absolute;
-    bottom: 10%;
+    bottom: 0%;
     width: 98%;
     flex-direction: column;
     align-items: center;
@@ -63,6 +65,7 @@ header{
     margin-right: 15px;
     width: 90%;
     border: none;
+    background-color: transparent;
 }
 
 #forgot-password{
@@ -73,6 +76,32 @@ header{
     font-weight: 600;
     font-size: 18px;
     line-height: 23px;
-
     margin: 20px;
+}
+
+.button{
+    width: 90%;
+    height: 50px;
+    margin-bottom: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 10px;
+    border:none;
+    font-family: Poppins, serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+
+    /* identical to box height */
+
+    color: #FFFFFF;
+}
+
+#button-login{
+    background-color: #F37944;
+}
+
+#button-sign-up{
+    background-color: #0BD1B8;
 }
