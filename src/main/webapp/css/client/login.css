@@ -113,6 +113,12 @@ header{
     }
 }
 
+@media only screen and (max-height: 900px){
+    #login-header-tablet{
+        display: none;
+    }
+}
+
 @media only screen and (min-height: 900px) {
     #login-label {
         display: none;
