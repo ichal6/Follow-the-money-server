@@ -1,6 +1,7 @@
 package com.example.mlkb.entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Category {
@@ -12,6 +13,7 @@ public class Category {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private GeneralType generalType;
-
-    // nie wzięte pod uwagę subkategorie
+    @OneToMany(targetEntity = Subcategory.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
+    private Set<Subcategory> subcategories;
 }
