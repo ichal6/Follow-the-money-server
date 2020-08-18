@@ -1,4 +1,4 @@
-package com.example.mlkb.controller.client;
+package com.example.mlkb.viewcontroller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
