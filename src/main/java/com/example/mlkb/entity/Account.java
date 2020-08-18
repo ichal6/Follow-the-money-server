@@ -22,5 +22,7 @@ public class Account {
     @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private Set<Transaction> transactions;
+    @OneToMany
+    private Set<Transfer> transfers;
 
 }
