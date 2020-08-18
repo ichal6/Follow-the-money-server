@@ -1,6 +1,7 @@
 package com.example.mlkb.entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Account {
@@ -18,5 +19,8 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private Currency currency;
+    @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_id")
+    private Set<Transaction> transactions;
 
 }
