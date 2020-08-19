@@ -1,6 +1,5 @@
 package com.example.mlkb.modelDTO;
 
-
 public class LoginDataDTO {
     private Long id;
     private String email;

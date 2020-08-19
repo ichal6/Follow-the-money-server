@@ -17,19 +17,17 @@ public class LoginDataController {
         this.loginDataService = loginDataService;
     }
 
+
     // post, tworzy LoginData
     @PostMapping("/login")
     public ResponseEntity<String> createLogin(@RequestBody LoginDataDTO newLogin){
         if (loginDataService.isValid(newLogin)) {
-
-            //personRepository.persist(person);
-
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-
+            return loginDataService.createLoginData(newLogin);
+//            return ResponseEntity.status(HttpStatus.CREATED).build();
         }
-
         return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
     }
+
 
     // get, zwraca profileID/profile, parametry - login i hasło, sprawdza
     @GetMapping("/login")
