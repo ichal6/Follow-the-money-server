@@ -17,7 +17,7 @@ import java.util.Date;
 @Entity
 public class Transfer {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @DecimalMin(value = "0.0")
     private Double value;
