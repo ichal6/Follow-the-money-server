@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,5 +49,10 @@ public class LoginDataService {
 
     public Optional<LoginData> getLogin(String email){
         return loginDataRepository.findByEmail(email);
+    }
+
+    @Transactional
+    public void deleteLogin(String email){
+        loginDataRepository.deleteByEmail(email);
     }
 }

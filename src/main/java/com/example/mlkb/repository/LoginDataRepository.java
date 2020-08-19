@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface LoginDataRepository extends JpaRepository<LoginData, Long> {
     Optional<LoginData> findByEmail(String email);
+
+    void deleteByEmail(String email);
 }

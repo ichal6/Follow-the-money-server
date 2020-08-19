@@ -48,7 +48,12 @@ public class LoginDataController {
             return ResponseEntity.badRequest().body("This email does not exists in the database!");
         }
     }
+
     // delete, usuwa LoginData
+    @DeleteMapping("/login/{email}")
+    public void deleteLogin(@PathVariable("email") String email){
+        loginDataService.deleteLogin(email);
+    }
     // PUT, modyfikuje LoginData
 
 }
