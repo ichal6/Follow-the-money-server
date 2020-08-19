@@ -24,10 +24,8 @@ public class Transfer {
     private String title;
     @CreatedDate
     private Date date;
-
     @OneToOne
     private Account accountFrom;
     @OneToOne
     private Account accountTo;
-
 }

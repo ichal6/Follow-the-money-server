@@ -31,7 +31,10 @@ public class Account {
     @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private Set<Transaction> transactions;
-    @OneToMany(targetEntity = Transfer.class, cascade = CascadeType.ALL)
-    private Set<Transfer> transfers;
-
+    @OneToMany
+    @JoinColumn(name = "account_from_id")
+    private Set<Transfer> transfersFrom;
+    @OneToMany
+    @JoinColumn(name = "account_to_id")
+    private Set<Transfer> transfersTo;
 }
