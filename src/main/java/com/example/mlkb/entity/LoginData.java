@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -23,5 +24,15 @@ public class LoginData {
     public LoginData(String email, String password){
         this.email = email;
         this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoginData loginData = (LoginData) o;
+        return Objects.equals(id, loginData.id) &&
+                Objects.equals(email, loginData.email) &&
+                Objects.equals(password, loginData.password);
     }
 }

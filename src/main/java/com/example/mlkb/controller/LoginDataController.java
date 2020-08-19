@@ -22,7 +22,7 @@ public class LoginDataController {
     // post, tworzy LoginData
     @PostMapping("/login")
     public ResponseEntity<String> createLogin(@RequestBody LoginDataDTO newLogin){
-        if (loginDataService.isValid(newLogin)) {
+        if (loginDataService.isValidWithoutId(newLogin)) {
             return loginDataService.createLoginData(newLogin);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
@@ -54,6 +54,14 @@ public class LoginDataController {
     public void deleteLogin(@PathVariable("email") String email){
         loginDataService.deleteLogin(email);
     }
+
     // PUT, modyfikuje LoginData
+    @PutMapping("/login")
+    public ResponseEntity<String> updateLogin(@RequestBody LoginDataDTO updateLogin){
+        if (loginDataService.isValidWithId(updateLogin)) {
+            return loginDataService.updateLogin(updateLogin);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
+    }
 
 }

@@ -20,8 +20,15 @@ public class LoginDataService {
         this.loginDataRepository = loginDataRepository;
     }
 
-    public boolean isValid(LoginDataDTO loginDataDTO) {
+    public boolean isValidWithoutId(LoginDataDTO loginDataDTO) {
         return loginDataDTO != null
+                && loginDataDTO.getPassword() != null
+                && loginDataDTO.getEmail() != null;
+    }
+
+    public boolean isValidWithId(LoginDataDTO loginDataDTO) {
+        return loginDataDTO != null
+                && loginDataDTO.getId() != null
                 && loginDataDTO.getPassword() != null
                 && loginDataDTO.getEmail() != null;
     }
@@ -54,5 +61,21 @@ public class LoginDataService {
     @Transactional
     public void deleteLogin(String email){
         loginDataRepository.deleteByEmail(email);
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateLogin(LoginDataDTO loginDataDTO){
+        if (loginDataRepository.findByEmail(loginDataDTO.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("This email is already present in the database!");
+        } else {
+            LoginData loginData = new LoginData(loginDataDTO.getId(), loginDataDTO.getEmail(), loginDataDTO.getPassword());
+            LoginData saveLoginData = loginDataRepository.save(loginData);
+            Optional<LoginData> loginDataOptional = loginDataRepository.findById(saveLoginData.getId());
+            if (loginDataOptional.isPresent() && loginData.equals(loginDataOptional.get())) {
+                return ResponseEntity.status(HttpStatus.CREATED).body("Login data updated successfully!");
+            } else {
+                return ResponseEntity.unprocessableEntity().body("Failed creating Login Data!");
+            }
+        }
     }
 }
