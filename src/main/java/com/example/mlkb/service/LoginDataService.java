@@ -7,6 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class LoginDataService {
     private LoginDataRepository loginDataRepository;
@@ -33,5 +37,12 @@ public class LoginDataService {
                 return ResponseEntity.unprocessableEntity().body("Failed creating Login Data!");
             }
         }
+    }
+
+    public List<LoginDataDTO> getAllLogins(){
+        List<LoginData> loginDataList = loginDataRepository.findAll();
+        return loginDataList.stream()
+                .map(x -> new LoginDataDTO(x.getId() , x.getEmail(), x.getPassword()))
+                .collect(Collectors.toList());
     }
 }

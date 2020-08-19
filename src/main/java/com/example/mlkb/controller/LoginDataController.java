@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 public class LoginDataController {
     private LoginDataService loginDataService;
@@ -30,8 +33,9 @@ public class LoginDataController {
 
     // get, zwraca profileID/profile, parametry - login i hasło, sprawdza
     @GetMapping("/login")
-    public void getProfile(){
-
+    public ResponseEntity<List<LoginDataDTO>> getLogins(){
+        List<LoginDataDTO> loginDataDTOList = loginDataService.getAllLogins();
+        return new ResponseEntity<>(loginDataDTOList, HttpStatus.OK);
     }
     // delete, usuwa LoginData
     // PUT, modyfikuje LoginData
