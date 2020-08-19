@@ -19,4 +19,9 @@ public class LoginData {
     @Column(unique = true)
     private String email;
     private String password;
+
+    public LoginData(String email, String password){
+        this.email = email;
+        this.password = password;
+    }
 }

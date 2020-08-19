@@ -25,7 +25,7 @@ public class LoginDataService {
         if (loginDataRepository.findByEmail(loginDataDTO.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("This email is already present in the database!");
         } else {
-            LoginData loginData = new LoginData(loginDataDTO.getId(), loginDataDTO.getEmail(), loginDataDTO.getPassword());
+            LoginData loginData = new LoginData(loginDataDTO.getEmail(), loginDataDTO.getPassword());
             LoginData saveLoginData = loginDataRepository.save(loginData);
             if (loginDataRepository.findById(saveLoginData.getId()).isPresent()) {
                 return ResponseEntity.status(HttpStatus.CREATED).body("Login data added successfully!");
