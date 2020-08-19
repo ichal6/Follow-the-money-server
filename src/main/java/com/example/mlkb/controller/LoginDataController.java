@@ -23,9 +23,8 @@ public class LoginDataController {
     public ResponseEntity<String> createLogin(@RequestBody LoginDataDTO newLogin){
         if (loginDataService.isValid(newLogin)) {
             return loginDataService.createLoginData(newLogin);
-//            return ResponseEntity.status(HttpStatus.CREATED).build();
         }
-        return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
 
 
