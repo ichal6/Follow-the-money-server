@@ -1,13 +1,11 @@
 package com.example.mlkb.controller;
 
+import com.example.mlkb.entity.LoginData;
 import com.example.mlkb.modelDTO.LoginDataDTO;
 import com.example.mlkb.service.LoginDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +29,24 @@ public class LoginDataController {
     }
 
 
-    // get, zwraca profileID/profile, parametry - login i hasło, sprawdza
+    //get zwraca wszystkie loginy
     @GetMapping("/login")
     public ResponseEntity<List<LoginDataDTO>> getLogins(){
         List<LoginDataDTO> loginDataDTOList = loginDataService.getAllLogins();
         return new ResponseEntity<>(loginDataDTOList, HttpStatus.OK);
+    }
+
+    // get, zwraca profileID/profile, parametry - login i hasło, sprawdza
+    @GetMapping("/login/{email}")
+    public ResponseEntity<Object> getLogin(@PathVariable("email") String email){
+        Optional<LoginData> loginDataOptional = loginDataService.getLogin(email);
+        if(loginDataOptional.isPresent()){
+            LoginData loginData = loginDataOptional.get();
+            LoginDataDTO loginDataDTO = new LoginDataDTO(loginData.getId(), loginData.getEmail(), loginData.getPassword());
+            return new ResponseEntity<>(loginDataDTO, HttpStatus.OK);
+        } else{
+            return ResponseEntity.badRequest().body("This email does not exists in the database!");
+        }
     }
     // delete, usuwa LoginData
     // PUT, modyfikuje LoginData

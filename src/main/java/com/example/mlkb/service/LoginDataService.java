@@ -45,4 +45,8 @@ public class LoginDataService {
                 .map(x -> new LoginDataDTO(x.getId() , x.getEmail(), x.getPassword()))
                 .collect(Collectors.toList());
     }
+
+    public Optional<LoginData> getLogin(String email){
+        return loginDataRepository.findByEmail(email);
+    }
 }
