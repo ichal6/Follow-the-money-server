@@ -67,4 +67,8 @@ public class ProfileService {
                 .map(x -> new ProfileDTO(x.getId() , x.getName(), x.getDate()))
                 .collect(Collectors.toList());
     }
+
+    public Optional<Profile> getProfile(Long id) {
+        return profileRepository.findById(id);
+    }
 }

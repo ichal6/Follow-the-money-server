@@ -1,6 +1,7 @@
 package com.example.mlkb.controller;
 
 import com.example.mlkb.entity.LoginData;
+import com.example.mlkb.entity.Profile;
 import com.example.mlkb.modelDTO.LoginDataDTO;
 import com.example.mlkb.modelDTO.ProfileDTO;
 import com.example.mlkb.service.ProfileService;
@@ -37,16 +38,15 @@ public class ProfilesController {
 
     // GET - get profile by id
     @GetMapping("/profile/{id}")
-    public ResponseEntity<Object> getProfile(@PathVariable("id") String id){
-//        Optional<LoginData> loginDataOptional = loginDataService.getLogin(email);
-//        if(loginDataOptional.isPresent()){
-//            LoginData loginData = loginDataOptional.get();
-//            LoginDataDTO loginDataDTO = new LoginDataDTO(loginData.getId(), loginData.getEmail(), loginData.getPassword());
-//            return new ResponseEntity<>(loginDataDTO, HttpStatus.OK);
-//        } else{
-//            return ResponseEntity.badRequest().body("This email does not exists in the database!");
-//        }
-        return null;
+    public ResponseEntity<Object> getProfile(@PathVariable("id") Long id){
+        Optional<Profile> profileOptional = profileService.getProfile(id);
+        if(profileOptional.isPresent()){
+            Profile profile = profileOptional.get();
+            ProfileDTO profileDTO = new ProfileDTO(profile.getId(), profile.getName(), profile.getDate());
+            return new ResponseEntity<>(profileDTO, HttpStatus.OK);
+        } else{
+            return ResponseEntity.badRequest().body("The profile with this id does not exists in the database!");
+        }
     }
 
     // DELETE - delete by id
