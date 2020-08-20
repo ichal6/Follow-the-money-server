@@ -2,6 +2,7 @@ package com.example.mlkb.service;
 
 import com.example.mlkb.entity.LoginData;
 import com.example.mlkb.entity.Profile;
+import com.example.mlkb.modelDTO.LoginDataDTO;
 import com.example.mlkb.modelDTO.ProfileDTO;
 import com.example.mlkb.repository.ProfileRepository;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfileService {
@@ -56,5 +59,12 @@ public class ProfileService {
         } else {
             return ResponseEntity.unprocessableEntity().body("Could not update profile. This profile does not exist!");
         }
+    }
+
+    public List<ProfileDTO> getAllProfiles() {
+        List<Profile> profileList = profileRepository.findAll();
+        return profileList.stream()
+                .map(x -> new ProfileDTO(x.getId() , x.getName(), x.getDate()))
+                .collect(Collectors.toList());
     }
 }
