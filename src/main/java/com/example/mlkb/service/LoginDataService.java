@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class LoginDataService {
-    private LoginDataRepository loginDataRepository;
+    private final LoginDataRepository loginDataRepository;
 
     public LoginDataService(LoginDataRepository loginDataRepository) {
         this.loginDataRepository = loginDataRepository;

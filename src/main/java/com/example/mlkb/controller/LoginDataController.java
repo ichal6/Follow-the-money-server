@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 public class LoginDataController {
-    private LoginDataService loginDataService;
+    private final LoginDataService loginDataService;
 
     public LoginDataController(LoginDataService loginDataService){
         this.loginDataService = loginDataService;

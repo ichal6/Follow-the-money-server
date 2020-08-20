@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,7 +20,7 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @CreatedDate
+    @CreationTimestamp
     private Date date;
     @OneToMany(targetEntity = Account.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
@@ -34,4 +34,9 @@ public class Profile {
     @OneToMany(targetEntity = LoginData.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private Set<LoginData> logins;
+
+    public Profile(String name, Date date) {
+        this.name = name;
+        this.date = date;
+    }
 }
