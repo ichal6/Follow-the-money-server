@@ -18,8 +18,7 @@ public class LoginDataController {
         this.loginDataService = loginDataService;
     }
 
-
-    // post, tworzy LoginData
+    // POST, tworzy entity LoginData
     @PostMapping("/login")
     public ResponseEntity<String> createLogin(@RequestBody LoginDataDTO newLogin){
         if (loginDataService.isValidWithoutId(newLogin)) {
@@ -28,15 +27,14 @@ public class LoginDataController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
 
-
-    //get zwraca wszystkie loginy
+    // GET, zwraca wszystkie entities LoginData
     @GetMapping("/login")
     public ResponseEntity<List<LoginDataDTO>> getLogins(){
         List<LoginDataDTO> loginDataDTOList = loginDataService.getAllLogins();
         return new ResponseEntity<>(loginDataDTOList, HttpStatus.OK);
     }
 
-    // get, zwraca profileID/profile, parametry - login i hasło, sprawdza
+    // GET, zwraca entity LoginData na podstawie emaila
     @GetMapping("/login/{email}")
     public ResponseEntity<Object> getLogin(@PathVariable("email") String email){
         Optional<LoginData> loginDataOptional = loginDataService.getLogin(email);
@@ -49,13 +47,13 @@ public class LoginDataController {
         }
     }
 
-    // delete, usuwa LoginData
+    // DELETE, usuwa LoginData na podstawie emaila
     @DeleteMapping("/login/{email}")
     public void deleteLogin(@PathVariable("email") String email){
         loginDataService.deleteLogin(email);
     }
 
-    // PUT, modyfikuje LoginData
+    // PUT, modyfikuje entity LoginData
     @PutMapping("/login")
     public ResponseEntity<String> updateLogin(@RequestBody LoginDataDTO updateLogin){
         if (loginDataService.isValidWithId(updateLogin)) {
@@ -63,5 +61,4 @@ public class LoginDataController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
-
 }
