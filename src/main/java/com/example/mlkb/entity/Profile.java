@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -38,5 +39,21 @@ public class Profile {
     public Profile(String name, Date date) {
         this.name = name;
         this.date = date;
+    }
+
+    public Profile(Long id, String name, Date date) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Profile profile = (Profile) o;
+        return Objects.equals(getId(), profile.getId()) &&
+                Objects.equals(getName(), profile.getName()) &&
+                Objects.equals(getDate(), profile.getDate());
     }
 }

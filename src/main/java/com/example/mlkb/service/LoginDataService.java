@@ -74,7 +74,7 @@ public class LoginDataService {
             if (loginDataOptional.isPresent() && loginData.equals(loginDataOptional.get())) {
                 return ResponseEntity.status(HttpStatus.CREATED).body("Login data updated successfully!");
             } else {
-                return ResponseEntity.unprocessableEntity().body("Failed creating Login Data!");
+                return ResponseEntity.unprocessableEntity().body("Failed updating Login Data!");
             }
         }
     }

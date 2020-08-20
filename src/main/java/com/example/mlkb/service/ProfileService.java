@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.Optional;
+
 @Service
 public class ProfileService {
     private final ProfileRepository profileRepository;
@@ -34,6 +37,24 @@ public class ProfileService {
             return ResponseEntity.status(HttpStatus.CREATED).body("Profile added successfully!");
         } else {
             return ResponseEntity.unprocessableEntity().body("Failed creating Profile!");
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<String> updateProfile(ProfileDTO updateProfile) {
+        Optional<Profile> profileOptional = profileRepository.findById(updateProfile.getId());
+        if (profileOptional.isPresent()) {
+            Profile profile = profileOptional.get();
+            profile.setName(updateProfile.getName());
+            Profile updatedProfile = profileRepository.save(profile);
+            Optional<Profile> savedProfileOptional = profileRepository.findById(updatedProfile.getId());
+            if (savedProfileOptional.isPresent() && profile.equals(savedProfileOptional.get())) {
+                return ResponseEntity.status(HttpStatus.CREATED).body("Profile updated successfully!");
+            } else {
+                return ResponseEntity.unprocessableEntity().body("Failed updating Profile!");
+            }
+        } else {
+            return ResponseEntity.unprocessableEntity().body("Could not update profile. This profile does not exist!");
         }
     }
 }

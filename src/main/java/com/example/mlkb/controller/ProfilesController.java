@@ -1,10 +1,12 @@
 package com.example.mlkb.controller;
 
+import com.example.mlkb.modelDTO.LoginDataDTO;
 import com.example.mlkb.modelDTO.ProfileDTO;
 import com.example.mlkb.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +28,18 @@ public class ProfilesController {
     }
 
     // GET - get all profiles
+
+
     // GET - get profile by id
     // DELETE - delete by id
+
+
     // PUT - update
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateProfile(@RequestBody ProfileDTO updateProfile){
+        if (profileService.isValidWithId(updateProfile)) {
+            return profileService.updateProfile(updateProfile);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
+    }
 }
