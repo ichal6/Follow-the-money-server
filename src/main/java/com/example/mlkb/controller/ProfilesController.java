@@ -51,8 +51,8 @@ public class ProfilesController {
 
     // DELETE - delete by id
     @DeleteMapping("/profile/{id}")
-    public void deleteProfile(@PathVariable("id") String id){
-        //loginDataService.deleteLogin(email);
+    public void deleteProfile(@PathVariable("id") Long id){
+        profileService.deleteProfile(id);
     }
 
     // PUT - update

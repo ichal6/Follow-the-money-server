@@ -71,4 +71,10 @@ public class ProfileService {
     public Optional<Profile> getProfile(Long id) {
         return profileRepository.findById(id);
     }
+
+    public void deleteProfile(Long id) {
+        if(profileRepository.findById(id).isPresent()){
+            profileRepository.deleteById(id);
+        }
+    }
 }
