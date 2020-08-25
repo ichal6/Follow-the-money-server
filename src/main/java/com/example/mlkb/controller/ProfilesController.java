@@ -1,14 +1,16 @@
 package com.example.mlkb.controller;
 
+import com.example.mlkb.entity.LoginData;
+import com.example.mlkb.entity.Profile;
 import com.example.mlkb.modelDTO.LoginDataDTO;
 import com.example.mlkb.modelDTO.ProfileDTO;
 import com.example.mlkb.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class ProfilesController {
@@ -28,11 +30,30 @@ public class ProfilesController {
     }
 
     // GET - get all profiles
-
+    @GetMapping("/profile")
+    public ResponseEntity<List<ProfileDTO>> getProfiles(){
+        List<ProfileDTO> profileDTOList = profileService.getAllProfiles();
+        return new ResponseEntity<>(profileDTOList, HttpStatus.OK);
+    }
 
     // GET - get profile by id
-    // DELETE - delete by id
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<Object> getProfile(@PathVariable("id") Long id){
+        Optional<Profile> profileOptional = profileService.getProfile(id);
+        if(profileOptional.isPresent()){
+            Profile profile = profileOptional.get();
+            ProfileDTO profileDTO = new ProfileDTO(profile.getId(), profile.getName(), profile.getDate());
+            return new ResponseEntity<>(profileDTO, HttpStatus.OK);
+        } else{
+            return ResponseEntity.badRequest().body("The profile with this id does not exists in the database!");
+        }
+    }
 
+    // DELETE - delete by id
+    @DeleteMapping("/profile/{id}")
+    public void deleteProfile(@PathVariable("id") Long id){
+        profileService.deleteProfile(id);
+    }
 
     // PUT - update
     @PutMapping("/profile")
