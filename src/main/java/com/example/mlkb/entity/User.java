@@ -16,32 +16,33 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Profile {
+@Table(name = "\"user\"")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Column(unique = true)
+    private String email;
+    private String password;
     @CreationTimestamp
     private Date date;
     @OneToMany(targetEntity = Account.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "user_id")
     private Set<Account> accounts;
     @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "user_id")
     private Set<Category> categories;
     @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "user_id")
     private Set<Payee> payees;
-    @OneToMany(targetEntity = LoginData.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
-    private Set<LoginData> logins;
 
-    public Profile(String name, Date date) {
+    public User(String name, Date date) {
         this.name = name;
         this.date = date;
     }
 
-    public Profile(Long id, String name, Date date) {
+    public User(Long id, String name, Date date) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -51,9 +52,9 @@ public class Profile {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Profile profile = (Profile) o;
-        return Objects.equals(getId(), profile.getId()) &&
-                Objects.equals(getName(), profile.getName()) &&
-                Objects.equals(getDate(), profile.getDate());
+        User user = (User) o;
+        return Objects.equals(getId(), user.getId()) &&
+                Objects.equals(getName(), user.getName()) &&
+                Objects.equals(getDate(), user.getDate());
     }
 }

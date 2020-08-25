@@ -1,8 +1,6 @@
 package com.example.mlkb.controller;
 
-import com.example.mlkb.entity.LoginData;
-import com.example.mlkb.entity.Profile;
-import com.example.mlkb.modelDTO.LoginDataDTO;
+import com.example.mlkb.entity.User;
 import com.example.mlkb.modelDTO.ProfileDTO;
 import com.example.mlkb.service.ProfileService;
 import org.springframework.http.HttpStatus;
@@ -39,10 +37,10 @@ public class ProfilesController {
     // GET - get profile by id
     @GetMapping("/profile/{id}")
     public ResponseEntity<Object> getProfile(@PathVariable("id") Long id){
-        Optional<Profile> profileOptional = profileService.getProfile(id);
+        Optional<User> profileOptional = profileService.getProfile(id);
         if(profileOptional.isPresent()){
-            Profile profile = profileOptional.get();
-            ProfileDTO profileDTO = new ProfileDTO(profile.getId(), profile.getName(), profile.getDate());
+            User user = profileOptional.get();
+            ProfileDTO profileDTO = new ProfileDTO(user.getId(), user.getName(), user.getDate());
             return new ResponseEntity<>(profileDTO, HttpStatus.OK);
         } else{
             return ResponseEntity.badRequest().body("The profile with this id does not exists in the database!");
