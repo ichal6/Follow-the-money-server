@@ -27,6 +27,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
 
+    @GetMapping
+    public String temp(){
+        return "Wejście Smoka";
+    }
+
     // GET - get all users
     @GetMapping("/user")
     public ResponseEntity<List<UserDTO>> getUsers(){
