@@ -11,7 +11,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfileDTO {
+public class UserDTO {
     private Long id;
     private String name;
     private Date date;
