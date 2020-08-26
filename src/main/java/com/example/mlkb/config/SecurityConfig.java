@@ -1,6 +1,7 @@
 package com.example.mlkb.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -8,9 +9,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,13 +28,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private RestAuthenticationSuccessHandler authenticationSuccessHandler;
     private RestAuthenticationFailureHandler authenticationFailureHandler;
     private final DataSource dataSource;
+    private final String secret;
 
     public SecurityConfig(RestAuthenticationSuccessHandler authenticationSuccessHandler,
                           RestAuthenticationFailureHandler authenticationFailureHandler,
-                          DataSource dataSource) {
+                          DataSource dataSource,
+                          @Value("${jwt.secret}") String secret) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.dataSource = dataSource;
+        this.secret = secret;
     }
 
     @Bean
@@ -63,7 +70,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll() // 2
                 .anyRequest().authenticated()
                 .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 1
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), super.userDetailsService(), secret))
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
     }
@@ -75,5 +85,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationManager(super.authenticationManager());
         return filter;
+    }
+
+    @Bean
+    public UserDetailsManager userDetailsManager(){
+        return new JdbcUserDetailsManager(dataSource);
     }
 }
