@@ -27,7 +27,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
 
-    @GetMapping
+    @GetMapping("/")
     public String temp(){
         return "Wejście Smoka";
     }
