@@ -29,9 +29,11 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         UserDetails principal = (UserDetails) authentication.getPrincipal(); // 1
+        long actualTime = System.currentTimeMillis();
         String token = JWT.create() // 2
-                .withSubject(principal.getUsername()) // 3
-                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime)) // 4
+                .withSubject(principal.getUsername()) //
+                .withIssuedAt(new Date(actualTime))
+                .withExpiresAt(new Date(actualTime + expirationTime)) // 4
                 .sign(Algorithm.HMAC256(secret)); // 5
         response.addHeader("Authorization", "Bearer " + token);
     }
