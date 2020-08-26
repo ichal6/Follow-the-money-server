@@ -1,5 +1,6 @@
 package com.example.mlkb.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,19 +26,22 @@ import javax.sql.DataSource;
 @EnableWebSecurity(debug = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private RestAuthenticationSuccessHandler authenticationSuccessHandler;
-    private RestAuthenticationFailureHandler authenticationFailureHandler;
+    private final RestAuthenticationSuccessHandler authenticationSuccessHandler;
+    private final RestAuthenticationFailureHandler authenticationFailureHandler;
     private final DataSource dataSource;
     private final String secret;
+    private final ObjectMapper objectMapper;
 
     public SecurityConfig(RestAuthenticationSuccessHandler authenticationSuccessHandler,
                           RestAuthenticationFailureHandler authenticationFailureHandler,
                           DataSource dataSource,
-                          @Value("${jwt.secret}") String secret) {
+                          @Value("${jwt.secret}") String secret,
+                          ObjectMapper objectMapper) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.dataSource = dataSource;
         this.secret = secret;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -57,30 +61,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authoritiesByUsernameQuery("SELECT u.email, r.name " +
                         "FROM user_authority ur, user_data u, authorities r " +
                         "WHERE u.email=? AND ur.user_id = u.id");
-//                .withUser("test")
-//                .password("{bcrypt}" + new BCryptPasswordEncoder().encode("test"))
-//                .roles("USER");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http
-                .authorizeRequests()
-                .antMatchers("/").permitAll() // 2
-                .anyRequest().authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 1
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), super.userDetailsService(), secret))
-                .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+        http.authorizeRequests()
+            .antMatchers("/").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .addFilter(authenticationFilter())
+            .addFilter(new JwtAuthorizationFilter(authenticationManager(), super.userDetailsService(), secret))
+            .exceptionHandling()
+            .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
     }
 
     @Bean
     public JsonObjectAuthenticationFilter authenticationFilter() throws Exception {
-        JsonObjectAuthenticationFilter filter = new JsonObjectAuthenticationFilter();
+        JsonObjectAuthenticationFilter filter = new JsonObjectAuthenticationFilter(objectMapper);
         filter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationManager(super.authenticationManager());
