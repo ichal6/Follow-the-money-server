@@ -37,6 +37,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                 .withExpiresAt(new Date(actualTime + expirationTime)) // 4
                 .sign(Algorithm.HMAC256(secret)); // 5
         response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader("Access-Control-Allow-Origin", "*");
 
         Cookie cookie = new Cookie("token", token);
         cookie.setPath("/api");
