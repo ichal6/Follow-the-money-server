@@ -9,6 +9,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,5 +37,13 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                 .withExpiresAt(new Date(actualTime + expirationTime)) // 4
                 .sign(Algorithm.HMAC256(secret)); // 5
         response.addHeader("Authorization", "Bearer " + token);
+
+        Cookie cookie = new Cookie("token", token);
+        cookie.setPath("/api");
+        cookie.setHttpOnly(true);
+        //TODO: When in production must do cookie.setSecure(true);
+        cookie.setMaxAge(18000000);
+        System.out.println("udało się!");
+        response.addCookie(cookie);
     }
 }
