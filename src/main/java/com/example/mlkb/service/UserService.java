@@ -33,12 +33,8 @@ public class UserService {
 
     public ResponseEntity<String> createUser(UserDTO userDTO) {
         User user = new User(userDTO.getName(), userDTO.getDate());
-        User saveUser = userRepository.save(user);
-        if (userRepository.findById(saveUser.getId()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully!");
-        } else {
-            return ResponseEntity.unprocessableEntity().body("Failed creating User!");
-        }
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully!");
     }
 
     @Transactional
@@ -47,13 +43,8 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setName(updateUser.getName());
-            User updatedUser = userRepository.save(user);
-            Optional<User> savedUserOptional = userRepository.findById(updatedUser.getId());
-            if (savedUserOptional.isPresent() && user.equals(savedUserOptional.get())) {
-                return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
-            } else {
-                return ResponseEntity.unprocessableEntity().body("Failed updating User!");
-            }
+            userRepository.save(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
         } else {
             return ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
         }
