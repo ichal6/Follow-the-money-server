@@ -15,16 +15,6 @@ public class FollowTheMoneyApplication extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(FollowTheMoneyApplication.class);
     }
-//
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurerAdapter() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/login").allowedOrigins("http://localhost:4200");
-//            }
-//        };
-//    }
 
     public static void main(String[] args) {
         SpringApplication.run(FollowTheMoneyApplication.class, args);

@@ -14,12 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SimpleCORSFilter implements Filter {
+public class CORSFilter implements Filter {
 
-    private final Logger log = LoggerFactory.getLogger(SimpleCORSFilter.class);
+    private final Logger log = LoggerFactory.getLogger(CORSFilter.class);
 
-    public SimpleCORSFilter() {
-        log.info("SimpleCORSFilter init");
+    public CORSFilter() {
+        log.info("CORSFilter init");
     }
 
     @Override
