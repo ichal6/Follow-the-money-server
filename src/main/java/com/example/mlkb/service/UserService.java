@@ -31,31 +31,22 @@ public class UserService {
                 && userDTO.getName() != null;
     }
 
-    public ResponseEntity<String> createUser(UserDTO userDTO) {
+    public boolean createUser(UserDTO userDTO) {
         User user = new User(userDTO.getName(), userDTO.getDate());
-        User saveUser = userRepository.save(user);
-        if (userRepository.findById(saveUser.getId()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully!");
-        } else {
-            return ResponseEntity.unprocessableEntity().body("Failed creating User!");
-        }
+        userRepository.save(user);
+        return true;
     }
 
     @Transactional
-    public ResponseEntity<String> updateUser(UserDTO updateUser) {
+    public boolean updateUser(UserDTO updateUser) {
         Optional<User> userOptional = userRepository.findById(updateUser.getId());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setName(updateUser.getName());
-            User updatedUser = userRepository.save(user);
-            Optional<User> savedUserOptional = userRepository.findById(updatedUser.getId());
-            if (savedUserOptional.isPresent() && user.equals(savedUserOptional.get())) {
-                return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
-            } else {
-                return ResponseEntity.unprocessableEntity().body("Failed updating User!");
-            }
+            userRepository.save(user);
+            return true;
         } else {
-            return ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
+            return false;
         }
     }
 
@@ -70,9 +61,13 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public void deleteUser(Long id) {
+    public boolean deleteUser(Long id) {
+        System.out.println(userRepository.findById(id));
         if(userRepository.findById(id).isPresent()){
             userRepository.deleteById(id);
+            return true;
+        }else{
+            return false;
         }
     }
 }

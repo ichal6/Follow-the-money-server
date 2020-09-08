@@ -7,16 +7,14 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "\"user\"")
+@Table(name = "user_data")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +23,7 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
+    private int enabled;
     @CreationTimestamp
     private Date date;
     @OneToMany(targetEntity = Account.class, cascade = CascadeType.ALL)
@@ -36,6 +35,12 @@ public class User {
     @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<Payee> payees;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_authority",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "authority_id") })
+    private Set<Authorities> authorities = new HashSet<>();
 
     public User(String name, Date date) {
         this.name = name;
