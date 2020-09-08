@@ -18,11 +18,29 @@ public class UserController {
         this.userService = userService;
     }
 
+
+    // GET - get user by email
+    @GetMapping("/user/{email}")
+    public ResponseEntity<Object> getUser(@PathVariable("email") String email) {
+        Optional<UserDTO> optionalUserDTO = userService.getUser(email);
+        if (optionalUserDTO.isPresent()) {
+            return new ResponseEntity<>(optionalUserDTO.get(), HttpStatus.OK);
+        } else {
+            return ResponseEntity.badRequest().body("The user with this id does not exists in the database!");
+        }
+    }
+
+
+
+
+
+    // NOT CORRECT - TO UPDATE:
+
     // POST - create new user
     @PostMapping("/user")
-    public ResponseEntity<String> createUser(@RequestBody UserDTO newUser){
+    public ResponseEntity<String> createUser(@RequestBody UserDTO newUser) {
         if (userService.isValidWithoutId(newUser)) {
-            if(userService.createUser(newUser)){
+            if (userService.createUser(newUser)) {
                 return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully!");
             }
         }
@@ -30,47 +48,34 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public String greetings(){
+    public String greetings() {
         return "Wejście Smoka";
     }
 
     // GET - get all users
     @GetMapping("/user")
-    public ResponseEntity<List<UserDTO>> getUsers(){
+    public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userDTOList = userService.getAllUsers();
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
-    // GET - get user by id
-    @GetMapping("/user/{id}")
-    public ResponseEntity<Object> getUser(@PathVariable("id") Long id){
-        Optional<User> userOptional = userService.getUser(id);
-        if(userOptional.isPresent()){
-            User user = userOptional.get();
-            UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getDate());
-            return new ResponseEntity<>(userDTO, HttpStatus.OK);
-        } else{
-            return ResponseEntity.badRequest().body("The user with this id does not exists in the database!");
-        }
-    }
-
     // DELETE - delete by id
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id){
-        if(userService.deleteUser(id)){
+    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+        if (userService.deleteUser(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully!");
-        }else {
+        } else {
             return ResponseEntity.unprocessableEntity().body("Could not delete user!");
         }
     }
 
     // PUT - update
     @PutMapping("/user")
-    public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser){
-        if (userService.isValidWithId(updateUser)) {
-            if(userService.updateUser(updateUser)){
+    public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
+        if (userService.isValidWithoutId(updateUser)) {
+            if (userService.updateUser(updateUser)) {
                 return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
-            }else{
+            } else {
                 ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
             }
         }
