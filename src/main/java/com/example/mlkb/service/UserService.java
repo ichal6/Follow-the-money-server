@@ -25,11 +25,20 @@ public class UserService {
                 && userDTO.getName() != null;
     }
 
-    public boolean isValidWithId(UserDTO userDTO) {
-        return userDTO != null
-                && userDTO.getId() != null
-                && userDTO.getName() != null;
+    public Optional<UserDTO> getUser(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        Optional<UserDTO> optionalUserDTO = Optional.empty();
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            UserDTO userDTO = new UserDTO(user.getName(), user.getEmail(), user.getDate());
+            optionalUserDTO = Optional.of(userDTO);
+        }
+        return optionalUserDTO;
     }
+
+
+
+    // NOT CORRECT - TO UPDATE:
 
     public boolean createUser(UserDTO userDTO) {
         User user = new User(userDTO.getName(), userDTO.getDate());
@@ -39,7 +48,7 @@ public class UserService {
 
     @Transactional
     public boolean updateUser(UserDTO updateUser) {
-        Optional<User> userOptional = userRepository.findById(updateUser.getId());
+        Optional<User> userOptional = userRepository.findByEmail(updateUser.getEmail());
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setName(updateUser.getName());
@@ -53,20 +62,16 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> userList = userRepository.findAll();
         return userList.stream()
-                .map(x -> new UserDTO(x.getId() , x.getName(), x.getDate()))
+                .map(x -> new UserDTO(x.getName(), x.getEmail(), x.getDate()))
                 .collect(Collectors.toList());
-    }
-
-    public Optional<User> getUser(Long id) {
-        return userRepository.findById(id);
     }
 
     public boolean deleteUser(Long id) {
         System.out.println(userRepository.findById(id));
-        if(userRepository.findById(id).isPresent()){
+        if (userRepository.findById(id).isPresent()) {
             userRepository.deleteById(id);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
