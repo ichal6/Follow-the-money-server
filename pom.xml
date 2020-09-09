@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.mlkb</groupId>
-    <artifactId>follow-the-money</artifactId>
+    <artifactId>follow-the-money-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>follow-the-money</name>
+    <name>follow-the-money-server</name>
     <packaging>war</packaging>
     <description>Application for control budget</description>
 
