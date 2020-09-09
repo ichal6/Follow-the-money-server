@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class LogoutController {
+public class JwtController {
     @GetMapping("/logoutUser")
     public void logout(HttpServletResponse response, HttpServletRequest request) {
         Cookie cookie = new Cookie("token", null);
@@ -18,5 +18,10 @@ public class LogoutController {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
         SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
+    @GetMapping("/isLogin")
+    public void isLogin(){
+
     }
 }
