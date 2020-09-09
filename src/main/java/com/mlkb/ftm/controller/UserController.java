@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
 
@@ -19,7 +20,7 @@ public class UserController {
 
 
     // GET - get user by email
-    @GetMapping("/user/{email}")
+    @GetMapping("/{email}")
     public ResponseEntity<Object> getUser(@PathVariable("email") String email) {
         Optional<UserDTO> optionalUserDTO = userService.getUser(email);
         if (optionalUserDTO.isPresent()) {
@@ -36,7 +37,7 @@ public class UserController {
     // NOT CORRECT - TO UPDATE:
 
     // POST - create new user
-    @PostMapping("/user")
+    @PostMapping()
     public ResponseEntity<String> createUser(@RequestBody UserDTO newUser) {
         if (userService.isValidWithoutId(newUser)) {
             if (userService.createUser(newUser)) {
@@ -46,20 +47,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
 
-    @GetMapping("/")
-    public String greetings() {
-        return "Wejście Smoka";
-    }
-
     // GET - get all users
-    @GetMapping("/user")
+    @GetMapping()
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userDTOList = userService.getAllUsers();
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
     // DELETE - delete by id
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
         if (userService.deleteUser(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully!");
@@ -69,7 +65,7 @@ public class UserController {
     }
 
     // PUT - update
-    @PutMapping("/user")
+    @PutMapping()
     public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
         if (userService.isValidWithoutId(updateUser)) {
             if (userService.updateUser(updateUser)) {
