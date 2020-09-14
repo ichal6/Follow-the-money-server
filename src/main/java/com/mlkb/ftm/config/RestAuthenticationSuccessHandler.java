@@ -43,11 +43,19 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                 .sign(Algorithm.HMAC256(secret)); // 5
 
         setHeader(request, response, token);
-        addCookieWithToken(request, response, token);
+        addCookieWithToken(response, token);
+        addCookieWithEmail(principal.getUsername(), response);
         log.info("Token has created successfully");
     }
 
-    private void addCookieWithToken(HttpServletRequest request, HttpServletResponse response, String token){
+    private void addCookieWithEmail(String email, HttpServletResponse response){
+        Cookie cookieWithEmail = new Cookie("e-mail", email);
+        //TODO: When in production must do cookie.setSecure(true);
+        cookieWithEmail.setMaxAge(expirationTime/1000);
+        response.addCookie(cookieWithEmail);
+    }
+
+    private void addCookieWithToken(HttpServletResponse response, String token){
         Cookie cookie = new Cookie("token", token);
         cookie.setHttpOnly(true);
         //TODO: When in production must do cookie.setSecure(true);
