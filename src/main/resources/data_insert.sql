@@ -18,3 +18,12 @@ VALUES (1, 2);
 
 INSERT INTO "user_authority"("authority_id", "user_id")
 VALUES (1, 3);
+
+INSERT INTO "account" (id, account_type, currency, current_balance, name, starting_balance, user_id)
+VALUES (default, 'BANK', 'USD', 2000.0, 'Millenium', 0.0, 1);
+
+INSERT INTO "account" (id, account_type, currency, current_balance, name, starting_balance, user_id)
+VALUES (default, 'CASH', 'USD', -1000.0, 'WALLET MY', 200.0, 1);
+
+INSERT INTO "account" (id, account_type, currency, current_balance, name, starting_balance, user_id)
+VALUES (default, 'BANK', 'USD', 4000.0, 'PEKAO SA', 300.0, 1);
