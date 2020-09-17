@@ -38,7 +38,16 @@ INSERT INTO "payee" (id, general_type, name, user_id)
 VALUES (default, 'INCOME', 'Job', 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', 2500.00, 1, 1, 1);
+VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 1, 1, 1);
+
+INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
+VALUES (default, TO_DATE('2020-09-10','YYYY-MM-DD'), 'buy milk', 'EXPENSE', -25.00, 1, 1, 1);
+
+INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
+VALUES (default, TO_DATE('2020-08-10','YYYY-MM-DD'), 'buy bicycle', 'EXPENSE', -1200.00, 1, 1, 1);
+
+INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
+VALUES (default, TO_DATE('2020-09-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 1, 1, 1);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
 VALUES (default, TO_DATE('2019-09-02','YYYY-MM-DD'), 'from friend', 280.0, 2, 1);

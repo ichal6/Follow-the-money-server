@@ -11,4 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DashboardDTO {
     private Double totalBalance;
+    private Double difference;
 }
