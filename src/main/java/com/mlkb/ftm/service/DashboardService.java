@@ -2,7 +2,6 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
-import com.mlkb.ftm.entity.Transfer;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.modelDTO.DashboardDTO;
 import com.mlkb.ftm.repository.TransactionRepository;
@@ -11,10 +10,8 @@ import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class DashboardService {
@@ -48,21 +45,12 @@ public class DashboardService {
 
         Set<Account> accounts = user.getAccounts();
 
-        double sumOfTransaction = accounts.stream().flatMap(account -> {
+        return accounts.stream().flatMap(account -> {
             return account.getTransactions().stream();
         }).filter(transaction -> {
             return transaction.getDate().
                     getTime() >= thirtyDaysAgo.getTime();
         }).mapToDouble(Transaction::getValue).reduce(0, Double::sum);
-
-        sumOfTransaction += accounts.stream().flatMap(account -> {
-            return account.getTransfersFrom().stream();
-        }).filter(transaction -> {
-            return transaction.getDate().
-                    getTime() >= thirtyDaysAgo.getTime();
-        }).mapToDouble(Transfer::getValue).reduce(0, Double::sum);
-
-        return sumOfTransaction;
     }
 
     private Double getTotalBalance(User user){
