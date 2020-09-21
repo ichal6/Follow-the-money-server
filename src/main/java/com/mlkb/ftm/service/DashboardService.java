@@ -54,9 +54,8 @@ public class DashboardService {
     }
 
     private Double getTotalBalance(User user){
-        Double totalBalance = user.getAccounts().stream()
+        return user.getAccounts().stream()
                 .mapToDouble(Account::getCurrentBalance)
                 .reduce(0, Double::sum);
-        return totalBalance;
     }
 }
