@@ -31,11 +31,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> createUser(@RequestBody NewUserDTO newUser) {
+    public ResponseEntity<Object> createUser(@RequestBody NewUserDTO newUser) {
         if (userService.isValidNewUser(newUser)) {
-            if (userService.createUser(newUser)) {
-                return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully!");
-            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(newUser));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }

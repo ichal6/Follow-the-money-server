@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,16 +58,16 @@ public class UserService {
         return optionalUserDTO;
     }
 
-    public boolean createUser(NewUserDTO userDTO) {
+    public UserDTO createUser(NewUserDTO userDTO) {
         User user = new User();
         user.setName(userDTO.getName());
-        user.setDate(userDTO.getDate());
+//        user.setDate(new Date(System.currentTimeMillis()));
         user.setEmail(userDTO.getEmail());
         user.setAuthorities(Collections.singleton(new Authorities(AuthorityType.ROLE_USER)));
         user.setEnabled(1);
         user.setPassword(userDTO.getPassword());
         userRepository.save(user);
-        return true;
+        return new UserDTO(user.getName(), user.getEmail(), user.getDate());
     }
 
 

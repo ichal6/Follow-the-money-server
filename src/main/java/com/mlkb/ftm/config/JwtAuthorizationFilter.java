@@ -2,11 +2,13 @@ package com.mlkb.ftm.config;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.mlkb.ftm.controller.UserController;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -21,13 +23,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private static final String TOKEN_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
     private final UserDetailsService userDetailsService;
+    private final JwtController jwtController;
     private final String secret;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserDetailsService userDetailsService,
-                                  String secret) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager,
+                                  UserDetailsService userDetailsService,
+                                  String secret,
+                                  JwtController jwtController) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
         this.secret = secret;
+        this.jwtController = jwtController;
     }
 
     @Override
@@ -57,7 +63,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                     .verify(token)
                     .getSubject();
             if (userName != null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+                UserDetails userDetails = null;
+                try{
+                    userDetails = userDetailsService.loadUserByUsername(userName);
+                } catch (UsernameNotFoundException ex){
+                    jwtController.logout(response);
+                    filterChain.doFilter(request, response);
+                    return null;
+                }
+
                 return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
             }
         }
