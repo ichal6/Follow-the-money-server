@@ -62,6 +62,9 @@ INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, 
 VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 2, 1, 4);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
+VALUES (default, TO_DATE('2020-09-21','YYYY-MM-DD'), 'buy another car', 'EXPENSE', -2500.00, 2, 1, 4);
+
+INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
 VALUES (default, TO_DATE('2020-09-10','YYYY-MM-DD'), 'buy milk', 'EXPENSE', -25.00, 2, 3, 2);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
