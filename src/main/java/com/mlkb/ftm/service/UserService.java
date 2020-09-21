@@ -61,7 +61,6 @@ public class UserService {
     public UserDTO createUser(NewUserDTO userDTO) {
         User user = new User();
         user.setName(userDTO.getName());
-//        user.setDate(new Date(System.currentTimeMillis()));
         user.setEmail(userDTO.getEmail());
         user.setAuthorities(Collections.singleton(new Authorities(AuthorityType.ROLE_USER)));
         user.setEnabled(1);

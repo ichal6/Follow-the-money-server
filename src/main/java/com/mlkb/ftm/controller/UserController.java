@@ -26,14 +26,19 @@ public class UserController {
         if (optionalUserDTO.isPresent()) {
             return new ResponseEntity<>(optionalUserDTO.get(), HttpStatus.OK);
         } else {
-            return ResponseEntity.badRequest().body("The user with this id does not exists in the database!");
+            return ResponseEntity.badRequest().body("The user with this email does not exists in the database!");
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<Object> createUser(@RequestBody NewUserDTO newUser) {
         if (userService.isValidNewUser(newUser)) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(newUser));
+            Optional<UserDTO> optionalUserDTO = userService.getUser(newUser.getEmail());
+            if (optionalUserDTO.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("This email exists in the database!");
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(newUser));
+            }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
