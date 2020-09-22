@@ -66,13 +66,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.authorizeRequests()
             .antMatchers("/").permitAll()
+                .antMatchers("/register").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilter(authenticationFilter())
-            .addFilter(new JwtAuthorizationFilter(authenticationManager(), super.userDetailsService(), secret))
+            .addFilter(new JwtAuthorizationFilter(authenticationManager(), super.userDetailsService(), secret, new JwtController()))
             .exceptionHandling()
             .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
     }
