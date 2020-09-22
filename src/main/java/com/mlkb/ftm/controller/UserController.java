@@ -1,5 +1,6 @@
 package com.mlkb.ftm.controller;
 
+import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
 
@@ -20,42 +20,42 @@ public class UserController {
 
 
     // GET - get user by email
-    @GetMapping("/{email}")
+    @GetMapping("/api/user/{email}")
     public ResponseEntity<Object> getUser(@PathVariable("email") String email) {
         Optional<UserDTO> optionalUserDTO = userService.getUser(email);
         if (optionalUserDTO.isPresent()) {
             return new ResponseEntity<>(optionalUserDTO.get(), HttpStatus.OK);
         } else {
-            return ResponseEntity.badRequest().body("The user with this id does not exists in the database!");
+            return ResponseEntity.badRequest().body("The user with this email does not exists in the database!");
         }
     }
 
-
-
-
-
-    // NOT CORRECT - TO UPDATE:
-
-    // POST - create new user
-    @PostMapping()
-    public ResponseEntity<String> createUser(@RequestBody UserDTO newUser) {
-        if (userService.isValidWithoutId(newUser)) {
-            if (userService.createUser(newUser)) {
-                return ResponseEntity.status(HttpStatus.CREATED).body("User added successfully!");
+    @PostMapping("/register")
+    public ResponseEntity<Object> createUser(@RequestBody NewUserDTO newUser) {
+        if (userService.isValidNewUser(newUser)) {
+            Optional<UserDTO> optionalUserDTO = userService.getUser(newUser.getEmail());
+            if (optionalUserDTO.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("This email exists in the database!");
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(newUser));
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
     }
 
+
+
+    // NOT CORRECT - TO UPDATE:
+
     // GET - get all users
-    @GetMapping()
+    @GetMapping("/api/user")
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> userDTOList = userService.getAllUsers();
         return new ResponseEntity<>(userDTOList, HttpStatus.OK);
     }
 
     // DELETE - delete by id
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/api/user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
         if (userService.deleteUser(id)) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully!");
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     // PUT - update
-    @PutMapping()
+    @PutMapping("/api/user")
     public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
         if (userService.isValidWithoutId(updateUser)) {
             if (userService.updateUser(updateUser)) {

@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DashboardDTO {
-    private Double totalBalance;
-    private Double difference;
+public class NewUserDTO extends UserDTO {
+    private String password;
 }
