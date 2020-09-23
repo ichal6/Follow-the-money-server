@@ -1,7 +1,6 @@
 package com.mlkb.ftm.controller;
 
 import com.mlkb.ftm.modelDTO.AccountDTO;
-import com.mlkb.ftm.modelDTO.DashboardDTO;
 import com.mlkb.ftm.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/account")

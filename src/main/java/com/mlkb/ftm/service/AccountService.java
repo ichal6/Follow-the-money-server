@@ -1,9 +1,7 @@
 package com.mlkb.ftm.service;
 
-import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.modelDTO.AccountDTO;
-import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.repository.AccountRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;

@@ -35,13 +35,13 @@ public class UserService {
                 && checkPassword(userDTO.getPassword());
     }
 
-    private boolean checkPassword(String password){
+    private boolean checkPassword(String password) {
         //TODO It should be more complicated in production
         return password != null
                 && !password.isBlank();
     }
 
-    private boolean checkEmail(String email){
+    private boolean checkEmail(String email) {
         //TODO It should be more complicated in production
         return email != null
                 && !email.isBlank();
@@ -68,8 +68,6 @@ public class UserService {
         userRepository.save(user);
         return new UserDTO(user.getName(), user.getEmail(), user.getDate());
     }
-
-
 
 
     // NOT CORRECT - TO UPDATE:
