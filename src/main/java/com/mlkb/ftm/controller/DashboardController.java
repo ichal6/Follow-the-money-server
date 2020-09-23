@@ -14,7 +14,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/dashboard")
 public class DashboardController {
-    private DashboardService dashboardService;
+    private final DashboardService dashboardService;
 
     public DashboardController(DashboardService dashboardService){
         this.dashboardService = dashboardService;
