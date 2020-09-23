@@ -5,9 +5,6 @@ import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.DashboardDTO;
-import com.mlkb.ftm.repository.AccountsRepository;
-import com.mlkb.ftm.repository.TransactionRepository;
-import com.mlkb.ftm.repository.TransferRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
