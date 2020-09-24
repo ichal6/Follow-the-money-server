@@ -17,7 +17,7 @@ public class ActivityDTO {
     private String title;
     private String payeeFrom;
     private String payeeTo;
-    @JsonFormat(pattern="dd/MM/yyyy")
+    @JsonFormat(pattern="dd/MM/yyyy", timezone="Europe/Warsaw")
     private Date date;
     private Double cost;
 }
