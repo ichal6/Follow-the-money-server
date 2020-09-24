@@ -15,4 +15,5 @@ public class DashboardDTO {
     private Double totalBalance;
     private Double difference;
     private List<AccountDTO> popularAccounts;
+    private List<ActivityDTO> recentActivity;
 }

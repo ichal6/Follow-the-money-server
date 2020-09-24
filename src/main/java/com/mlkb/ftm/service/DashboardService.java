@@ -2,8 +2,10 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
+import com.mlkb.ftm.entity.Transfer;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.modelDTO.AccountDTO;
+import com.mlkb.ftm.modelDTO.ActivityDTO;
 import com.mlkb.ftm.modelDTO.DashboardDTO;
 import com.mlkb.ftm.repository.AccountsRepository;
 import com.mlkb.ftm.repository.TransactionRepository;
@@ -32,8 +34,9 @@ public class DashboardService {
             Double totalBalance = getTotalBalance();
             Double difference = getDifferenceFromLast30Days();
             List<AccountDTO> popularAccounts = getPopularAccounts();
+            List<ActivityDTO> recentActivity = getLastFourActivity();
 
-            DashboardDTO dashboardDTO = new DashboardDTO(totalBalance, difference, popularAccounts);
+            DashboardDTO dashboardDTO = new DashboardDTO(totalBalance, difference, popularAccounts, recentActivity);
             optionalDashboardDTO = Optional.of(dashboardDTO);
         }
         return optionalDashboardDTO;
@@ -92,5 +95,51 @@ public class DashboardService {
         newAccountDTO.setCurrentBalance(account.getCurrentBalance());
 
         return newAccountDTO;
+    }
+
+    private List<ActivityDTO> getLastFourActivity(){
+        Set<Account> accounts = user.getAccounts();
+        final int LIMIT = 4;
+
+        List<ActivityDTO> activityDTOList = accounts.stream()
+                .map(Account::getTransactions)
+                .flatMap(transactions -> transactions.stream()
+                        .map(transaction -> createActivityDTOFromTransaction(transaction, accounts)))
+                .collect(Collectors.toList());
+
+        activityDTOList.addAll(accounts.stream()
+                .flatMap(account -> account.getTransfersFrom().stream())
+                .map(this::createActivityDTOFromTransfer)
+                .collect(Collectors.toList()));
+
+        activityDTOList.sort(Comparator.comparing(ActivityDTO::getDate).reversed());
+        return activityDTOList.subList(0, LIMIT);
+    }
+
+    private ActivityDTO createActivityDTOFromTransaction(Transaction transaction, Set<Account> accounts){
+        ActivityDTO activityDTO = new ActivityDTO();
+        activityDTO.setId(transaction.getId());
+        activityDTO.setTitle(transaction.getTitle());
+        activityDTO.setCost(transaction.getValue());
+        activityDTO.setDate(transaction.getDate());
+        activityDTO.setPayeeTo(transaction.getPayee().getName());
+        String payeeFrom = accounts.stream()
+                .filter(account -> account.getTransactions().contains(transaction))
+                .findFirst().get().getName();
+        activityDTO.setPayeeFrom(payeeFrom);
+
+        return activityDTO;
+    }
+
+    private ActivityDTO createActivityDTOFromTransfer(Transfer transfer){
+        ActivityDTO activityDTO = new ActivityDTO();
+        activityDTO.setId(transfer.getId());
+        activityDTO.setTitle(transfer.getTitle());
+        activityDTO.setCost(transfer.getValue());
+        activityDTO.setDate(transfer.getDate());
+        activityDTO.setPayeeTo(transfer.getAccountTo().getName());
+        activityDTO.setPayeeFrom(transfer.getAccountFrom().getName());
+
+        return activityDTO;
     }
 }
