@@ -1,20 +1,18 @@
 package com.mlkb.ftm.service;
 
-import com.mlkb.ftm.entity.Account;
-import com.mlkb.ftm.entity.Transaction;
-import com.mlkb.ftm.entity.Transfer;
-import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.ActivityDTO;
 import com.mlkb.ftm.modelDTO.DashboardDTO;
-import com.mlkb.ftm.repository.AccountsRepository;
-import com.mlkb.ftm.repository.TransactionRepository;
-import com.mlkb.ftm.repository.TransferRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 public class DashboardService {
@@ -35,11 +33,51 @@ public class DashboardService {
             Double difference = getDifferenceFromLast30Days();
             List<AccountDTO> popularAccounts = getPopularAccounts();
             List<ActivityDTO> recentActivity = getLastFourActivity();
+            TreeMap<Month, Double> incomeFunds = getIncomeFromLast12Months();
+            TreeMap<Month, Double> expenseFunds = getExpenseFromLast12Months();
 
-            DashboardDTO dashboardDTO = new DashboardDTO(totalBalance, difference, popularAccounts, recentActivity);
+            DashboardDTO dashboardDTO = new DashboardDTO(
+                    totalBalance, difference, popularAccounts, recentActivity, incomeFunds, expenseFunds
+            );
             optionalDashboardDTO = Optional.of(dashboardDTO);
         }
         return optionalDashboardDTO;
+    }
+
+    private TreeMap<Month, Double> getExpenseFromLast12Months() {
+        Set<Account> accounts = user.getAccounts();
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -1);
+        Date previousYear = cal.getTime();
+
+        return accounts.stream()
+                .flatMap(
+                        account -> account.getTransactions().stream())
+                .filter(transaction -> transaction.getType() == GeneralType.EXPENSE)
+                .filter(transaction -> transaction.getDate().getTime() > previousYear.getTime())
+                .collect(groupingBy(transaction -> Month.from(transaction.getDate().toInstant()
+                                .atZone(ZoneId.systemDefault()).toLocalDate()),
+                        TreeMap::new,
+                        Collectors.summingDouble(Transaction::getAbsoluteValue)));
+    }
+
+    private TreeMap<Month, Double> getIncomeFromLast12Months() {
+        Set<Account> accounts = user.getAccounts();
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -1);
+        Date previousYear = cal.getTime();
+
+        return accounts.stream()
+                .flatMap(
+                        account -> account.getTransactions().stream())
+                .filter(transaction -> transaction.getType() == GeneralType.INCOME)
+                .filter(transaction -> transaction.getDate().getTime() > previousYear.getTime())
+                .collect(groupingBy(transaction -> Month.from(transaction.getDate().toInstant()
+                                .atZone(ZoneId.systemDefault()).toLocalDate()),
+                        TreeMap::new,
+                        Collectors.summingDouble(Transaction::getValue)));
     }
 
     private Double getDifferenceFromLast30Days() {
