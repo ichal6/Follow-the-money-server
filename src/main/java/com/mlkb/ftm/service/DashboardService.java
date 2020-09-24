@@ -113,7 +113,9 @@ public class DashboardService {
                 .collect(Collectors.toList()));
 
         activityDTOList.sort(Comparator.comparing(ActivityDTO::getDate).reversed());
-        return activityDTOList.subList(0, LIMIT);
+        return activityDTOList.stream()
+                .limit(LIMIT)
+                .collect(Collectors.toList());
     }
 
     private ActivityDTO createActivityDTOFromTransaction(Transaction transaction, Set<Account> accounts){
