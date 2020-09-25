@@ -12,7 +12,7 @@
     <artifactId>follow-the-money-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>follow-the-money-server</name>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <description>Application for control budget</description>
 
     <properties>

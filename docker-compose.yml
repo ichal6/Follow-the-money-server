@@ -1,0 +1,23 @@
+version: '3.1'
+services:
+  spring-app:
+    container_name: ftm-server
+    image: ftm-server
+    build: ./
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ftm
+    depends_on:
+      - db
+    links:
+      - "db:ftm_db"
+  db:
+    container_name: ftm_db
+    image: postgres
+    ports:
+      - "8888:5432"
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=ftm
