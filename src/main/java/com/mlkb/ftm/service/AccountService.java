@@ -11,12 +11,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccountService {
-    private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
-        this.accountRepository = accountRepository;
+    public AccountService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -30,7 +27,7 @@ public class AccountService {
             Collections.reverse(accountDTOS);
             return accountDTOS;
         } else {
-            throw new NoSuchElementException("User with such email does not exist");
+            throw new IllegalArgumentException("User with such email does not exist");
         }
     }
 }

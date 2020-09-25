@@ -26,7 +26,7 @@ public class AccountsController {
         try {
             List<AccountDTO> accountDTOList = accountService.getAllAccountsFromUser(email);
             return new ResponseEntity<>(accountDTOList, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
