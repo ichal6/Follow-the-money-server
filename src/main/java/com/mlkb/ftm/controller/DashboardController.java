@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.rmi.NoSuchObjectException;
 import java.util.Optional;
 
 @RestController
@@ -22,11 +23,11 @@ public class DashboardController {
 
     @GetMapping("/{email}")
     public ResponseEntity<Object> getDashboard(@PathVariable("email") String email){
-        Optional<DashboardDTO> optionalDashboardDTO = dashboardService.getDashboard(email);
-        if (optionalDashboardDTO.isPresent()) {
-            return new ResponseEntity<>(optionalDashboardDTO.get(), HttpStatus.OK);
-        } else {
-            return ResponseEntity.badRequest().body("The user with this id does not exists in the database!");
+        try {
+            DashboardDTO dashboardDTO = dashboardService.getDashboard(email);
+            return new ResponseEntity<>(dashboardDTO, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

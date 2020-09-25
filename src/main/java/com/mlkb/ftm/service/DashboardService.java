@@ -23,25 +23,21 @@ public class DashboardService {
         this.userRepository = userRepository;
     }
 
-    public Optional<DashboardDTO> getDashboard(String email) {
+    public DashboardDTO getDashboard(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        Optional<DashboardDTO> optionalDashboardDTO = Optional.empty();
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
-
-            Double totalBalance = getTotalBalance();
-            Double difference = getDifferenceFromLast30Days();
-            List<AccountDTO> popularAccounts = getPopularAccounts();
-            List<ActivityDTO> recentActivity = getLastFourActivity();
-            TreeMap<Month, Double> incomeFunds = getIncomeFromLast12Months();
-            TreeMap<Month, Double> expenseFunds = getExpenseFromLast12Months();
-
-            DashboardDTO dashboardDTO = new DashboardDTO(
-                    totalBalance, difference, popularAccounts, recentActivity, incomeFunds, expenseFunds
-            );
-            optionalDashboardDTO = Optional.of(dashboardDTO);
+            return new DashboardDTO.Builder()
+                    .withTotalBalance(getTotalBalance())
+                    .withDifference(getDifferenceFromLast30Days())
+                    .withPopularAccounts(getPopularAccounts())
+                    .withRecentActivities(getLastFourActivity())
+                    .withIncomeFunds(getIncomeFromLast12Months())
+                    .withExpenseFunds(getExpenseFromLast12Months())
+                    .build();
+        } else {
+            throw new IllegalArgumentException("Couldn't find a dashboard for user with give email");
         }
-        return optionalDashboardDTO;
     }
 
     private TreeMap<Month, Double> getExpenseFromLast12Months() {
