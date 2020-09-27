@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.time.Month;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -18,16 +18,16 @@ public class DashboardDTO {
     private Double difference;
     private List<AccountDTO> popularAccounts;
     private List<ActivityDTO> recentActivities;
-    private TreeMap<Month, Double> incomeFunds;
-    private TreeMap<Month, Double> expenseFunds;
+    private Map<Month, Double> incomeFunds;
+    private Map<Month, Double> expenseFunds;
 
     public static final class Builder {
         private Double totalBalance;
         private Double difference;
         private List<AccountDTO> popularAccounts;
         private List<ActivityDTO> recentActivities;
-        private TreeMap<Month, Double> incomeFunds;
-        private TreeMap<Month, Double> expenseFunds;
+        private Map<Month, Double> incomeFunds;
+        private Map<Month, Double> expenseFunds;
 
         public Builder withTotalBalance(Double totalBalance) {
             this.totalBalance = totalBalance;
@@ -49,12 +49,12 @@ public class DashboardDTO {
             return this;
         }
 
-        public Builder withIncomeFunds(TreeMap<Month, Double> incomeFunds) {
+        public Builder withIncomeFunds(Map<Month, Double> incomeFunds) {
             this.incomeFunds = incomeFunds;
             return this;
         }
 
-        public Builder withExpenseFunds(TreeMap<Month, Double> expenseFunds) {
+        public Builder withExpenseFunds(Map<Month, Double> expenseFunds) {
             this.expenseFunds = expenseFunds;
             return this;
         }
