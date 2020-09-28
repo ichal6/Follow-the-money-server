@@ -8,6 +8,7 @@ import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,11 +30,11 @@ public class AccountController {
             List<AccountDTO> accountDTOList = accountService.getAllAccountsFromUser(email);
             return new ResponseEntity<>(accountDTOList, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @PostMapping("/{email}")
+    @PostMapping()
     public ResponseEntity<Object> createAccount(@RequestBody NewAccountDTO newAccount) {
         try {
             if (accountService.isValidNewAccount(newAccount)) {
@@ -41,20 +42,31 @@ public class AccountController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Couldn't add new account. Your JSON is invalid");
             }
-        } catch (InputIncorrectException e){
+        } catch (InputIncorrectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-//    @PutMapping("/api/user")
-//    public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
-//        if (userService.isValidWithoutId(updateUser)) {
-//            if (userService.updateUser(updateUser)) {
-//                return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
-//            } else {
-//                ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
-//            }
-//        }
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
-//    }
+    @PutMapping()
+    public ResponseEntity<Object> updateAccount(@RequestBody NewAccountDTO updatedAccount) {
+        try {
+            if (accountService.isValidNewAccount(updatedAccount)) {
+                return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(updatedAccount));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Couldn't add new account. Your JSON is invalid");
+            }
+        } catch (InputIncorrectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleException(HttpMessageNotReadableException httpMessageNotReadableException) {
+        String message = "Couldn't process your request. Your JSON is the wrong format";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
 }

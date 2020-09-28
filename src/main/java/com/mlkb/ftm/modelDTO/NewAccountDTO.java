@@ -11,4 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NewAccountDTO extends AccountDTO {
     private String userEmail;
+    private Double startingBalance;
 }

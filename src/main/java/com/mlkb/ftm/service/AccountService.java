@@ -5,7 +5,6 @@ import com.mlkb.ftm.entity.Currency;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
-import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.repository.AccountRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
@@ -26,11 +25,12 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public boolean isValidNewAccount(AccountDTO accountDTO) throws InputIncorrectException {
-        return accountDTO != null
-                && inputValidator.checkName(accountDTO.getName())
-                && inputValidator.checkIfAccountTypeInEnum(accountDTO.getAccountType())
-                && inputValidator.checkBalance(accountDTO.getCurrentBalance());
+    public boolean isValidNewAccount(NewAccountDTO newAccountDTO) throws InputIncorrectException {
+        return newAccountDTO != null
+                && inputValidator.checkName(newAccountDTO.getName())
+                && inputValidator.checkIfAccountTypeInEnum(newAccountDTO.getAccountType())
+                && inputValidator.checkBalance(newAccountDTO.getCurrentBalance())
+                && inputValidator.checkBalance(newAccountDTO.getStartingBalance());
     }
 
     public List<AccountDTO> getAllAccountsFromUser(String email) {
@@ -47,27 +47,45 @@ public class AccountService {
         }
     }
 
-    public AccountDTO createAccount(NewAccountDTO newAccountDTO) {
+    public NewAccountDTO createAccount(NewAccountDTO newAccountDTO) {
         Optional<User> user = userRepository.findByEmail(newAccountDTO.getUserEmail());
         if (user.isPresent()) {
             Account account = getAccountFromAccountDTO(newAccountDTO);
             Account savedAccount = accountRepository.save(account);
-
             addAccountToUserInDB(savedAccount, user.get());
 
             newAccountDTO.setId(savedAccount.getId());
             return newAccountDTO;
         } else {
-            throw new IllegalArgumentException("Couldn't add account tu user. User with such email does not exist");
+            throw new IllegalArgumentException("Couldn't add account tu user. User with this email does not exist");
         }
     }
 
-    private Account getAccountFromAccountDTO(AccountDTO accountDTO) {
+    public NewAccountDTO updateAccount(NewAccountDTO updatedAccountDTO) {
+        Optional<User> user = userRepository.findByEmail(updatedAccountDTO.getUserEmail());
+        if (user.isPresent()) {
+            Optional<Account> accountToUpdateOptional = accountRepository.findById(updatedAccountDTO.getId());
+            if (accountToUpdateOptional.isPresent()) {
+                Account accountToUpdate = getAccountFromAccountDTO(updatedAccountDTO);
+                accountToUpdate.setId(updatedAccountDTO.getId());
+
+                accountRepository.save(accountToUpdate);
+                return updatedAccountDTO;
+            } else {
+                throw new IllegalArgumentException("Couldn't update this account. Account with given id does not exist");
+            }
+        } else {
+            throw new IllegalArgumentException("Couldn't update account of user. User with this email does not exist");
+        }
+    }
+
+
+    private Account getAccountFromAccountDTO(NewAccountDTO newAccountDTO) {
         Account account = new Account();
-        account.setName(accountDTO.getName());
-        account.setStartingBalance(accountDTO.getCurrentBalance());
-        account.setCurrentBalance(accountDTO.getCurrentBalance());
-        account.setAccountType(Enum.valueOf(AccountType.class, accountDTO.getAccountType().toUpperCase()));
+        account.setName(newAccountDTO.getName());
+        account.setStartingBalance(newAccountDTO.getStartingBalance());
+        account.setCurrentBalance(newAccountDTO.getCurrentBalance());
+        account.setAccountType(Enum.valueOf(AccountType.class, newAccountDTO.getAccountType().toUpperCase()));
         account.setCurrency(Currency.USD);
 
         return account;
