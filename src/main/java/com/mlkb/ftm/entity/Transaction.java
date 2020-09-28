@@ -31,4 +31,8 @@ public class Transaction {
     private Payee payee;
     @OneToOne
     private Category category;
+
+    public Double getAbsoluteValue(){
+        return Math.abs(value);
+    }
 }
