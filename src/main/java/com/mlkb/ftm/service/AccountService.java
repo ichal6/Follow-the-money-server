@@ -46,17 +46,35 @@ public class AccountService {
         }
     }
 
-    public AccountDTO createAccount(AccountDTO accountDTO) {
+    public AccountDTO createAccount(AccountDTO accountDTO, String userEmail) {
+        Optional<User> user = userRepository.findByEmail(userEmail);
+        if (user.isPresent()) {
+            Account account = getAccountFromAccountDTO(accountDTO);
+            Account savedAccount = accountRepository.save(account);
+            addAccountToUserInDB(savedAccount, user.get());
+
+            accountDTO.setId(savedAccount.getId());
+            return accountDTO;
+        } else {
+            throw new IllegalArgumentException("Couldn't add account tu user. User with such email does not exist");
+        }
+    }
+
+    private Account getAccountFromAccountDTO(AccountDTO accountDTO) {
         Account account = new Account();
         account.setName(accountDTO.getName());
         account.setStartingBalance(accountDTO.getCurrentBalance());
         account.setCurrentBalance(accountDTO.getCurrentBalance());
-        account.setAccountType(Enum.valueOf(AccountType.class, accountDTO.getAccountType()));
+        account.setAccountType(Enum.valueOf(AccountType.class, accountDTO.getAccountType().toUpperCase()));
         account.setCurrency(Currency.USD);
 
-        Account savedAccount = accountRepository.save(account);
-        accountDTO.setId(savedAccount.getId());
+        return account;
+    }
 
-        return accountDTO;
+    private void addAccountToUserInDB(Account savedAccount, User modifiedUser) {
+        Set<Account> userAccounts = modifiedUser.getAccounts();
+        userAccounts.add(savedAccount);
+        modifiedUser.setAccounts(userAccounts);
+        userRepository.save(modifiedUser);
     }
 }

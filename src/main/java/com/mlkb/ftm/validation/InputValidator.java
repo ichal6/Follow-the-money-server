@@ -30,9 +30,9 @@ public class InputValidator {
 
     public boolean checkIfAccountTypeInEnum(String type) throws InputIncorrectException {
         List<AccountType> types = Arrays.asList(AccountType.values());
-        if (types.contains(AccountType.valueOf(type))) {
-            return true;
-        } else {
+        try {
+            return types.contains(AccountType.valueOf(type.toUpperCase()));
+        } catch (IllegalArgumentException e) {
             throw new InputIncorrectException(InputType.ACCOUNT_TYPE);
         }
     }

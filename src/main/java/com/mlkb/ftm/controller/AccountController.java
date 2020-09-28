@@ -32,11 +32,14 @@ public class AccountController {
         }
     }
 
-    @PostMapping()
-    public ResponseEntity<Object> createAccount(@RequestBody AccountDTO newAccount) {
+    @PostMapping("/{email}")
+    public ResponseEntity<Object> createAccount(@RequestBody AccountDTO newAccount, @PathVariable("email") String email) {
         try {
-            accountService.isValidNewAccount(newAccount);
-            return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
+            if (accountService.isValidNewAccount(newAccount)) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount, email));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Couldn't add new account. Your JSON is invalid");
+            }
         } catch (InputIncorrectException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
