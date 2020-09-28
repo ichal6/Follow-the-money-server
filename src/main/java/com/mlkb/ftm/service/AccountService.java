@@ -2,6 +2,7 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.modelDTO.AccountDTO;
+import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.repository.AccountRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,13 @@ public class AccountService {
 
     public AccountService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public boolean isValidAccount(AccountDTO accountDTO) {
+        return accountDTO != null
+                && accountDTO.getId() != null
+                && checkEmail(userDTO.getEmail())
+                && checkPassword(userDTO.getPassword());
     }
 
     public List<AccountDTO> getAllAccountsFromUser(String email) {
