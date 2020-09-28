@@ -2,6 +2,7 @@ package com.mlkb.ftm.controller;
 
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
+import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.service.AccountService;
@@ -33,10 +34,10 @@ public class AccountController {
     }
 
     @PostMapping("/{email}")
-    public ResponseEntity<Object> createAccount(@RequestBody AccountDTO newAccount, @PathVariable("email") String email) {
+    public ResponseEntity<Object> createAccount(@RequestBody NewAccountDTO newAccount) {
         try {
             if (accountService.isValidNewAccount(newAccount)) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount, email));
+                return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Couldn't add new account. Your JSON is invalid");
             }
@@ -44,4 +45,16 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+//    @PutMapping("/api/user")
+//    public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
+//        if (userService.isValidWithoutId(updateUser)) {
+//            if (userService.updateUser(updateUser)) {
+//                return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
+//            } else {
+//                ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
+//            }
+//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
+//    }
 }

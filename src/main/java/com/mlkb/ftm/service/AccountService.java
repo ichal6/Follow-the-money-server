@@ -4,6 +4,7 @@ import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.entity.Currency;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
+import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.repository.AccountRepository;
 import com.mlkb.ftm.repository.UserRepository;
@@ -46,15 +47,16 @@ public class AccountService {
         }
     }
 
-    public AccountDTO createAccount(AccountDTO accountDTO, String userEmail) {
-        Optional<User> user = userRepository.findByEmail(userEmail);
+    public AccountDTO createAccount(NewAccountDTO newAccountDTO) {
+        Optional<User> user = userRepository.findByEmail(newAccountDTO.getUserEmail());
         if (user.isPresent()) {
-            Account account = getAccountFromAccountDTO(accountDTO);
+            Account account = getAccountFromAccountDTO(newAccountDTO);
             Account savedAccount = accountRepository.save(account);
+
             addAccountToUserInDB(savedAccount, user.get());
 
-            accountDTO.setId(savedAccount.getId());
-            return accountDTO;
+            newAccountDTO.setId(savedAccount.getId());
+            return newAccountDTO;
         } else {
             throw new IllegalArgumentException("Couldn't add account tu user. User with such email does not exist");
         }
