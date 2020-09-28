@@ -30,7 +30,7 @@ public class AccountController {
             List<AccountDTO> accountDTOList = accountService.getAllAccountsFromUser(email);
             return new ResponseEntity<>(accountDTOList, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
@@ -64,9 +64,10 @@ public class AccountController {
         }
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> handleException(HttpMessageNotReadableException httpMessageNotReadableException) {
-        String message = "Couldn't process your request. Your JSON is the wrong format";
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
-    }
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<String> handleException(HttpMessageNotReadableException httpMessageNotReadableException) {
+//        String message = "Couldn't process your request. Your JSON is the wrong format";
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+//    }
+
 }
