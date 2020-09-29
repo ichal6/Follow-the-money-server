@@ -1,24 +1,20 @@
-package com.mlkb.ftm.entity;
+package com.mlkb.ftm.modelDTO;
 
+import com.mlkb.ftm.entity.GeneralType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Subcategory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CategoryDTO {
     private Long id;
-    @Column(unique = true)
     private String name;
-    @Enumerated(EnumType.STRING)
-    @Column(length = 8)
     private GeneralType type;
+    private List<SubcategoryDTO> subcategories;
 }
