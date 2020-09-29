@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> handleException(HttpMessageNotReadableException httpMessageNotReadableException) {
+    public ResponseEntity<String> handleJSONParseException(HttpMessageNotReadableException httpMessageNotReadableException) {
         String message = "Couldn't process your request. Your JSON is the wrong format";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resourceNotFoundException.getMessage());
     }
 }

@@ -26,48 +26,27 @@ public class AccountController {
 
     @GetMapping("/{email}")
     public ResponseEntity<Object> getAllAccountsFromUser(@PathVariable("email") String email) {
-        try {
-            List<AccountDTO> accountDTOList = accountService.getAllAccountsFromUser(email);
-            return new ResponseEntity<>(accountDTOList, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        List<AccountDTO> accountDTOList = accountService.getAllAccountsFromUser(email);
+        return new ResponseEntity<>(accountDTOList, HttpStatus.OK);
     }
 
     @PostMapping()
     public ResponseEntity<Object> createAccount(@RequestBody NewAccountDTO newAccount) {
         try {
-            if (accountService.isValidNewAccount(newAccount)) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Couldn't add new account. Your JSON is invalid");
-            }
+            accountService.isValidNewAccount(newAccount);
+            return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
         } catch (InputIncorrectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @PutMapping()
     public ResponseEntity<Object> updateAccount(@RequestBody NewAccountDTO updatedAccount) {
         try {
-            if (accountService.isValidNewAccount(updatedAccount)) {
-                return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(updatedAccount));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Couldn't add new account. Your JSON is invalid");
-            }
+            accountService.isValidNewAccount(updatedAccount);
+            return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(updatedAccount));
         } catch (InputIncorrectException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-//    @ExceptionHandler(HttpMessageNotReadableException.class)
-//    public ResponseEntity<String> handleException(HttpMessageNotReadableException httpMessageNotReadableException) {
-//        String message = "Couldn't process your request. Your JSON is the wrong format";
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
-//    }
-
 }

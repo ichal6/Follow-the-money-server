@@ -3,6 +3,7 @@ package com.mlkb.ftm.service;
 import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.entity.Currency;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.repository.AccountRepository;
@@ -10,6 +11,7 @@ import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,7 @@ public class AccountService {
             Collections.reverse(accountDTOS);
             return accountDTOS;
         } else {
-            throw new IllegalArgumentException("User with such email does not exist");
+            throw new ResourceNotFoundException("User with such email does not exist");
         }
     }
 
@@ -57,7 +59,7 @@ public class AccountService {
             newAccountDTO.setId(savedAccount.getId());
             return newAccountDTO;
         } else {
-            throw new IllegalArgumentException("Couldn't add account tu user. User with this email does not exist");
+            throw new ResourceNotFoundException("Couldn't add account tu user. User with this email does not exist");
         }
     }
 
@@ -72,13 +74,12 @@ public class AccountService {
                 accountRepository.save(accountToUpdate);
                 return updatedAccountDTO;
             } else {
-                throw new IllegalArgumentException("Couldn't update this account. Account with given id does not exist");
+                throw new ResourceNotFoundException("Couldn't update this account. Account with given id does not exist");
             }
         } else {
-            throw new IllegalArgumentException("Couldn't update account of user. User with this email does not exist");
+            throw new ResourceNotFoundException("Couldn't update account of user. User with this email does not exist");
         }
     }
-
 
     private Account getAccountFromAccountDTO(NewAccountDTO newAccountDTO) {
         Account account = new Account();
