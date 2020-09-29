@@ -36,4 +36,15 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{email}/{idCat}/{idSub}")
+    public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long idCat,
+                                                 @PathVariable Long idSub){
+        try {
+            categoryService.deleteSubcategory(email, idCat, idSub);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

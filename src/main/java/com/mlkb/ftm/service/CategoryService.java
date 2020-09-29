@@ -67,4 +67,26 @@ public class CategoryService {
             throw new IllegalArgumentException("Couldn't find a categories for user with give email");
         }
     }
+
+    public void deleteSubcategory(String email, Long catId, Long subId) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Set<Category> userCategories = user.getCategories();
+            Set<Subcategory> newCategories = userCategories.stream()
+                    .filter(category -> category.getId().equals(catId))
+                    .findFirst().get()
+                    .getSubcategories().stream()
+                    .filter(subcategory -> !subcategory.getId().equals(subId))
+                    .collect(Collectors.toSet());
+
+            userCategories.stream()
+                    .filter(category -> category.getId().equals(catId))
+                    .findFirst().get().setSubcategories(newCategories);
+            user.setCategories(userCategories);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+        }
+    }
 }
