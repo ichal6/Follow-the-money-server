@@ -1,6 +1,7 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.Category;
+import com.mlkb.ftm.entity.GeneralType;
 import com.mlkb.ftm.entity.Subcategory;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.modelDTO.CategoryDTO;
@@ -21,6 +22,18 @@ public class CategoryService {
 
     public CategoryService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public List<CategoryDTO> getCategoriesForExpense(String email){
+        return getCategories(email).stream()
+                .filter(categoryDTO -> categoryDTO.getType().equals(GeneralType.EXPENSE))
+                .collect(Collectors.toList());
+    }
+
+    public List<CategoryDTO> getCategoriesForIncome(String email){
+        return getCategories(email).stream()
+                .filter(categoryDTO -> categoryDTO.getType().equals(GeneralType.INCOME))
+                .collect(Collectors.toList());
     }
 
     public List<CategoryDTO> getCategories(String email){

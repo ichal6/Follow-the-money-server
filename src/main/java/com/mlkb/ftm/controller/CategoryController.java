@@ -27,6 +27,26 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/expense/{email}")
+    public ResponseEntity<Object> getCategoriesForExpense(@PathVariable String email){
+        try {
+            List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForExpense(email);
+            return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/income/{email}")
+    public ResponseEntity<Object> getCategoriesForIncome(@PathVariable String email){
+        try {
+            List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForIncome(email);
+            return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/{email}/{id}")
     public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long id){
         try {
