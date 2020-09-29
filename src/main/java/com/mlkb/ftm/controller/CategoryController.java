@@ -1,6 +1,7 @@
 package com.mlkb.ftm.controller;
 
 import com.mlkb.ftm.modelDTO.CategoryDTO;
+import com.mlkb.ftm.modelDTO.SubcategoryDTO;
 import com.mlkb.ftm.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,6 +86,27 @@ public class CategoryController {
                                                  @RequestBody String newName){
         try {
             categoryService.updateSubcategory(email, idCat, idSub, newName);
+            return new ResponseEntity<>(null, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{email}")
+    public ResponseEntity<Object> AddCategory(@PathVariable String email, @RequestBody CategoryDTO newCategory){
+        try {
+            categoryService.addCategory(email, newCategory);
+            return new ResponseEntity<>(null, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{email}/{id}")
+    public ResponseEntity<Object> AddCategory(@PathVariable String email, @PathVariable Long id,
+                                              @RequestBody SubcategoryDTO newSubcategory){
+        try {
+            categoryService.addSubcategory(email, id, newSubcategory);
             return new ResponseEntity<>(null, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

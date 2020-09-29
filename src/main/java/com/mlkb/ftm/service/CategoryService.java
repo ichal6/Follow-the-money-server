@@ -10,10 +10,7 @@ import com.mlkb.ftm.modelDTO.SubcategoryDTO;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,6 +135,36 @@ public class CategoryService {
                     .filter(category -> category.getId().equals(catId))
                     .findFirst().get().getSubcategories().add(subcategoryToEdit);
             user.setCategories(userCategories);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+        }
+    }
+
+    public void addCategory(String email, CategoryDTO newCategory) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Set<Category> userCategories = user.getCategories();
+            userCategories.add(new Category(null, newCategory.getName(), newCategory.getType(), new HashSet<>()));
+            user.setCategories(userCategories);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+        }
+    }
+
+    public void addSubcategory(String email, Long id, SubcategoryDTO newSubcategory) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Set<Category> userCategories = user.getCategories();
+            Category categoryToEdit = userCategories.stream()
+                    .filter(category -> category.getId().equals(id))
+                    .findFirst().get();
+            categoryToEdit.getSubcategories()
+                    .add(new Subcategory(null, newSubcategory.getName(), newSubcategory.getType()));
+            userCategories.add(categoryToEdit);
             userRepository.save(user);
         } else {
             throw new IllegalArgumentException("Couldn't find a categories for user with give email");
