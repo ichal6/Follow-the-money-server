@@ -67,4 +67,15 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/{email}/{id}")
+    public ResponseEntity<Object> UpdateCategory(@PathVariable String email, @PathVariable Long id,
+                                                 @RequestBody String newName){
+        try {
+            categoryService.updateCategory(email, id, newName);
+            return new ResponseEntity<>(null, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

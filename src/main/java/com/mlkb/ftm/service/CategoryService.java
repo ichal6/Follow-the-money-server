@@ -102,4 +102,21 @@ public class CategoryService {
             throw new IllegalArgumentException("Couldn't find a categories for user with give email");
         }
     }
+
+    public void updateCategory(String email, Long id, String newName) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Set<Category> userCategories = user.getCategories();
+            Category categoryToEdit = userCategories.stream()
+                    .filter(category -> category.getId().equals(id))
+                    .findFirst().get();
+            categoryToEdit.setName(newName);
+            userCategories.add(categoryToEdit);
+            user.setCategories(userCategories);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+        }
+    }
 }
