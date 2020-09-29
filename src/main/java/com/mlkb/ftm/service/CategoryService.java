@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
     private final UserRepository userRepository;
-    private User user;
 
     public CategoryService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -27,7 +26,7 @@ public class CategoryService {
     public List<CategoryDTO> getCategories(String email){
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
-            user = optionalUser.get();
+            User user = optionalUser.get();
             List<CategoryDTO> categories;
 
             Set<Category> userCategories = user.getCategories();
@@ -52,5 +51,20 @@ public class CategoryService {
                 .map(subcategory -> new SubcategoryDTO(subcategory.getId(),
                         subcategory.getName(), subcategory.getType()))
                 .collect(Collectors.toList());
+    }
+
+    public void deleteCategory(String email, Long id) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Set<Category> userCategories = user.getCategories();
+            Set<Category> newCategories = userCategories.stream()
+                    .filter(category -> !category.getId().equals(id))
+                    .collect(Collectors.toSet());
+            user.setCategories(newCategories);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+        }
     }
 }

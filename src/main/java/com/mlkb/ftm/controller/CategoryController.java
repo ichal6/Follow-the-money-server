@@ -4,10 +4,7 @@ import com.mlkb.ftm.modelDTO.CategoryDTO;
 import com.mlkb.ftm.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +22,16 @@ public class CategoryController {
         try {
             List<CategoryDTO> categoriesDTO = categoryService.getCategories(email);
             return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{email}/{id}")
+    public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long id){
+        try {
+            categoryService.deleteCategory(email, id);
+            return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
