@@ -14,4 +14,5 @@ public class AccountDTO {
     private String name;
     private String accountType;
     private Double currentBalance;
+    private Double startingBalance;
 }
