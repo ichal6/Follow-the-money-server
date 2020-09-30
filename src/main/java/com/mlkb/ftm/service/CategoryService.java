@@ -4,10 +4,11 @@ import com.mlkb.ftm.entity.Category;
 import com.mlkb.ftm.entity.GeneralType;
 import com.mlkb.ftm.entity.Subcategory;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.modelDTO.CategoryDTO;
-import com.mlkb.ftm.modelDTO.DashboardDTO;
 import com.mlkb.ftm.modelDTO.SubcategoryDTO;
 import com.mlkb.ftm.repository.UserRepository;
+import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,9 +17,11 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
     private final UserRepository userRepository;
+    private final InputValidator inputValidator;
 
-    public CategoryService(UserRepository userRepository) {
+    public CategoryService(UserRepository userRepository, InputValidator inputValidator) {
         this.userRepository = userRepository;
+        this.inputValidator = inputValidator;
     }
 
     public List<CategoryDTO> getCategoriesForExpense(String email){
@@ -169,5 +172,15 @@ public class CategoryService {
         } else {
             throw new IllegalArgumentException("Couldn't find a categories for user with give email");
         }
+    }
+
+    public boolean isValidNewCategory(CategoryDTO categoryDTO) throws InputIncorrectException {
+        return categoryDTO != null
+                && inputValidator.checkName(categoryDTO.getName());
+    }
+
+    public boolean isValidNewSubcategory(SubcategoryDTO subcategoryDTO) throws InputIncorrectException {
+        return subcategoryDTO != null
+                && inputValidator.checkName(subcategoryDTO.getName());
     }
 }

@@ -1,9 +1,11 @@
 package com.mlkb.ftm.controller;
 
+import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.modelDTO.CategoryDTO;
 import com.mlkb.ftm.modelDTO.SubcategoryDTO;
 import com.mlkb.ftm.service.CategoryService;
 import com.mlkb.ftm.validation.AccessValidator;
+import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,13 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final AccessValidator accessValidator;
+    private final InputValidator inputValidator;
 
-    public CategoryController(CategoryService categoryService, AccessValidator validator){
+    public CategoryController(CategoryService categoryService, AccessValidator accessValidator,
+                              InputValidator inputValidator){
         this.categoryService = categoryService;
-        this.accessValidator = validator;
+        this.accessValidator = accessValidator;
+        this.inputValidator = inputValidator;
     }
 
     @GetMapping("/{email}")
@@ -107,8 +112,9 @@ public class CategoryController {
         accessValidator.checkPermit(email);
         try {
             categoryService.addCategory(email, newCategory);
+            categoryService.isValidNewCategory(newCategory);
             return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | InputIncorrectException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -119,8 +125,9 @@ public class CategoryController {
         accessValidator.checkPermit(email);
         try {
             categoryService.addSubcategory(email, id, newSubcategory);
+            categoryService.isValidNewSubcategory(newSubcategory);
             return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | InputIncorrectException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
