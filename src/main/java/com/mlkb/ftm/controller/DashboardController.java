@@ -14,17 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
     private final DashboardService dashboardService;
 
-    public DashboardController(DashboardService dashboardService){
+    public DashboardController(DashboardService dashboardService) {
         this.dashboardService = dashboardService;
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<Object> getDashboard(@PathVariable("email") String email){
-        try {
-            DashboardDTO dashboardDTO = dashboardService.getDashboard(email);
-            return new ResponseEntity<>(dashboardDTO, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Object> getDashboard(@PathVariable("email") String email) {
+        DashboardDTO dashboardDTO = dashboardService.getDashboard(email);
+        return new ResponseEntity<>(dashboardDTO, HttpStatus.OK);
     }
 }
