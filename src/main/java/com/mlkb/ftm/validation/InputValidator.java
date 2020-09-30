@@ -59,7 +59,11 @@ public class InputValidator {
     }
 
     public boolean checkPassword(String password) throws InputIncorrectException {
-        // TODO - should add more password validation logic
-        return password != null && !password.isBlank();
+        // TODO - should add more password validation logic and message to enum
+        if (password != null && !password.isBlank()) {
+            return true;
+        } else {
+            throw new InputIncorrectException(InputType.PASSWORD);
+        }
     }
 }

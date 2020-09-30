@@ -5,7 +5,8 @@ public enum InputType {
     NAME("Name should be at least 3 characters long."),
     ACCOUNT_TYPE("The account should have a valid account type: Cash or Bank."),
     BALANCE("Balance should be a valid number (positive or negative)."),
-    EMAIL("Email should be in format: user@domain.pl. No special signs allowed.");
+    EMAIL("Email should be in format: user@domain.pl. No special signs allowed."),
+    PASSWORD("Password incorrect. Should be at least...");
 
     public final String message;
 
