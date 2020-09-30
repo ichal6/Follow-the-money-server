@@ -3,9 +3,12 @@ package com.mlkb.ftm.service;
 import com.mlkb.ftm.entity.Authorities;
 import com.mlkb.ftm.entity.AuthorityType;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.repository.UserRepository;
+import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,44 +21,38 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final InputValidator inputValidator;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, InputValidator inputValidator) {
         this.userRepository = userRepository;
+        this.inputValidator = inputValidator;
     }
 
-    public boolean isValidWithoutId(UserDTO userDTO) {
+    public boolean isValidWithoutId(UserDTO userDTO) throws InputIncorrectException {
         return userDTO != null
-                && userDTO.getName() != null;
+                && inputValidator.checkName(userDTO.getName());
     }
 
-    public boolean isValidNewUser(NewUserDTO userDTO) {
+    public boolean isValidNewUser(NewUserDTO userDTO) throws InputIncorrectException {
         return userDTO != null
-                && userDTO.getName() != null
-                && checkEmail(userDTO.getEmail())
-                && checkPassword(userDTO.getPassword());
+                && inputValidator.checkName(userDTO.getName())
+                && inputValidator.checkEmail(userDTO.getEmail())
+                && inputValidator.checkPassword(userDTO.getPassword());
     }
 
-    private boolean checkPassword(String password){
-        //TODO It should be more complicated in production
-        return password != null
-                && !password.isBlank();
-    }
-
-    private boolean checkEmail(String email){
-        //TODO It should be more complicated in production
-        return email != null
-                && !email.isBlank();
-    }
-
-    public Optional<UserDTO> getUser(String email) {
+    public boolean isUserInDB(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        Optional<UserDTO> optionalUserDTO = Optional.empty();
+        return optionalUser.isPresent();
+    }
+
+    public UserDTO getUser(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            UserDTO userDTO = new UserDTO(user.getName(), user.getEmail(), user.getDate());
-            optionalUserDTO = Optional.of(userDTO);
+            return new UserDTO(user.getName(), user.getEmail(), user.getDate());
+        } else {
+            throw new ResourceNotFoundException("Couldn't get this user. User with this email does not exist");
         }
-        return optionalUserDTO;
     }
 
     public UserDTO createUser(NewUserDTO userDTO) {
@@ -85,13 +82,6 @@ public class UserService {
         } else {
             return false;
         }
-    }
-
-    public List<UserDTO> getAllUsers() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream()
-                .map(x -> new UserDTO(x.getName(), x.getEmail(), x.getDate()))
-                .collect(Collectors.toList());
     }
 
     public boolean deleteUser(Long id) {
