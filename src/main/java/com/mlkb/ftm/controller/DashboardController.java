@@ -23,11 +23,7 @@ public class DashboardController {
 
     @GetMapping("/{email}")
     public ResponseEntity<Object> getDashboard(@PathVariable("email") String email) {
-        try{
-            this.accessValidator.checkPermit(email);
-        } catch (IllegalAccessException ex){
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
-        }
+        this.accessValidator.checkPermit(email);
 
         try {
             DashboardDTO dashboardDTO = dashboardService.getDashboard(email);

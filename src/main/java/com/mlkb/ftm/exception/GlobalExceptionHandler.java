@@ -24,4 +24,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserNotFoundException(UsernameNotFoundException UsernameNotFoundException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(UsernameNotFoundException.getMessage());
     }
+
+    @ExceptionHandler(IllegalAccessRuntimeException.class)
+    public ResponseEntity<String> handleAccessDenied(IllegalAccessRuntimeException accessDeniedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(accessDeniedException.getMessage());
+    }
 }

@@ -21,11 +21,7 @@ public class UserController {
 
     @GetMapping("/api/user/{email}")
     public ResponseEntity<Object> getUser(@PathVariable("email") String email) {
-        try{
-            accessValidator.checkPermit(email);
-        } catch (IllegalAccessException ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
-        }
+        accessValidator.checkPermit(email);
         UserDTO userDTO = userService.getUser(email);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }

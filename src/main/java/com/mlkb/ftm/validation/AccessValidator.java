@@ -1,5 +1,6 @@
 package com.mlkb.ftm.validation;
 
+import com.mlkb.ftm.exception.IllegalAccessRuntimeException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -7,13 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccessValidator {
 
-    public boolean checkPermit(String email) throws IllegalAccessException {
+    public boolean checkPermit(String email){
         String emailFromToken = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(emailFromToken == null){
             throw new UsernameNotFoundException("You have to log in before access");
         }
         if(!email.equals(emailFromToken)){
-            throw new IllegalAccessException("Access denied");
+            throw new IllegalAccessRuntimeException("Access denied");
         }
         return true;
     }
