@@ -1,6 +1,7 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.*;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.ActivityDTO;
 import com.mlkb.ftm.modelDTO.DashboardDTO;
@@ -36,7 +37,7 @@ public class DashboardService {
                     .withExpenseFunds(getExpenseFromLast12Months())
                     .build();
         } else {
-            throw new IllegalArgumentException("Couldn't find a dashboard for user with give email");
+            throw new ResourceNotFoundException("Couldn't find a dashboard for user with given email");
         }
     }
 
