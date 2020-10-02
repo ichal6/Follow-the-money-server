@@ -84,12 +84,13 @@ public class CategoryController {
 
     @PutMapping("/{email}/{id}")
     public ResponseEntity<Object> UpdateCategory(@PathVariable String email, @PathVariable Long id,
-                                                 @RequestBody String newName){
+                                                 @RequestBody CategoryDTO categoryToEdit){
         accessValidator.checkPermit(email);
         try {
-            categoryService.updateCategory(email, id, newName);
+            categoryService.isValidNewCategory(categoryToEdit);
+            categoryService.updateCategory(email, id, categoryToEdit);
             return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | InputIncorrectException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -111,8 +112,8 @@ public class CategoryController {
     public ResponseEntity<Object> AddCategory(@PathVariable String email, @RequestBody CategoryDTO newCategory){
         accessValidator.checkPermit(email);
         try {
-            categoryService.addCategory(email, newCategory);
             categoryService.isValidNewCategory(newCategory);
+            categoryService.addCategory(email, newCategory);
             return new ResponseEntity<>(null, HttpStatus.CREATED);
         } catch (IllegalArgumentException | InputIncorrectException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

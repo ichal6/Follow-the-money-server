@@ -103,7 +103,7 @@ public class CategoryService {
         }
     }
 
-    public void updateCategory(String email, Long id, String newName) {
+    public void updateCategory(String email, Long id, CategoryDTO categoryDTO) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -111,7 +111,8 @@ public class CategoryService {
             Category categoryToEdit = userCategories.stream()
                     .filter(category -> category.getId().equals(id))
                     .findFirst().get();
-            categoryToEdit.setName(newName);
+            categoryToEdit.setName(categoryDTO.getName());
+            categoryToEdit.setGeneralType(categoryDTO.getType());
             userCategories.add(categoryToEdit);
             user.setCategories(userCategories);
             userRepository.save(user);
