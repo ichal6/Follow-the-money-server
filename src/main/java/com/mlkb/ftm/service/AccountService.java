@@ -40,7 +40,7 @@ public class AccountService {
         if (optionalUser.isPresent()) {
             List<AccountDTO> accountDTOS = optionalUser.get().getAccounts().stream()
                     .sorted(Comparator.comparing(o -> o.getTransactions().size()))
-                    .map(x -> new AccountDTO(x.getId(), x.getName(), x.getAccountType().toString(), x.getCurrentBalance()))
+                    .map(x -> new AccountDTO(x.getId(), x.getName(), x.getAccountType().toString(), x.getCurrentBalance(), x.getStartingBalance()))
                     .collect(Collectors.toList());
             Collections.reverse(accountDTOS);
             return accountDTOS;
