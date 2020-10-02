@@ -6,66 +6,63 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.3.2.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>com.mlkb</groupId>
     <artifactId>follow-the-money-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>follow-the-money-server</name>
     <packaging>jar</packaging>
-    <description>Application for control budget</description>
+    <description>Application for controlling budget</description>
 
     <properties>
         <java.version>11</java.version>
     </properties>
 
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M5</version>
+        </dependency>
 
-        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>3.0.0</version>
         </dependency>
-
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>3.0.0</version>
         </dependency>
-
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
             <version>3.0.0</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.springframework.plugin</groupId>
             <artifactId>spring-plugin-core</artifactId>
             <version>2.0.0.RELEASE</version>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-jwt</artifactId>
             <version>1.1.1.RELEASE</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
             <version>3.10.3</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -130,10 +127,57 @@
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.18.Final</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.21.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>3.0.0-M3</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
