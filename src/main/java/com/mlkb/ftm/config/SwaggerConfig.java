@@ -1,4 +1,3 @@
-
 package com.mlkb.ftm.config;
 
 import org.springframework.context.annotation.Bean;

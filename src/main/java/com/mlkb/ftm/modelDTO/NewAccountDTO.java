@@ -11,4 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NewAccountDTO extends AccountDTO {
     private String userEmail;
+
+    public NewAccountDTO(Long id, String name, String type, Double currentBalance, Double startingBalance, String email) {
+        super(id, name, type, startingBalance, currentBalance);
+        this.userEmail = email;
+    }
 }
