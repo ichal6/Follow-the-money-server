@@ -1,10 +1,12 @@
 package com.mlkb.ftm;
 
 import com.mlkb.ftm.controller.AccountController;
+import com.mlkb.ftm.exception.GlobalExceptionHandler;
 import com.mlkb.ftm.service.AccountService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
@@ -19,5 +21,10 @@ public class ApplicationConfig {
     @Bean
     public AccountService accountService() {
         return Mockito.mock(AccountService.class);
+    }
+
+    @Bean
+    public GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
     }
 }

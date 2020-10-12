@@ -2,6 +2,7 @@ package com.mlkb.ftm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.service.AccountService;
@@ -17,7 +18,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -25,8 +25,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -90,6 +89,37 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
         verify(accountService, times(1)).createAccount(any(NewAccountDTO.class));
+    }
+
+    @Test
+    public void should_return_not_found_code_when_resource_not_found() throws Exception {
+        NewAccountDTO newAccountDTO = new NewAccountDTO(1L, "N", "C", 100.00, 40.00, "email@email.pl");
+        String newAccountDTOtoJSON = convertAccountDtoToJson(newAccountDTO);
+
+        when(accountService.getAllAccountsFromUser(any())).thenThrow(new ResourceNotFoundException("There is no such user"));
+        when(accountService.createAccount(any())).thenThrow(new ResourceNotFoundException("There is no such user"));
+        when(accountService.updateAccount(any())).thenThrow(new ResourceNotFoundException("There is no such account or user"));
+        when(accountService.deleteAccount(1L)).thenThrow(new ResourceNotFoundException("There is no such account"));
+
+        mockMvc.perform(get("/api/account/anyEmail"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("There is no such user"));
+
+        mockMvc.perform(post("/api/account").contentType(MediaType.APPLICATION_JSON)
+                .content(newAccountDTOtoJSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("There is no such user"));
+
+        mockMvc.perform(put("/api/account").contentType(MediaType.APPLICATION_JSON)
+                .content(newAccountDTOtoJSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("There is no such account or user"));
+
+        mockMvc.perform(delete("/api/account/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("There is no such account"));
     }
 
     private String convertAccountDtoToJson(NewAccountDTO accountDTO) throws JsonProcessingException {
