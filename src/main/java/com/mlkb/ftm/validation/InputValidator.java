@@ -2,7 +2,7 @@ package com.mlkb.ftm.validation;
 
 import com.mlkb.ftm.entity.AccountType;
 import com.mlkb.ftm.exception.InputIncorrectException;
-import com.mlkb.ftm.exception.InputType;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -18,7 +18,7 @@ public class InputValidator {
         if (id >= 1) {
             return true;
         } else {
-            throw new InputIncorrectException(InputType.ID);
+            throw new InputIncorrectException(InputValidationMessage.ID);
         }
     }
 
@@ -26,7 +26,7 @@ public class InputValidator {
         if (name != null && name.length() >= 3) {
             return true;
         } else {
-            throw new InputIncorrectException(InputType.NAME);
+            throw new InputIncorrectException(InputValidationMessage.NAME);
         }
     }
 
@@ -35,7 +35,7 @@ public class InputValidator {
         try {
             return types.contains(AccountType.valueOf(type.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            throw new InputIncorrectException(InputType.ACCOUNT_TYPE);
+            throw new InputIncorrectException(InputValidationMessage.ACCOUNT_TYPE);
         }
     }
 
@@ -43,7 +43,7 @@ public class InputValidator {
         if (balance != null) {
             return true;
         } else {
-            throw new InputIncorrectException(InputType.BALANCE);
+            throw new InputIncorrectException(InputValidationMessage.BALANCE);
         }
     }
 
@@ -54,7 +54,7 @@ public class InputValidator {
         if (matcher.matches()) {
             return true;
         } else {
-            throw new InputIncorrectException(InputType.EMAIL);
+            throw new InputIncorrectException(InputValidationMessage.EMAIL);
         }
     }
 
@@ -63,7 +63,7 @@ public class InputValidator {
         if (password != null && !password.isBlank()) {
             return true;
         } else {
-            throw new InputIncorrectException(InputType.PASSWORD);
+            throw new InputIncorrectException(InputValidationMessage.PASSWORD);
         }
     }
 }
