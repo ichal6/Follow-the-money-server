@@ -5,6 +5,7 @@ import com.mlkb.ftm.entity.GeneralType;
 import com.mlkb.ftm.entity.Subcategory;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.CategoryDTO;
 import com.mlkb.ftm.modelDTO.SubcategoryDTO;
 import com.mlkb.ftm.repository.UserRepository;
@@ -45,9 +46,8 @@ public class CategoryService {
             Set<Category> userCategories = user.getCategories();
             categories = getListOfCategories(userCategories);
             return categories;
-
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find a user with given email");
         }
     }
 
@@ -77,7 +77,7 @@ public class CategoryService {
             user.setCategories(newCategories);
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find a user with given email");
         }
     }
 
@@ -99,7 +99,7 @@ public class CategoryService {
             user.setCategories(userCategories);
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find a user with give email");
         }
     }
 
@@ -117,7 +117,7 @@ public class CategoryService {
             user.setCategories(userCategories);
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find a user with given email");
         }
     }
 
@@ -141,7 +141,7 @@ public class CategoryService {
             user.setCategories(userCategories);
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find a user with give email");
         }
     }
 
@@ -154,7 +154,7 @@ public class CategoryService {
             user.setCategories(userCategories);
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find user with given email");
         }
     }
 
@@ -171,7 +171,7 @@ public class CategoryService {
             userCategories.add(categoryToEdit);
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("Couldn't find a categories for user with give email");
+            throw new ResourceNotFoundException("Couldn't find user with given email");
         }
     }
 

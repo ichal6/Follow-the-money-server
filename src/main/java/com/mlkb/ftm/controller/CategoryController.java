@@ -20,116 +20,80 @@ public class CategoryController {
     private final InputValidator inputValidator;
 
     public CategoryController(CategoryService categoryService, AccessValidator accessValidator,
-                              InputValidator inputValidator){
+                              InputValidator inputValidator) {
         this.categoryService = categoryService;
         this.accessValidator = accessValidator;
         this.inputValidator = inputValidator;
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<Object> getCategories(@PathVariable String email){
+    public ResponseEntity<Object> getCategories(@PathVariable String email) {
         accessValidator.checkPermit(email);
-        try {
-            List<CategoryDTO> categoriesDTO = categoryService.getCategories(email);
-            return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        List<CategoryDTO> categoriesDTO = categoryService.getCategories(email);
+        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
     }
 
     @GetMapping("/expense/{email}")
-    public ResponseEntity<Object> getCategoriesForExpense(@PathVariable String email){
+    public ResponseEntity<Object> getCategoriesForExpense(@PathVariable String email) {
         accessValidator.checkPermit(email);
-        try {
-            List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForExpense(email);
-            return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForExpense(email);
+        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
     }
 
     @GetMapping("/income/{email}")
-    public ResponseEntity<Object> getCategoriesForIncome(@PathVariable String email){
+    public ResponseEntity<Object> getCategoriesForIncome(@PathVariable String email) {
         accessValidator.checkPermit(email);
-        try {
-            List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForIncome(email);
-            return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForIncome(email);
+        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/{email}/{id}")
-    public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long id){
+    public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long id) {
         accessValidator.checkPermit(email);
-        try {
-            categoryService.deleteCategory(email, id);
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        categoryService.deleteCategory(email, id);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @DeleteMapping("/{email}/{idCat}/{idSub}")
-    public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long idCat,
-                                                 @PathVariable Long idSub){
+    public ResponseEntity<Object> deleteSubcategory(@PathVariable String email, @PathVariable Long idCat,
+                                                 @PathVariable Long idSub) {
         accessValidator.checkPermit(email);
-        try {
-            categoryService.deleteSubcategory(email, idCat, idSub);
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        categoryService.deleteSubcategory(email, idCat, idSub);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @PutMapping("/{email}/{id}")
-    public ResponseEntity<Object> UpdateCategory(@PathVariable String email, @PathVariable Long id,
-                                                 @RequestBody CategoryDTO categoryToEdit){
+    public ResponseEntity<Object> updateCategory(@PathVariable String email, @PathVariable Long id,
+                                                 @RequestBody CategoryDTO categoryToEdit) throws InputIncorrectException {
         accessValidator.checkPermit(email);
-        try {
-            categoryService.isValidNewCategory(categoryToEdit);
-            categoryService.updateCategory(email, id, categoryToEdit);
-            return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | InputIncorrectException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        categoryService.isValidNewCategory(categoryToEdit);
+        categoryService.updateCategory(email, id, categoryToEdit);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
     @PutMapping("/{email}/{idCat}/{idSub}")
-    public ResponseEntity<Object> UpdateSubcategory(@PathVariable String email, @PathVariable Long idCat,
-                                                 @PathVariable Long idSub,
-                                                 @RequestBody String newName){
+    public ResponseEntity<Object> updateSubcategory(@PathVariable String email, @PathVariable Long idCat,
+                                                    @PathVariable Long idSub,
+                                                    @RequestBody String newName) {
         accessValidator.checkPermit(email);
-        try {
-            categoryService.updateSubcategory(email, idCat, idSub, newName);
-            return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        categoryService.updateSubcategory(email, idCat, idSub, newName);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
     @PostMapping("/{email}")
-    public ResponseEntity<Object> AddCategory(@PathVariable String email, @RequestBody CategoryDTO newCategory){
+    public ResponseEntity<Object> addCategory(@PathVariable String email, @RequestBody CategoryDTO newCategory) throws InputIncorrectException {
         accessValidator.checkPermit(email);
-        try {
-            categoryService.isValidNewCategory(newCategory);
-            categoryService.addCategory(email, newCategory);
-            return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | InputIncorrectException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        categoryService.isValidNewCategory(newCategory);
+        categoryService.addCategory(email, newCategory);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
     @PostMapping("/{email}/{id}")
-    public ResponseEntity<Object> AddCategory(@PathVariable String email, @PathVariable Long id,
-                                              @RequestBody SubcategoryDTO newSubcategory){
+    public ResponseEntity<Object> addSubcategory(@PathVariable String email, @PathVariable Long id,
+                                              @RequestBody SubcategoryDTO newSubcategory) throws InputIncorrectException {
         accessValidator.checkPermit(email);
-        try {
-            categoryService.addSubcategory(email, id, newSubcategory);
-            categoryService.isValidNewSubcategory(newSubcategory);
-            return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (IllegalArgumentException | InputIncorrectException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        categoryService.addSubcategory(email, id, newSubcategory);
+        categoryService.isValidNewSubcategory(newSubcategory);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 }

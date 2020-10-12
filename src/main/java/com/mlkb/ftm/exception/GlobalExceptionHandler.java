@@ -29,4 +29,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAccessDenied(IllegalAccessRuntimeException accessDeniedException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(accessDeniedException.getMessage());
     }
+
+    @ExceptionHandler(InputIncorrectException.class)
+    public ResponseEntity<String> handleInputIncorrectException(InputIncorrectException inputIncorrectException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(inputIncorrectException.getMessage());
+    }
 }
