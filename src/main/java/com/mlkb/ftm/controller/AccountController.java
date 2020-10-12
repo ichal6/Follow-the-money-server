@@ -49,4 +49,10 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Long> deleteAccount(@PathVariable("id") Long id) {
+        accountService.deleteAccount(id);
+        return ResponseEntity.status(HttpStatus.OK).body(id);
+    }
 }

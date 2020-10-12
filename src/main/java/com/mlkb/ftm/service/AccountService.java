@@ -68,9 +68,10 @@ public class AccountService {
         if (user.isPresent()) {
             Optional<Account> accountToUpdateOptional = accountRepository.findById(updatedAccountDTO.getId());
             if (accountToUpdateOptional.isPresent()) {
+                Double balanceDifference = updatedAccountDTO.getStartingBalance() - accountToUpdateOptional.get().getStartingBalance();
+                changeCurrentBalanceOfAccountDTO(updatedAccountDTO, balanceDifference);
                 Account accountToUpdate = getAccountFromAccountDTO(updatedAccountDTO);
                 accountToUpdate.setId(updatedAccountDTO.getId());
-
                 accountRepository.save(accountToUpdate);
                 return updatedAccountDTO;
             } else {
@@ -78,6 +79,14 @@ public class AccountService {
             }
         } else {
             throw new ResourceNotFoundException("Couldn't update account of user. User with this email does not exist");
+        }
+    }
+
+    public void deleteAccount(Long id) {
+        try {
+            accountRepository.deleteById(id);
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException("Couldn't delete this account. Account with given id does not exist");
         }
     }
 
@@ -97,5 +106,10 @@ public class AccountService {
         userAccounts.add(savedAccount);
         modifiedUser.setAccounts(userAccounts);
         userRepository.save(modifiedUser);
+    }
+
+    private void changeCurrentBalanceOfAccountDTO(NewAccountDTO accountDTO, Double difference) {
+        Double newCurrentBalance = accountDTO.getCurrentBalance() + difference;
+        accountDTO.setCurrentBalance(newCurrentBalance);
     }
 }
