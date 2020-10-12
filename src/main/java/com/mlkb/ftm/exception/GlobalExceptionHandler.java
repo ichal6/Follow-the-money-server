@@ -18,4 +18,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resourceNotFoundException.getMessage());
     }
+
+    @ExceptionHandler(InputIncorrectException.class)
+    public ResponseEntity<String> handleInputIncorrectException(InputIncorrectException inputIncorrectException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(inputIncorrectException.getMessage());
+    }
 }

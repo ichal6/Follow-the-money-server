@@ -31,23 +31,15 @@ public class AccountController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> createAccount(@RequestBody NewAccountDTO newAccount) {
-        try {
-            accountService.isValidNewAccount(newAccount);
-            return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
-        } catch (InputIncorrectException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<Object> createAccount(@RequestBody NewAccountDTO newAccount) throws InputIncorrectException {
+        accountService.isValidNewAccount(newAccount);
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
     }
 
     @PutMapping()
-    public ResponseEntity<Object> updateAccount(@RequestBody NewAccountDTO updatedAccount) {
-        try {
-            accountService.isValidNewAccount(updatedAccount);
-            return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(updatedAccount));
-        } catch (InputIncorrectException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<Object> updateAccount(@RequestBody NewAccountDTO updatedAccount) throws InputIncorrectException {
+        accountService.isValidNewAccount(updatedAccount);
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(updatedAccount));
     }
 
     @DeleteMapping("/{id}")
