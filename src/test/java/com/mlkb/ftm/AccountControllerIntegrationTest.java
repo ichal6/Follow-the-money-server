@@ -2,6 +2,8 @@ package com.mlkb.ftm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
@@ -73,8 +75,7 @@ public class AccountControllerIntegrationTest {
         NewAccountDTO newAccountDTO = new NewAccountDTO(1L, "Name", "CASH", 100.00, 40.00, "email@email.pl");
         String newAccountDTOtoJSON = convertAccountDtoToJson(newAccountDTO);
 
-        when(accountService.isValidNewAccount(any())).thenReturn(true);
-        when(accountService.createAccount(any())).thenReturn(newAccountDTO);
+        doReturn(newAccountDTO).when(accountService).createAccount(any());
 
         mockMvc.perform(post("/api/account").contentType(MediaType.APPLICATION_JSON)
                 .content(newAccountDTOtoJSON)
@@ -88,38 +89,40 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.startingBalance").value(100.0))
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
-        verify(accountService, times(1)).createAccount(any(NewAccountDTO.class));
+        verify(accountService, times(2)).createAccount(any(NewAccountDTO.class));
     }
 
     @Test
-    public void should_return_not_found_code_when_resource_not_found() throws Exception {
-        NewAccountDTO newAccountDTO = new NewAccountDTO(1L, "N", "C", 100.00, 40.00, "email@email.pl");
-        String newAccountDTOtoJSON = convertAccountDtoToJson(newAccountDTO);
+    public void should_return_ok_status_code_and_updated_object_when_modifying_account() throws Exception {
+        NewAccountDTO accountDTO = new NewAccountDTO(1L, "Name", "CASH", 100.00, 40.00, "email@email.pl");
+        String accountDTOtoJSON = convertAccountDtoToJson(accountDTO);
 
-        when(accountService.getAllAccountsFromUser(any())).thenThrow(new ResourceNotFoundException("There is no such user"));
-        when(accountService.createAccount(any())).thenThrow(new ResourceNotFoundException("There is no such user"));
-        when(accountService.updateAccount(any())).thenThrow(new ResourceNotFoundException("There is no such account or user"));
-        when(accountService.deleteAccount(1L)).thenThrow(new ResourceNotFoundException("There is no such account"));
-
-        mockMvc.perform(get("/api/account/anyEmail"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").value("There is no such user"));
-
-        mockMvc.perform(post("/api/account").contentType(MediaType.APPLICATION_JSON)
-                .content(newAccountDTOtoJSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").value("There is no such user"));
+        doReturn(accountDTO).when(accountService).updateAccount(any());
 
         mockMvc.perform(put("/api/account").contentType(MediaType.APPLICATION_JSON)
-                .content(newAccountDTOtoJSON)
+                .content(accountDTOtoJSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").value("There is no such account or user"));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.name").value("Name"))
+                .andExpect(jsonPath("$.accountType").value("CASH"))
+                .andExpect(jsonPath("$.currentBalance").value(40.0))
+                .andExpect(jsonPath("$.startingBalance").value(100.0))
+                .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
-        mockMvc.perform(delete("/api/account/1"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").value("There is no such account"));
+        verify(accountService, times(2)).updateAccount(any(NewAccountDTO.class));
+    }
+
+    @Test
+    public void should_return_ok_status_code_and_id_when_deleting_account() throws Exception {
+        when(accountService.deleteAccount(5L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/account/5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("5"));
+
+        verify(accountService, times(1)).deleteAccount(5L);
     }
 
     private String convertAccountDtoToJson(NewAccountDTO accountDTO) throws JsonProcessingException {
