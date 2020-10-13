@@ -43,8 +43,20 @@ VALUES (default, 'EXPENSE', 'Food', '1');
 INSERT INTO "category" (id, general_type, name, user_id)
 VALUES (default, 'INCOME', 'Salary', '1');
 
+INSERT INTO "category" (id, general_type, name, user_id)
+VALUES (default, 'INCOME', 'Bonuses', '1');
+
 INSERT INTO "subcategory" (id, name, type, category_id)
 VALUES (default, 'studies', 'EXPENSE', 1);
+
+INSERT INTO "subcategory" (id, name, type, category_id)
+VALUES (default, 'books', 'EXPENSE', 1);
+
+INSERT INTO "subcategory" (id, name, type, category_id)
+VALUES (default, 'regular salary', 'INCOME', 3);
+
+INSERT INTO "subcategory" (id, name, type, category_id)
+VALUES (default, 'extra hours', 'INCOME', 3);
 
 INSERT INTO "payee" (id, general_type, name, user_id)
 VALUES (default, 'INCOME', 'Job', 1);
