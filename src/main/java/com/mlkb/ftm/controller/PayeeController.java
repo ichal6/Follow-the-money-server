@@ -1,16 +1,12 @@
 package com.mlkb.ftm.controller;
 
-import com.mlkb.ftm.modelDTO.CategoryDTO;
 import com.mlkb.ftm.modelDTO.PayeeDTO;
 import com.mlkb.ftm.service.PayeeService;
 import com.mlkb.ftm.validation.AccessValidator;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
@@ -41,5 +37,12 @@ public class PayeeController {
         accessValidator.checkPermit(email);
         Set<PayeeDTO> payeesDTO = payeeService.getPayeeForExpense(email);
         return new ResponseEntity<>(payeesDTO, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{email}/{id}")
+    public ResponseEntity<Object> deleteSubcategory(@PathVariable String email, @PathVariable Long id) {
+        accessValidator.checkPermit(email);
+        payeeService.deletePayee(email, id);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }

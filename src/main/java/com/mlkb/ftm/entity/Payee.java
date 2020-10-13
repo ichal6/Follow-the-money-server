@@ -21,4 +21,6 @@ public class Payee {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private GeneralType generalType;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean isEnabled;
 }
