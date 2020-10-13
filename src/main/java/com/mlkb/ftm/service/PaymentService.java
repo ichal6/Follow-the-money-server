@@ -2,6 +2,7 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
+import com.mlkb.ftm.entity.Transfer;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
@@ -53,21 +54,32 @@ public class PaymentService {
 
     private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays) {
         List<PaymentDTO> payments = new ArrayList<>();
-        // extract payments from transactions
-        // extract payments from transfers from
-        // extract payments from transfers to
-        // sort by date
-        // calculate balance after each transaction
         long DAY_IN_MS = 1000 * 60 * 60 * 24;
         Date dateFrom = new Date(System.currentTimeMillis() - (periodInDays * DAY_IN_MS));
-
 
         List<PaymentDTO> transactions = account.getTransactions().stream()
                 .filter(transaction -> transaction.getDate().getTime() > dateFrom.getTime())
                 .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
                 .collect(Collectors.toList());
 
+        List<PaymentDTO> transfersFrom = account.getTransfersFrom().stream()
+                .filter(transfer -> transfer.getDate().getTime() > dateFrom.getTime())
+                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
+                .collect(Collectors.toList());
+
+        List<PaymentDTO> transfersTo = account.getTransfersTo().stream()
+                .filter(transfer -> transfer.getDate().getTime() > dateFrom.getTime())
+                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
+                .collect(Collectors.toList());
+
         payments.addAll(transactions);
+        payments.addAll(transfersFrom);
+        payments.addAll(transfersTo);
+
+        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
+
+        calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
+
         return payments;
     }
 
@@ -78,6 +90,7 @@ public class PaymentService {
         newPaymentDTO.setValue(transaction.getValue());
         newPaymentDTO.setDate(transaction.getDate());
         newPaymentDTO.setTitle(transaction.getTitle());
+        newPaymentDTO.setCategoryName(transaction.getCategory().getName());
         if (transaction.getValue() > 0) {
             newPaymentDTO.setFrom(transaction.getPayee().getName());
             newPaymentDTO.setTo(accountName);
@@ -88,18 +101,37 @@ public class PaymentService {
         return newPaymentDTO;
     }
 
+    private PaymentDTO makePaymentDTOFromTransferFrom(Transfer transfer, String accountName) {
+        PaymentDTO newPaymentDTO = new PaymentDTO();
+        newPaymentDTO.setInternal(true);
+        newPaymentDTO.setId(transfer.getId());
+        newPaymentDTO.setValue(0 - transfer.getValue());
+        newPaymentDTO.setDate(transfer.getDate());
+        newPaymentDTO.setTitle(transfer.getTitle());
+        newPaymentDTO.setFrom(accountName);
+        newPaymentDTO.setTo(transfer.getAccountTo().getName());
 
+        return newPaymentDTO;
+    }
 
+    private PaymentDTO makePaymentDTOFromTransferTo(Transfer transfer, String accountName) {
+        PaymentDTO newPaymentDTO = new PaymentDTO();
+        newPaymentDTO.setInternal(true);
+        newPaymentDTO.setId(transfer.getId());
+        newPaymentDTO.setValue(transfer.getValue());
+        newPaymentDTO.setDate(transfer.getDate());
+        newPaymentDTO.setTitle(transfer.getTitle());
+        newPaymentDTO.setFrom(transfer.getAccountFrom().getName());
+        newPaymentDTO.setTo(accountName);
 
+        return newPaymentDTO;
+    }
 
-
-//    private boolean isInternal;
-//    private Long id;
-//    private Double value;
-//    private Date date;
-//    private String title;
-//    private String from;
-//    private String to;
-//    private Double balanceAfter;
+    private void calculateBalanceAfterEachPayment(List<PaymentDTO> payments, Double currentBalance) {
+        for (PaymentDTO payment : payments) {
+            payment.setBalanceAfter(currentBalance);
+            currentBalance -= payment.getValue();
+        }
+    }
 }
 

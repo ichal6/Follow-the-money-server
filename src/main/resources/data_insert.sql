@@ -101,4 +101,13 @@ INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, 
 VALUES (default, TO_DATE('2020-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
-VALUES (default, TO_DATE('2019-09-02','YYYY-MM-DD'), 'from friend', 280.0, 2, 1);
+VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'wplatomat wrzesien', 280.0, 2, 1);
+
+INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
+VALUES (default, TO_DATE('2020-10-02','YYYY-MM-DD'), 'wplatomat pazdziernik', 200.0, 2, 1);
+
+INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
+VALUES (default, TO_DATE('2020-09-12','YYYY-MM-DD'), 'wyplata z bankomatu', 200.0, 1, 2);
+
+INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
+VALUES (default, TO_DATE('2020-07-12','YYYY-MM-DD'), 'wyplata z bankomatu', 400.0, 1, 2);
