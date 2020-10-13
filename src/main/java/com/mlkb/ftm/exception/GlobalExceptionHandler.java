@@ -20,6 +20,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resourceNotFoundException.getMessage());
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UsernameNotFoundException UsernameNotFoundException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(UsernameNotFoundException.getMessage());
+    }
+
+    @ExceptionHandler(IllegalAccessRuntimeException.class)
+    public ResponseEntity<String> handleAccessDenied(IllegalAccessRuntimeException accessDeniedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(accessDeniedException.getMessage());
+    }
+
     @ExceptionHandler(InputIncorrectException.class)
     public ResponseEntity<String> handleInputIncorrectException(InputIncorrectException inputIncorrectException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(inputIncorrectException.getMessage());
