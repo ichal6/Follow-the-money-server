@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/transaction")
+@RequestMapping("/api/payment")
 public class PaymentController {
     private final PaymentService paymentService;
     private final AccessValidator accessValidator;
@@ -25,7 +25,7 @@ public class PaymentController {
                                                   @RequestParam("id") String accountId,
                                                   @RequestParam("period") String period) {
         accessValidator.checkPermit(email);
-        List<PaymentDTO> transactionDTOList = paymentService.getPaymentsWithParameters(email, accountId, period);
-        return new ResponseEntity<>(transactionDTOList, HttpStatus.OK);
+        List<PaymentDTO> paymentsDTOList = paymentService.getPaymentsWithParameters(email, accountId, period);
+        return new ResponseEntity<>(paymentsDTOList, HttpStatus.OK);
     }
 }
