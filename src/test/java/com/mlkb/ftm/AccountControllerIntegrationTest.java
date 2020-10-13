@@ -2,9 +2,6 @@ package com.mlkb.ftm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mlkb.ftm.exception.InputIncorrectException;
-import com.mlkb.ftm.exception.InputValidationMessage;
-import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.service.AccountService;
