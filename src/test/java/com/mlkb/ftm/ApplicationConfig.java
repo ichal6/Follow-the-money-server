@@ -1,6 +1,7 @@
 package com.mlkb.ftm;
 
 import com.mlkb.ftm.controller.AccountController;
+import com.mlkb.ftm.exception.GlobalExceptionHandler;
 import com.mlkb.ftm.service.AccountService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -19,5 +20,10 @@ public class ApplicationConfig {
     @Bean
     public AccountService accountService() {
         return Mockito.mock(AccountService.class);
+    }
+
+    @Bean
+    public GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
     }
 }

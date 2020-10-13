@@ -17,7 +17,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -25,8 +24,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -74,8 +72,7 @@ public class AccountControllerIntegrationTest {
         NewAccountDTO newAccountDTO = new NewAccountDTO(1L, "Name", "CASH", 100.00, 40.00, "email@email.pl");
         String newAccountDTOtoJSON = convertAccountDtoToJson(newAccountDTO);
 
-        when(accountService.isValidNewAccount(any())).thenReturn(true);
-        when(accountService.createAccount(any())).thenReturn(newAccountDTO);
+        doReturn(newAccountDTO).when(accountService).createAccount(any());
 
         mockMvc.perform(post("/api/account").contentType(MediaType.APPLICATION_JSON)
                 .content(newAccountDTOtoJSON)
@@ -89,7 +86,40 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.startingBalance").value(100.0))
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
-        verify(accountService, times(1)).createAccount(any(NewAccountDTO.class));
+        verify(accountService, times(2)).createAccount(any(NewAccountDTO.class));
+    }
+
+    @Test
+    public void should_return_ok_status_code_and_updated_object_when_modifying_account() throws Exception {
+        NewAccountDTO accountDTO = new NewAccountDTO(1L, "Name", "CASH", 100.00, 40.00, "email@email.pl");
+        String accountDTOtoJSON = convertAccountDtoToJson(accountDTO);
+
+        doReturn(accountDTO).when(accountService).updateAccount(any());
+
+        mockMvc.perform(put("/api/account").contentType(MediaType.APPLICATION_JSON)
+                .content(accountDTOtoJSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.name").value("Name"))
+                .andExpect(jsonPath("$.accountType").value("CASH"))
+                .andExpect(jsonPath("$.currentBalance").value(40.0))
+                .andExpect(jsonPath("$.startingBalance").value(100.0))
+                .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
+
+        verify(accountService, times(2)).updateAccount(any(NewAccountDTO.class));
+    }
+
+    @Test
+    public void should_return_ok_status_code_and_id_when_deleting_account() throws Exception {
+        when(accountService.deleteAccount(5L)).thenReturn(true);
+
+        mockMvc.perform(delete("/api/account/5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("5"));
+
+        verify(accountService, times(1)).deleteAccount(5L);
     }
 
     private String convertAccountDtoToJson(NewAccountDTO accountDTO) throws JsonProcessingException {

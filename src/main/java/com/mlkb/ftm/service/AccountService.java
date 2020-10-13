@@ -59,7 +59,7 @@ public class AccountService {
             newAccountDTO.setId(savedAccount.getId());
             return newAccountDTO;
         } else {
-            throw new ResourceNotFoundException("Couldn't add account tu user. User with this email does not exist");
+            throw new ResourceNotFoundException("Couldn't add account to user. User with this email does not exist");
         }
     }
 
@@ -82,9 +82,10 @@ public class AccountService {
         }
     }
 
-    public void deleteAccount(Long id) {
+    public boolean deleteAccount(Long id) {
         try {
             accountRepository.deleteById(id);
+            return true;
         } catch (IllegalArgumentException e) {
             throw new ResourceNotFoundException("Couldn't delete this account. Account with given id does not exist");
         }
