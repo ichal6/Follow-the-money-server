@@ -57,4 +57,12 @@ public class PayeeController {
         payeeService.savePayee(payeeDTO, userId);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
+
+    @PutMapping("/{email}/{payeeId}")
+    public ResponseEntity<Object> updatePayee(@PathVariable String email, @PathVariable Long payeeId,
+                                              @RequestBody String name){
+        accessValidator.checkPermit(email);
+        payeeService.updatePayee(name, payeeId);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
 }

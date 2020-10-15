@@ -25,4 +25,9 @@ public interface PayeesRepository extends JpaRepository<Payee, Long> {
     @Query(value = "INSERT INTO payee (general_type, name, user_id)  VALUES (?, ?, ?)", nativeQuery = true)
     void addPayee(String generalType, String name, Long userId);
 
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE payee SET name = ? WHERE id = ?", nativeQuery = true)
+    void updatePayee(String name, Long payeeId);
+
 }
