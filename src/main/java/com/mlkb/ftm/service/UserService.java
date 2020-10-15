@@ -55,6 +55,10 @@ public class UserService {
         }
     }
 
+    public Long getUserId(String email) {
+        return userRepository.getUserId(email);
+    }
+
     public UserDTO createUser(NewUserDTO userDTO) {
         User user = new User();
         user.setName(userDTO.getName());
