@@ -68,21 +68,37 @@ public class PaymentService {
     public void createNewTransaction(TransactionDTO transactionDTO, String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
-            // check if categoryId, accountId and payeeId exist
-            // get transaction from transactionDTO
-            // save transaction
-            // add transaction to account in db
             Optional<Category> categoryOptional = categoryRepository.findById(transactionDTO.getCategoryId());
             Optional<Account> accountOptional = accountRepository.findById(transactionDTO.getAccountId());
             Optional<Payee> payeeOptional = payeeRepository.findById(transactionDTO.getPayeeId());
             if (categoryOptional.isPresent() && accountOptional.isPresent() && payeeOptional.isPresent()) {
-                // logika
+                Transaction transaction = new Transaction();
+                transaction.setType(GeneralType.valueOf(transactionDTO.getType()));
+                transaction.setValue(transactionDTO.getValue());
+                transaction.setDate(transactionDTO.getDate());
+                transaction.setTitle(transactionDTO.getTitle());
+                transaction.setPayee(payeeOptional.get());
+                transaction.setCategory(categoryOptional.get());
+
+                transactionRepository.save(transaction);
+                addTransactionToAccountInDB(accountOptional.get(), transaction);
+                modifyTotalBalanceForAccount(accountOptional.get(), transactionDTO.getValue());
             } else {
                 throw new ResourceNotFoundException("Couldn't create new transaction. Category, account or payee with given id don't exist");
             }
         } else {
             throw new ResourceNotFoundException("Couldn't add transaction to this user. User with this email does not exist");
         }
+    }
+
+    private void addTransactionToAccountInDB(Account account, Transaction transaction) {
+        account.getTransactions().add(transaction);
+        accountRepository.save(account);
+    }
+
+    private void modifyTotalBalanceForAccount(Account account, Double value) {
+        account.setCurrentBalance(account.getCurrentBalance() + value);
+        accountRepository.save(account);
     }
 
     private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays) {
