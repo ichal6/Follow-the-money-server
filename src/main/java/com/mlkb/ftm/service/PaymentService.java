@@ -1,14 +1,11 @@
 package com.mlkb.ftm.service;
 
-import com.mlkb.ftm.entity.Account;
-import com.mlkb.ftm.entity.Transaction;
-import com.mlkb.ftm.entity.Transfer;
-import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.entity.*;
+import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
-import com.mlkb.ftm.repository.AccountRepository;
-import com.mlkb.ftm.repository.TransactionRepository;
-import com.mlkb.ftm.repository.UserRepository;
+import com.mlkb.ftm.modelDTO.TransactionDTO;
+import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +18,18 @@ public class PaymentService {
     private final InputValidator inputValidator;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final CategoryRepository categoryRepository;
+    private final PayeeRepository payeeRepository;
 
     public PaymentService(UserRepository userRepository, InputValidator inputValidator,
-                          TransactionRepository transactionRepository, AccountRepository accountRepository) {
+                          TransactionRepository transactionRepository, AccountRepository accountRepository,
+                          CategoryRepository categoryRepository, PayeeRepository payeeRepository) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
+        this.categoryRepository = categoryRepository;
+        this.payeeRepository = payeeRepository;
     }
 
     public List<PaymentDTO> getPaymentsWithParameters(String email, String accountId, String period) {
@@ -49,6 +51,37 @@ public class PaymentService {
             }
         } catch (NumberFormatException e) {
             throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
+        }
+    }
+
+    public boolean isValidNewTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
+        return transactionDTO != null
+                && inputValidator.checkName(transactionDTO.getTitle())
+                && inputValidator.checkIfGeneralTypeInEnum(transactionDTO.getType())
+                && inputValidator.checkBalance(transactionDTO.getValue())
+                && inputValidator.checkId(transactionDTO.getAccountId())
+                && inputValidator.checkId(transactionDTO.getCategoryId())
+                && inputValidator.checkId(transactionDTO.getPayeeId())
+                && inputValidator.checkDate(transactionDTO.getDate());
+    }
+
+    public void createNewTransaction(TransactionDTO transactionDTO, String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            // check if categoryId, accountId and payeeId exist
+            // get transaction from transactionDTO
+            // save transaction
+            // add transaction to account in db
+            Optional<Category> categoryOptional = categoryRepository.findById(transactionDTO.getCategoryId());
+            Optional<Account> accountOptional = accountRepository.findById(transactionDTO.getAccountId());
+            Optional<Payee> payeeOptional = payeeRepository.findById(transactionDTO.getPayeeId());
+            if (categoryOptional.isPresent() && accountOptional.isPresent() && payeeOptional.isPresent()) {
+                // logika
+            } else {
+                throw new ResourceNotFoundException("Couldn't create new transaction. Category, account or payee with given id don't exist");
+            }
+        } else {
+            throw new ResourceNotFoundException("Couldn't add transaction to this user. User with this email does not exist");
         }
     }
 

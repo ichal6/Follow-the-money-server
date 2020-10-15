@@ -1,11 +1,13 @@
 package com.mlkb.ftm.validation;
 
 import com.mlkb.ftm.entity.AccountType;
+import com.mlkb.ftm.entity.GeneralType;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.InputValidationMessage;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +41,15 @@ public class InputValidator {
         }
     }
 
+    public boolean checkIfGeneralTypeInEnum(String type) throws InputIncorrectException {
+        List<GeneralType> types = Arrays.asList(GeneralType.values());
+        try {
+            return types.contains(GeneralType.valueOf(type.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new InputIncorrectException(InputValidationMessage.GENERAL_TYPE);
+        }
+    }
+
     public boolean checkBalance(Double balance) throws InputIncorrectException {
         if (balance != null) {
             return true;
@@ -64,6 +75,14 @@ public class InputValidator {
             return true;
         } else {
             throw new InputIncorrectException(InputValidationMessage.PASSWORD);
+        }
+    }
+
+    public boolean checkDate(Date date) throws InputIncorrectException {
+        if (date != null) {
+            return true;
+        } else {
+            throw new InputIncorrectException(InputValidationMessage.DATE);
         }
     }
 }

@@ -1,6 +1,9 @@
 package com.mlkb.ftm.controller;
 
+import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
+import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.validation.AccessValidator;
 import org.springframework.http.HttpStatus;
@@ -27,5 +30,14 @@ public class PaymentController {
         accessValidator.checkPermit(email);
         List<PaymentDTO> paymentsDTOList = paymentService.getPaymentsWithParameters(email, accountId, period);
         return new ResponseEntity<>(paymentsDTOList, HttpStatus.OK);
+    }
+
+    @PostMapping("/transaction/{email}")
+    public ResponseEntity<Object> createTransaction(@PathVariable("email") String email,
+                                                    @RequestBody TransactionDTO transactionDTO) throws InputIncorrectException {
+        accessValidator.checkPermit(email);
+        paymentService.isValidNewTransaction(transactionDTO);
+        paymentService.createNewTransaction(transactionDTO, email);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
