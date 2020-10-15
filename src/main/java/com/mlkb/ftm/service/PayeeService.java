@@ -43,4 +43,8 @@ public class PayeeService {
             payeesRepository.setDisabled(id);
         }
     }
+
+    public void savePayee(PayeeDTO payee, Long userId){
+        payeesRepository.addPayee(payee.getType().toString(), payee.getName(), userId);
+    }
 }
