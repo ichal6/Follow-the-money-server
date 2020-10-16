@@ -43,8 +43,20 @@ VALUES (default, 'EXPENSE', 'Food', '1');
 INSERT INTO "category" (id, general_type, name, user_id)
 VALUES (default, 'INCOME', 'Salary', '1');
 
+INSERT INTO "category" (id, general_type, name, user_id)
+VALUES (default, 'INCOME', 'Bonuses', '1');
+
 INSERT INTO "subcategory" (id, name, type, category_id)
 VALUES (default, 'studies', 'EXPENSE', 1);
+
+INSERT INTO "subcategory" (id, name, type, category_id)
+VALUES (default, 'books', 'EXPENSE', 1);
+
+INSERT INTO "subcategory" (id, name, type, category_id)
+VALUES (default, 'regular salary', 'INCOME', 3);
+
+INSERT INTO "subcategory" (id, name, type, category_id)
+VALUES (default, 'extra hours', 'INCOME', 3);
 
 INSERT INTO "payee" (id, general_type, name, user_id)
 VALUES (default, 'INCOME', 'Job', 1);
@@ -77,13 +89,25 @@ INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, 
 VALUES (default, TO_DATE('2020-02-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-07','YYYY-MM-DD'), 'Morgage september', 'EXPENSE', -1000.00, 1, 1, 5);
+VALUES (default, TO_DATE('2020-10-07','YYYY-MM-DD'), 'Morgage october', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 1, 5);
+VALUES (default, TO_DATE('2020-09-07','YYYY-MM-DD'), 'Morgage september', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 1, 5);
+VALUES (default, TO_DATE('2020-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 2, 5);
+
+INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
+VALUES (default, TO_DATE('2020-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
-VALUES (default, TO_DATE('2019-09-02','YYYY-MM-DD'), 'from friend', 280.0, 2, 1);
+VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'wplatomat wrzesien', 280.0, 2, 1);
+
+INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
+VALUES (default, TO_DATE('2020-10-02','YYYY-MM-DD'), 'wplatomat pazdziernik', 200.0, 2, 1);
+
+INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
+VALUES (default, TO_DATE('2020-09-12','YYYY-MM-DD'), 'wyplata z bankomatu', 200.0, 1, 2);
+
+INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
+VALUES (default, TO_DATE('2020-07-12','YYYY-MM-DD'), 'wyplata z bankomatu', 400.0, 1, 2);

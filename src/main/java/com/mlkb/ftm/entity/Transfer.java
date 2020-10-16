@@ -19,7 +19,6 @@ public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @DecimalMin(value = "0.0")
     private Double value;
     private String title;
     @CreatedDate
