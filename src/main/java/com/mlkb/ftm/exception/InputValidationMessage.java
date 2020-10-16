@@ -6,6 +6,7 @@ public enum InputValidationMessage {
     ACCOUNT_TYPE("The account should have a valid account type: Cash or Bank."),
     GENERAL_TYPE("The type should be: Income or Expense"),
     BALANCE("Balance should be a valid number (positive or negative)."),
+    BALANCE_POSITIVE("Balance should be a valid number above 0."),
     DATE("Date shouldn't be empty - choose a valid date format."),
     EMAIL("Email should be in format: user@domain.pl. No special signs allowed."),
     PASSWORD("Password incorrect. Should be at least...");

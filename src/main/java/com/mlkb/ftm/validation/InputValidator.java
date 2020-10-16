@@ -58,6 +58,14 @@ public class InputValidator {
         }
     }
 
+    public boolean checkBalancePositive(Double balance) throws InputIncorrectException {
+        if (balance != null && balance >= 0) {
+            return true;
+        } else {
+            throw new InputIncorrectException(InputValidationMessage.BALANCE_POSITIVE);
+        }
+    }
+
     public boolean checkEmail(String email) throws InputIncorrectException {
         String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
         Pattern pattern = Pattern.compile(regex);

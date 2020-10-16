@@ -5,6 +5,7 @@ import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
+import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
@@ -65,30 +66,38 @@ public class PaymentService {
                 && inputValidator.checkDate(transactionDTO.getDate());
     }
 
-    public void createNewTransaction(TransactionDTO transactionDTO, String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            Optional<Category> categoryOptional = categoryRepository.findById(transactionDTO.getCategoryId());
-            Optional<Account> accountOptional = accountRepository.findById(transactionDTO.getAccountId());
-            Optional<Payee> payeeOptional = payeeRepository.findById(transactionDTO.getPayeeId());
-            if (categoryOptional.isPresent() && accountOptional.isPresent() && payeeOptional.isPresent()) {
-                Transaction transaction = new Transaction();
-                transaction.setType(GeneralType.valueOf(transactionDTO.getType()));
-                transaction.setValue(transactionDTO.getValue());
-                transaction.setDate(transactionDTO.getDate());
-                transaction.setTitle(transactionDTO.getTitle());
-                transaction.setPayee(payeeOptional.get());
-                transaction.setCategory(categoryOptional.get());
+    public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
+        return transferDTO != null
+                && inputValidator.checkName(transferDTO.getTitle())
+                && inputValidator.checkBalancePositive(transferDTO.getValue())
+                && inputValidator.checkId(transferDTO.getAccountIdFrom())
+                && inputValidator.checkId(transferDTO.getAccountIdTo())
+                && inputValidator.checkDate(transferDTO.getDate());
+    }
 
-                transactionRepository.save(transaction);
-                addTransactionToAccountInDB(accountOptional.get(), transaction);
-                modifyTotalBalanceForAccount(accountOptional.get(), transactionDTO.getValue());
-            } else {
-                throw new ResourceNotFoundException("Couldn't create new transaction. Category, account or payee with given id don't exist");
-            }
+    public void createNewTransaction(TransactionDTO transactionDTO) {
+        Optional<Category> categoryOptional = categoryRepository.findById(transactionDTO.getCategoryId());
+        Optional<Account> accountOptional = accountRepository.findById(transactionDTO.getAccountId());
+        Optional<Payee> payeeOptional = payeeRepository.findById(transactionDTO.getPayeeId());
+        if (categoryOptional.isPresent() && accountOptional.isPresent() && payeeOptional.isPresent()) {
+            Transaction transaction = new Transaction();
+            transaction.setType(GeneralType.valueOf(transactionDTO.getType()));
+            transaction.setValue(transactionDTO.getValue());
+            transaction.setDate(transactionDTO.getDate());
+            transaction.setTitle(transactionDTO.getTitle());
+            transaction.setPayee(payeeOptional.get());
+            transaction.setCategory(categoryOptional.get());
+
+            transactionRepository.save(transaction);
+            addTransactionToAccountInDB(accountOptional.get(), transaction);
+            modifyTotalBalanceForAccount(accountOptional.get(), transactionDTO.getValue());
         } else {
-            throw new ResourceNotFoundException("Couldn't add transaction to this user. User with this email does not exist");
+            throw new ResourceNotFoundException("Couldn't create new transaction. Category, account or payee with given id don't exist");
         }
+    }
+
+    public void createNewTransfer(TransferDTO transferDTO) {
+        // add logic
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {

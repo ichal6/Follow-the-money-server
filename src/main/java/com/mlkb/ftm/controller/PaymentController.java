@@ -4,6 +4,7 @@ import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
+import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.validation.AccessValidator;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,16 @@ public class PaymentController {
                                                     @RequestBody TransactionDTO transactionDTO) throws InputIncorrectException {
         accessValidator.checkPermit(email);
         paymentService.isValidNewTransaction(transactionDTO);
-        paymentService.createNewTransaction(transactionDTO, email);
+        paymentService.createNewTransaction(transactionDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/transfer/{email}")
+    public ResponseEntity<Object> createTransfer(@PathVariable("email") String email,
+                                                 @RequestBody TransferDTO transferDTO) throws InputIncorrectException {
+        accessValidator.checkPermit(email);
+        paymentService.isValidNewTransfer(transferDTO);
+        paymentService.createNewTransfer(transferDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
