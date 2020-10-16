@@ -22,7 +22,6 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private GeneralType type;
-    @DecimalMin(value="0.0")
     private Double value;
     @CreatedDate
     private Date date;
