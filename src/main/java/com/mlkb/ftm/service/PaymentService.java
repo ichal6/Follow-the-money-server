@@ -18,16 +18,19 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final InputValidator inputValidator;
     private final TransactionRepository transactionRepository;
+    private final TransferRepository transferRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final PayeeRepository payeeRepository;
 
     public PaymentService(UserRepository userRepository, InputValidator inputValidator,
                           TransactionRepository transactionRepository, AccountRepository accountRepository,
-                          CategoryRepository categoryRepository, PayeeRepository payeeRepository) {
+                          CategoryRepository categoryRepository, PayeeRepository payeeRepository,
+                          TransferRepository transferRepository) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
         this.transactionRepository = transactionRepository;
+        this.transferRepository = transferRepository;
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
         this.payeeRepository = payeeRepository;
@@ -97,7 +100,22 @@ public class PaymentService {
     }
 
     public void createNewTransfer(TransferDTO transferDTO) {
-        // add logic
+        Optional<Account> accountOptionalFrom = accountRepository.findById(transferDTO.getAccountIdFrom());
+        Optional<Account> accountOptionalTo = accountRepository.findById(transferDTO.getAccountIdTo());
+        if (accountOptionalFrom.isPresent() && accountOptionalTo.isPresent()) {
+            Transfer transfer = new Transfer();
+            transfer.setValue(transferDTO.getValue());
+            transfer.setTitle(transferDTO.getTitle());
+            transfer.setDate(transferDTO.getDate());
+            transfer.setAccountFrom(accountOptionalFrom.get());
+            transfer.setAccountTo(accountOptionalTo.get());
+
+            transferRepository.save(transfer);
+            addTransferToAccountsInDB(accountOptionalFrom.get(), accountOptionalTo.get(), transfer);
+            modifyTotalBalanceForBothAccountsAfterTransfer(accountOptionalFrom.get(), accountOptionalTo.get(), transfer.getValue());
+        } else {
+            throw new ResourceNotFoundException("Couldn't create new transfer. AccountFrom or/and AccountTo with given ids don't exist.");
+        }
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {
@@ -108,6 +126,20 @@ public class PaymentService {
     private void modifyTotalBalanceForAccount(Account account, Double value) {
         account.setCurrentBalance(account.getCurrentBalance() + value);
         accountRepository.save(account);
+    }
+
+    private void addTransferToAccountsInDB(Account accountFrom, Account accountTo, Transfer transfer) {
+        accountFrom.getTransfersFrom().add(transfer);
+        accountTo.getTransfersTo().add(transfer);
+        accountRepository.save(accountFrom);
+        accountRepository.save(accountTo);
+    }
+
+    private void modifyTotalBalanceForBothAccountsAfterTransfer(Account accountFrom, Account accountTo, Double value) {
+        accountFrom.setCurrentBalance(accountFrom.getCurrentBalance() - value);
+        accountTo.setCurrentBalance(accountTo.getCurrentBalance() + value);
+        accountRepository.save(accountFrom);
+        accountRepository.save(accountTo);
     }
 
     private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays) {
