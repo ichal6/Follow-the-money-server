@@ -62,7 +62,7 @@ INSERT INTO "payee" (id, general_type, name, user_id)
 VALUES (default, 'INCOME', 'Job', 1);
 
 INSERT INTO "payee" (id, general_type, name, user_id)
-VALUES (default, 'EXPENSE', 'Bank', 1);
+VALUES (default, 'EXPENSE', 'Bank', 3);
 
 INSERT INTO "payee" (id, general_type, name, user_id)
 VALUES (default, 'EXPENSE', 'Biedronka', 1);
