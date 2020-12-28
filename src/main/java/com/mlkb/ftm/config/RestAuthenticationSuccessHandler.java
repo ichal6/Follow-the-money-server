@@ -50,7 +50,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
         Cookie cookieWithEmail = new Cookie("e-mail", email);
-        cookieWithEmail.setHttpOnly(true);
+//        cookieWithEmail.setHttpOnly(true);
         cookieWithEmail.setSecure(true);
         cookieWithEmail.setMaxAge(expirationTime/1000);
         response.addCookie(cookieWithEmail);
