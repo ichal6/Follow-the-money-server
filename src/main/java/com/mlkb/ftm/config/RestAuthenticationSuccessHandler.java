@@ -50,7 +50,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
         Cookie cookieWithEmail = new Cookie("e-mail", email);
-        //TODO: When in production must do cookie.setSecure(true);
+        cookieWithEmail.setSecure(true);
         cookieWithEmail.setMaxAge(expirationTime/1000);
         response.addCookie(cookieWithEmail);
     }
@@ -58,7 +58,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     private void addCookieWithToken(HttpServletResponse response, String token){
         Cookie cookie = new Cookie("token", token);
         cookie.setHttpOnly(true);
-        //TODO: When in production must do cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setMaxAge(expirationTime/1000);
         response.addCookie(cookie);
     }
