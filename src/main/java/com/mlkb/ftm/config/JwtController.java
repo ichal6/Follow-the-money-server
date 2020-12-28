@@ -1,5 +1,6 @@
 package com.mlkb.ftm.config;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
 
 @RestController
 public class JwtController {
@@ -20,7 +22,7 @@ public class JwtController {
     public void logout(HttpServletResponse response) {
         removeJwtCookie(response);
         removeEmailCookie(response);
-
+        addSameSiteCookieAttribute(response);
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
@@ -37,6 +39,22 @@ public class JwtController {
         cookie.setSecure(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+    }
+
+    private void addSameSiteCookieAttribute(HttpServletResponse response) {
+        Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+        boolean firstHeader = true;
+        // there can be multiple Set-Cookie attributes
+        for (String header : headers) {
+            if (firstHeader) {
+                response.setHeader(HttpHeaders.SET_COOKIE,
+                        String.format("%s; %s", header, "SameSite=None"));
+                firstHeader = false;
+                continue;
+            }
+            response.addHeader(HttpHeaders.SET_COOKIE,
+                    String.format("%s; %s", header, "SameSite=None"));
+        }
     }
 
     @GetMapping("/isLogin")
