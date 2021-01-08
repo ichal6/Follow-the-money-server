@@ -1,5 +1,5 @@
 FROM openjdk:14-alpine
-MAINTAINER experto.com
+MAINTAINER mlkb.com
 VOLUME /tmp
 EXPOSE 8080
 ADD target/follow-the-money-server-0.0.1-SNAPSHOT.jar follow-the-money-server-0.0.1-SNAPSHOT.jar
