@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.Collection;
 
 @Component
 public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -50,7 +52,8 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
         Cookie cookieWithEmail = new Cookie("e-mail", email);
-        //TODO: When in production must do cookie.setSecure(true);
+//        cookieWithEmail.setHttpOnly(true);
+        cookieWithEmail.setSecure(true);
         cookieWithEmail.setMaxAge(expirationTime/1000);
         response.addCookie(cookieWithEmail);
     }
@@ -58,7 +61,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     private void addCookieWithToken(HttpServletResponse response, String token){
         Cookie cookie = new Cookie("token", token);
         cookie.setHttpOnly(true);
-        //TODO: When in production must do cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setMaxAge(expirationTime/1000);
         response.addCookie(cookie);
     }
