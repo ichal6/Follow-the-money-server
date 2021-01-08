@@ -47,24 +47,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
         setHeader(request, response, token);
         addCookieWithToken(response, token);
         addCookieWithEmail(principal.getUsername(), response);
-        addSameSiteCookieAttribute(response);
         log.info("Token has created successfully");
-    }
-
-    private void addSameSiteCookieAttribute(HttpServletResponse response) {
-        Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
-        boolean firstHeader = true;
-        // there can be multiple Set-Cookie attributes
-        for (String header : headers) {
-            if (firstHeader) {
-                response.setHeader(HttpHeaders.SET_COOKIE,
-                        String.format("%s; %s", header, "SameSite=None"));
-                firstHeader = false;
-                continue;
-            }
-            response.addHeader(HttpHeaders.SET_COOKIE,
-                    String.format("%s; %s", header, "SameSite=None"));
-        }
     }
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
