@@ -27,7 +27,7 @@ public class JwtController {
 
     private void removeEmailCookie(HttpServletResponse response){
         Cookie cookie = new Cookie("e-mail", null);
-        cookie.setSecure(true);
+        //TODO: When in production must do cookie.setSecure(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
@@ -35,7 +35,7 @@ public class JwtController {
     private void removeJwtCookie(HttpServletResponse response){
         Cookie cookie = new Cookie("token", null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        //TODO: When in production must do cookie.setSecure(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
