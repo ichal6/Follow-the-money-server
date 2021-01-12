@@ -1,6 +1,7 @@
 package com.mlkb.ftm.config;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,18 +27,24 @@ public class JwtController {
     }
 
     private void removeEmailCookie(HttpServletResponse response){
-        Cookie cookie = new Cookie("e-mail", null);
-        cookie.setSecure(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        ResponseCookie responseCookie = ResponseCookie.from("e-mail", null)
+                .sameSite("None")
+                .secure(true)
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
     private void removeJwtCookie(HttpServletResponse response){
-        Cookie cookie = new Cookie("token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        ResponseCookie responseCookie = ResponseCookie.from("token", null)
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
     @GetMapping("/isLogin")
