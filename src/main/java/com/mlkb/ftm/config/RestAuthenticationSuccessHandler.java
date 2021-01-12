@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.http.ResponseCookie;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -51,19 +52,37 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     }
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
-        Cookie cookieWithEmail = new Cookie("e-mail", email);
-//        cookieWithEmail.setHttpOnly(true);
-        cookieWithEmail.setSecure(true);
-        cookieWithEmail.setMaxAge(expirationTime/1000);
-        response.addCookie(cookieWithEmail);
+//        Cookie cookieWithEmail = new Cookie("e-mail", email);
+////        cookieWithEmail.setHttpOnly(true);
+//        cookieWithEmail.setSecure(true);
+//        cookieWithEmail.setMaxAge(expirationTime/1000);
+//
+//        response.addCookie(cookieWithEmail);
+
+        ResponseCookie responseCookie = ResponseCookie.from("e-mail", email)
+                .sameSite("None")
+                .secure(true)
+                .maxAge(expirationTime/1000)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
     private void addCookieWithToken(HttpServletResponse response, String token){
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(expirationTime/1000);
-        response.addCookie(cookie);
+//        Cookie cookie = new Cookie("token", token);
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+//        cookie.setMaxAge(expirationTime/1000);
+//        response.addCookie(cookie);
+
+        ResponseCookie responseCookie = ResponseCookie.from("token", token)
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(expirationTime/1000)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
     private void setHeader(HttpServletRequest request, HttpServletResponse response, String token){
