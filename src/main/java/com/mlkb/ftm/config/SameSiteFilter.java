@@ -43,7 +43,7 @@ public class SameSiteFilter implements Filter {
                     String.format("%s; %s", header, "SameSite=None"));
         }
 
-        chain.doFilter(req, res);
+        chain.doFilter(request, response);
     }
 
     @Override
