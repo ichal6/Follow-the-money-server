@@ -52,13 +52,6 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     }
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
-//        Cookie cookieWithEmail = new Cookie("e-mail", email);
-////        cookieWithEmail.setHttpOnly(true);
-//        cookieWithEmail.setSecure(true);
-//        cookieWithEmail.setMaxAge(expirationTime/1000);
-//
-//        response.addCookie(cookieWithEmail);
-
         ResponseCookie responseCookie = ResponseCookie.from("e-mail", email)
                 .sameSite("None")
                 .secure(true)
@@ -69,12 +62,6 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
     }
 
     private void addCookieWithToken(HttpServletResponse response, String token){
-//        Cookie cookie = new Cookie("token", token);
-//        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
-//        cookie.setMaxAge(expirationTime/1000);
-//        response.addCookie(cookie);
-
         ResponseCookie responseCookie = ResponseCookie.from("token", token)
                 .sameSite("None")
                 .httpOnly(true)
