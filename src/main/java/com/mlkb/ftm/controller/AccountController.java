@@ -20,13 +20,16 @@ import java.util.Optional;
 @RequestMapping("/api/account")
 public class AccountController {
     private final AccountService accountService;
+    private final AccessValidator accessValidator;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, AccessValidator accessValidator) {
         this.accountService = accountService;
+        this.accessValidator = accessValidator;
     }
 
     @GetMapping("/{email}")
     public ResponseEntity<Object> getAllAccountsFromUser(@PathVariable("email") String email) {
+        accessValidator.checkPermit(email);
         List<AccountDTO> accountDTOList = accountService.getAllAccountsFromUser(email);
         return new ResponseEntity<>(accountDTOList, HttpStatus.OK);
     }
