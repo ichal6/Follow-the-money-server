@@ -51,8 +51,8 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
         ResponseCookie responseCookie = ResponseCookie.from("e-mail", email)
-                .sameSite("None")
-                .secure(true)
+                //TODO Active on PROD .sameSite("None")
+                .secure(false) //TODO set to true on PROD
                 .maxAge(expirationTime/1000)
                 .build();
 
@@ -61,9 +61,9 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithToken(HttpServletResponse response, String token){
         ResponseCookie responseCookie = ResponseCookie.from("token", token)
-                .sameSite("None")
+                //TODO Active on PROD .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge(expirationTime/1000)
                 .build();
 

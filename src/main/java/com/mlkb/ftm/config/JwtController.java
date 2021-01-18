@@ -26,8 +26,8 @@ public class JwtController {
 
     private void removeEmailCookie(HttpServletResponse response){
         ResponseCookie responseCookie = ResponseCookie.from("e-mail", null)
-                .sameSite("None")
-                .secure(true)
+                //TODO Active on PROD .sameSite("None")
+                .secure(false) //TODO set to true on PROD
                 .maxAge(0)
                 .build();
 
@@ -36,9 +36,9 @@ public class JwtController {
 
     private void removeJwtCookie(HttpServletResponse response){
         ResponseCookie responseCookie = ResponseCookie.from("token", null)
-                .sameSite("None")
+                //TODO Active on PROD .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge(0)
                 .build();
 
