@@ -28,6 +28,8 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private Currency currency;
+    @Column(columnDefinition = "boolean default true")
+    private Boolean isEnabled;
     @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private Set<Transaction> transactions;
