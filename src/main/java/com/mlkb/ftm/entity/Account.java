@@ -29,7 +29,7 @@ public class Account {
     @Column(length = 8)
     private Currency currency;
     @Column(columnDefinition = "boolean default true")
-    private Boolean isEnabled;
+    private Boolean isEnabled = true;
     @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private Set<Transaction> transactions;

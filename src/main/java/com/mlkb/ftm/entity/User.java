@@ -40,7 +40,7 @@ public class User {
     @JoinTable(name = "user_authority",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = { @JoinColumn(name = "authority_id") })
-    private Set<Authorities> authorities = new HashSet<>();
+    private Set<Authorities> authorities;
 
     public User(String name, Date date) {
         this.name = name;
