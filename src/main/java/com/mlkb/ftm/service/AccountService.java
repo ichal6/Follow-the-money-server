@@ -84,8 +84,15 @@ public class AccountService {
 
     public boolean deleteAccount(Long id) {
         try {
-            accountRepository.deleteById(id);
-            return true;
+            Optional<Account> possibleAccountToRemove = accountRepository.findById(id);
+            if(possibleAccountToRemove.isPresent()){
+                Account accountToRemove = possibleAccountToRemove.get();
+                accountToRemove.setIsEnabled(false);
+                accountRepository.save(accountToRemove);
+                return true;
+            } else{
+                throw new ResourceNotFoundException("Couldn't update this account. Account with given id does not exist");
+            }
         } catch (IllegalArgumentException e) {
             throw new ResourceNotFoundException("Couldn't delete this account. Account with given id does not exist");
         }
