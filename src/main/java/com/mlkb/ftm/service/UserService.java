@@ -7,25 +7,25 @@ import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
+import com.mlkb.ftm.repository.AuthorityRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final InputValidator inputValidator;
+    private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository, InputValidator inputValidator) {
+    public UserService(UserRepository userRepository, InputValidator inputValidator, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
+        this.authorityRepository = authorityRepository;
     }
 
     public boolean isValidWithoutId(UserDTO userDTO) throws InputIncorrectException {
@@ -63,11 +63,20 @@ public class UserService {
         User user = new User();
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
-        user.setAuthorities(Collections.singleton(new Authorities(AuthorityType.ROLE_USER)));
+        user.setAuthorities(Collections.singleton(getAuthorities(AuthorityType.ROLE_USER)));
         user.setEnabled(1);
         user.setPassword(userDTO.getPassword());
         userRepository.save(user);
         return new UserDTO(user.getName(), user.getEmail(), user.getDate());
+    }
+
+    private Authorities getAuthorities(AuthorityType authorityType){
+        Optional<Authorities> possibleAuthorities = authorityRepository.findByName(authorityType);
+        if (possibleAuthorities.isPresent()){
+            return possibleAuthorities.get();
+        } else{
+            throw new ResourceNotFoundException("There is no ROLE USER authority");
+        }
     }
 
 
