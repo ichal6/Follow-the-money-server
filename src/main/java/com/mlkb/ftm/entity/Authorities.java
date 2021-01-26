@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,9 +19,13 @@ public class Authorities {
     private Integer id;
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true)
     private AuthorityType name;
 
     public Authorities(AuthorityType name) {
         this.name = name;
     }
+
+    @ManyToMany(mappedBy = "authorities")
+    Set<User> users;
 }
