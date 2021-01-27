@@ -36,6 +36,7 @@ public class AccountController {
 
     @PostMapping()
     public ResponseEntity<Object> createAccount(@RequestBody NewAccountDTO newAccount) throws InputIncorrectException {
+        accessValidator.checkPermit(newAccount.getUserEmail());
         accountService.isValidNewAccount(newAccount);
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(newAccount));
     }
