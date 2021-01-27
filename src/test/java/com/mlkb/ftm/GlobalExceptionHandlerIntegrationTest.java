@@ -17,6 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -24,8 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ApplicationConfig.class})
@@ -54,7 +54,7 @@ public class GlobalExceptionHandlerIntegrationTest {
         when(accountService.getAllAccountsFromUser("anyValidEmail")).thenThrow(new ResourceNotFoundException("There is no such user"));
         when(accountService.createAccount(any())).thenThrow(new ResourceNotFoundException("There is no such user"));
         when(accountService.updateAccount(any())).thenThrow(new ResourceNotFoundException("There is no such account or user"));
-        when(accountService.deleteAccount(1L)).thenThrow(new ResourceNotFoundException("There is no such account"));
+        when(accountService.deleteAccount(1L, "none")).thenThrow(new ResourceNotFoundException("There is no such account"));
 
         mockMvc.perform(get("/api/account/anyValidEmail"))
                 .andExpect(status().isNotFound())
@@ -73,6 +73,7 @@ public class GlobalExceptionHandlerIntegrationTest {
                 .andExpect(jsonPath("$").value("There is no such account or user"));
 
         mockMvc.perform(delete("/api/account/1"))
+                .andExpect(MockMvcResultMatchers.cookie().doesNotExist("e-mail"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$").value("There is no such account"));
     }
