@@ -43,6 +43,7 @@ public class AccountController {
 
     @PutMapping()
     public ResponseEntity<Object> updateAccount(@RequestBody NewAccountDTO updatedAccount) throws InputIncorrectException {
+        accessValidator.checkPermit(updatedAccount.getUserEmail());
         accountService.isValidNewAccount(updatedAccount);
         return ResponseEntity.status(HttpStatus.OK).body(accountService.updateAccount(updatedAccount));
     }
