@@ -113,13 +113,13 @@ public class AccountControllerIntegrationTest {
 
     @Test
     public void should_return_ok_status_code_and_id_when_deleting_account() throws Exception {
-        when(accountService.deleteAccount(5L)).thenReturn(true);
+        when(accountService.deleteAccount(5L, "none")).thenReturn(true);
 
         mockMvc.perform(delete("/api/account/5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("5"));
 
-        verify(accountService, times(1)).deleteAccount(5L);
+        verify(accountService, times(1)).deleteAccount(5L, "none");
     }
 
     private String convertAccountDtoToJson(NewAccountDTO accountDTO) throws JsonProcessingException {

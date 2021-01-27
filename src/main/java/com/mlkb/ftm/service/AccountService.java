@@ -11,7 +11,6 @@ import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
-import java.lang.module.ResolutionException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,20 +82,25 @@ public class AccountService {
         }
     }
 
-    public boolean deleteAccount(Long id) {
-        try {
-            Optional<Account> possibleAccountToRemove = accountRepository.findById(id);
-            if(possibleAccountToRemove.isPresent()){
-                Account accountToRemove = possibleAccountToRemove.get();
-                accountToRemove.setIsEnabled(false);
-                accountRepository.save(accountToRemove);
-                return true;
-            } else{
-                throw new ResourceNotFoundException("Couldn't update this account. Account with given id does not exist");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new ResourceNotFoundException("Couldn't delete this account. Account with given id does not exist");
+    public boolean deleteAccount(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this account. User for this email does not exist");
         }
+
+        Optional<Account> possibleAccountToRemove = possibleUser.get().getAccounts()
+                .stream()
+                .filter(account -> account.getId().equals(id))
+                .findFirst();
+
+        if(possibleAccountToRemove.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this account. User don't have account for this id");
+        }
+
+        Account accountToRemove = possibleAccountToRemove.get();
+        accountToRemove.setIsEnabled(false);
+        accountRepository.save(accountToRemove);
+        return true;
     }
 
     private Account getAccountFromAccountDTO(NewAccountDTO newAccountDTO) {
