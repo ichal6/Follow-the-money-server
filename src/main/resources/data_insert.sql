@@ -98,7 +98,7 @@ INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, 
 VALUES (default, TO_DATE('2021-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2021-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (default, TO_DATE('2021-01-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
 VALUES (default, TO_DATE('2021-01-02','YYYY-MM-DD'), 'wplatomat wrzesien', 280.0, 2, 1);
