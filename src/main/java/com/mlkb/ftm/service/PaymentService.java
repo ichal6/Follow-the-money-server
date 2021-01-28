@@ -242,5 +242,31 @@ public class PaymentService {
 
         return true;
     }
+
+    public boolean removeTransfer(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transfer. User for this email does not exist");
+        }
+        Optional<Transfer> possibleTransfer = possibleUser.get().getAccounts().stream()
+                .flatMap(account -> account.getTransfersTo().stream())
+                .filter(transfer -> transfer.getId().equals(id))
+                .findFirst();
+        if(possibleTransfer.isEmpty()){
+            possibleTransfer = possibleUser.get().getAccounts().stream()
+                    .flatMap(account -> account.getTransfersFrom().stream())
+                    .filter(transfer -> transfer.getId().equals(id))
+                    .findFirst();
+        }
+        if(possibleTransfer.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transfer. Transfer doesn't exist");
+        }
+        System.out.print("Delete - ");
+        System.out.println(id);
+        transferRepository.deleteById(id);
+
+        return true;
+    }
+
 }
 
