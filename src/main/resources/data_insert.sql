@@ -71,43 +71,43 @@ INSERT INTO "payee" (id, general_type, name, user_id)
 VALUES (default, 'EXPENSE', 'Mariusz-trans komis', 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 2, 1, 4);
+VALUES (default, TO_DATE('2021-01-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 2, 1, 4);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-21','YYYY-MM-DD'), 'buy another car', 'EXPENSE', -2500.00, 2, 1, 4);
+VALUES (default, TO_DATE('2021-01-21','YYYY-MM-DD'), 'buy another car', 'EXPENSE', -2500.00, 2, 1, 4);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-10','YYYY-MM-DD'), 'buy milk', 'EXPENSE', -25.00, 2, 3, 2);
+VALUES (default, TO_DATE('2021-01-10','YYYY-MM-DD'), 'buy milk', 'EXPENSE', -25.00, 2, 3, 2);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-08-10','YYYY-MM-DD'), 'buy bicycle', 'EXPENSE', -1200.00, 1, 4, 3);
+VALUES (default, TO_DATE('2021-01-10','YYYY-MM-DD'), 'buy bicycle', 'EXPENSE', -1200.00, 1, 4, 3);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
+VALUES (default, TO_DATE('2021-01-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-02-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
+VALUES (default, TO_DATE('2021-01-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-10-07','YYYY-MM-DD'), 'Morgage october', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (default, TO_DATE('2021-01-07','YYYY-MM-DD'), 'Morgage october', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-09-07','YYYY-MM-DD'), 'Morgage september', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (default, TO_DATE('2021-01-07','YYYY-MM-DD'), 'Morgage september', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (default, TO_DATE('2021-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (default, TO_DATE('2020-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (default, TO_DATE('2021-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
-VALUES (default, TO_DATE('2020-09-02','YYYY-MM-DD'), 'wplatomat wrzesien', 280.0, 2, 1);
+VALUES (default, TO_DATE('2021-01-02','YYYY-MM-DD'), 'wplatomat wrzesien', 280.0, 2, 1);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
-VALUES (default, TO_DATE('2020-10-02','YYYY-MM-DD'), 'wplatomat pazdziernik', 200.0, 2, 1);
+VALUES (default, TO_DATE('2021-01-02','YYYY-MM-DD'), 'wplatomat pazdziernik', 200.0, 2, 1);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
-VALUES (default, TO_DATE('2020-09-12','YYYY-MM-DD'), 'wyplata z bankomatu', 200.0, 1, 2);
+VALUES (default, TO_DATE('2021-01-12','YYYY-MM-DD'), 'wyplata z bankomatu', 200.0, 1, 2);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
-VALUES (default, TO_DATE('2020-07-12','YYYY-MM-DD'), 'wyplata z bankomatu', 400.0, 1, 2);
+VALUES (default, TO_DATE('2021-01-12','YYYY-MM-DD'), 'wyplata z bankomatu', 400.0, 1, 2);
