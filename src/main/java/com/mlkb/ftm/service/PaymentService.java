@@ -223,5 +223,26 @@ public class PaymentService {
             currentBalance -= payment.getValue();
         }
     }
+
+    public boolean removeTransaction(Long id, String idAccount, String email) {
+        Long accountIdLong = Long.parseLong(idAccount);
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. User for this email does not exist");
+        }
+
+        Optional<Account> possibleAccount = accountRepository.findById(accountIdLong);
+        if(possibleAccount.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't exist");
+        }
+
+        if(possibleUser.get().getAccounts().contains(possibleAccount.get())){
+            transactionRepository.deleteById(id);
+        } else{
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't contain to this user");
+        }
+
+        return true;
+    }
 }
 
