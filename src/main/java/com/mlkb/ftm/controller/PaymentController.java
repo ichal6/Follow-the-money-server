@@ -53,10 +53,9 @@ public class PaymentController {
 
     @DeleteMapping("/transaction/{id}")
     public ResponseEntity<Object> deleteTransaction(@PathVariable("id") Long idTransaction,
-                                                    @RequestParam("account-id") String accountId,
                                                     @CookieValue(value = "e-mail", defaultValue = "none") String email){
         accessValidator.checkPermit(email);
-        paymentService.removeTransaction(idTransaction, accountId, email);
+        paymentService.removeTransaction(idTransaction, email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

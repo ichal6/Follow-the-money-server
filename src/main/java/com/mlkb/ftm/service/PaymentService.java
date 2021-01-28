@@ -224,23 +224,21 @@ public class PaymentService {
         }
     }
 
-    public boolean removeTransaction(Long id, String idAccount, String email) {
-        Long accountIdLong = Long.parseLong(idAccount);
+    public boolean removeTransaction(Long id, String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
         if(possibleUser.isEmpty()){
             throw new ResourceNotFoundException("Couldn't delete this transaction. User for this email does not exist");
         }
-
-        Optional<Account> possibleAccount = accountRepository.findById(accountIdLong);
-        if(possibleAccount.isEmpty()){
-            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't exist");
+        Optional<Transaction> possibleTransaction = possibleUser.get().getAccounts().stream()
+                .flatMap(account -> account.getTransactions().stream())
+                .filter(transaction -> transaction.getId().equals(id))
+                .findFirst();
+        if(possibleTransaction.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Transaction doesn't exist");
         }
-
-        if(possibleUser.get().getAccounts().contains(possibleAccount.get())){
-            transactionRepository.deleteById(id);
-        } else{
-            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't contain to this user");
-        }
+        System.out.print("Delete - ");
+        System.out.println(id);
+        transactionRepository.deleteById(id);
 
         return true;
     }
