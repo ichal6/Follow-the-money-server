@@ -175,7 +175,7 @@ public class PaymentService {
 
     private PaymentDTO makePaymentDTOFromTransaction(Transaction transaction, String accountName) {
         PaymentDTO newPaymentDTO = new PaymentDTO();
-        newPaymentDTO.setInternal(false);
+        newPaymentDTO.setIsInternal(false);
         newPaymentDTO.setId(transaction.getId());
         newPaymentDTO.setValue(transaction.getValue());
         newPaymentDTO.setDate(transaction.getDate());
@@ -193,7 +193,7 @@ public class PaymentService {
 
     private PaymentDTO makePaymentDTOFromTransferFrom(Transfer transfer, String accountName) {
         PaymentDTO newPaymentDTO = new PaymentDTO();
-        newPaymentDTO.setInternal(true);
+        newPaymentDTO.setIsInternal(true);
         newPaymentDTO.setId(transfer.getId());
         newPaymentDTO.setValue(0 - transfer.getValue());
         newPaymentDTO.setDate(transfer.getDate());
@@ -206,7 +206,7 @@ public class PaymentService {
 
     private PaymentDTO makePaymentDTOFromTransferTo(Transfer transfer, String accountName) {
         PaymentDTO newPaymentDTO = new PaymentDTO();
-        newPaymentDTO.setInternal(true);
+        newPaymentDTO.setIsInternal(true);
         newPaymentDTO.setId(transfer.getId());
         newPaymentDTO.setValue(transfer.getValue());
         newPaymentDTO.setDate(transfer.getDate());
