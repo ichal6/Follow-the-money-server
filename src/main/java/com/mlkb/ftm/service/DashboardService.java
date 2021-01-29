@@ -98,7 +98,10 @@ public class DashboardService {
     }
 
     private List<AccountDTO> getPopularAccounts() {
-        Set<Account> accounts = user.getAccounts();
+        Set<Account> accounts = user.getAccounts()
+                .stream()
+                .filter(account -> account.getIsEnabled() == true)
+                .collect(Collectors.toSet());
         Map<AccountDTO, Date> accountsWithLastModifiedDate = new HashMap<>();
         long fiveYears = 157784760000L;
         Date fiveYearsAgo = new Date(System.currentTimeMillis() - fiveYears);
