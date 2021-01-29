@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentDTO {
-    private boolean isInternal;
+    private Boolean isInternal;
     private Long id;
     private Double value;
     private Date date;

@@ -1,7 +1,6 @@
 package com.mlkb.ftm.controller;
 
 import com.mlkb.ftm.exception.InputIncorrectException;
-import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
@@ -49,5 +48,21 @@ public class PaymentController {
         paymentService.isValidNewTransfer(transferDTO);
         paymentService.createNewTransfer(transferDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/transaction/{id}")
+    public ResponseEntity<Object> deleteTransaction(@PathVariable("id") Long idTransaction,
+                                                    @CookieValue(value = "e-mail", defaultValue = "none") String email){
+        accessValidator.checkPermit(email);
+        paymentService.removeTransaction(idTransaction, email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/transfer/{id}")
+    public ResponseEntity<Object> deleteTransfer(@PathVariable("id") Long idTransfer,
+                                                    @CookieValue(value = "e-mail", defaultValue = "none") String email){
+        accessValidator.checkPermit(email);
+        paymentService.removeTransfer(idTransfer, email);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
