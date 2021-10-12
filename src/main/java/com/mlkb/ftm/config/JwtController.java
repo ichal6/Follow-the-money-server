@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
 
 @RestController
 public class JwtController {
@@ -28,8 +26,9 @@ public class JwtController {
 
     private void removeEmailCookie(HttpServletResponse response){
         ResponseCookie responseCookie = ResponseCookie.from("e-mail", null)
+                //TODO Active ONLY on PROD
                 .sameSite("None")
-                .secure(true)
+                .secure(true) //TODO set to true on PROD
                 .maxAge(0)
                 .build();
 
@@ -38,9 +37,10 @@ public class JwtController {
 
     private void removeJwtCookie(HttpServletResponse response){
         ResponseCookie responseCookie = ResponseCookie.from("token", null)
+                //TODO Active only on PROD
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(true) //TODO set to true on PROD
                 .maxAge(0)
                 .build();
 

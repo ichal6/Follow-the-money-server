@@ -13,12 +13,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.http.ResponseCookie;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
-import java.util.Collection;
 
 @Component
 public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -53,8 +51,9 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithEmail(String email, HttpServletResponse response){
         ResponseCookie responseCookie = ResponseCookie.from("e-mail", email)
+                //TODO Active on PROD
                 .sameSite("None")
-                .secure(true)
+                .secure(true) //TODO set to true on PROD
                 .maxAge(expirationTime/1000)
                 .build();
 
@@ -63,9 +62,10 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
     private void addCookieWithToken(HttpServletResponse response, String token){
         ResponseCookie responseCookie = ResponseCookie.from("token", token)
+                //TODO Active on PROD
                 .sameSite("None")
                 .httpOnly(true)
-                .secure(true)
+                .secure(true) //TODO set to true on PROD
                 .maxAge(expirationTime/1000)
                 .build();
 

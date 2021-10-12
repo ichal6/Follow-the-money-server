@@ -11,7 +11,6 @@ import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
-import java.lang.module.ResolutionException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +39,7 @@ public class AccountService {
         if (optionalUser.isPresent()) {
             List<AccountDTO> accountDTOS = optionalUser.get().getAccounts().stream()
                     .sorted(Comparator.comparing(o -> o.getTransactions().size()))
+                    .filter(account -> account.getIsEnabled() == true)
                     .map(x -> new AccountDTO(x.getId(), x.getName(), x.getAccountType().toString(), x.getCurrentBalance(), x.getStartingBalance()))
                     .collect(Collectors.toList());
             Collections.reverse(accountDTOS);
@@ -82,13 +82,25 @@ public class AccountService {
         }
     }
 
-    public boolean deleteAccount(Long id) {
-        try {
-            accountRepository.deleteById(id);
-            return true;
-        } catch (IllegalArgumentException e) {
-            throw new ResourceNotFoundException("Couldn't delete this account. Account with given id does not exist");
+    public boolean deleteAccount(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this account. User for this email does not exist");
         }
+
+        Optional<Account> possibleAccountToRemove = possibleUser.get().getAccounts()
+                .stream()
+                .filter(account -> account.getId().equals(id))
+                .findFirst();
+
+        if(possibleAccountToRemove.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this account. User don't have account for this id");
+        }
+
+        Account accountToRemove = possibleAccountToRemove.get();
+        accountToRemove.setIsEnabled(false);
+        accountRepository.save(accountToRemove);
+        return true;
     }
 
     private Account getAccountFromAccountDTO(NewAccountDTO newAccountDTO) {

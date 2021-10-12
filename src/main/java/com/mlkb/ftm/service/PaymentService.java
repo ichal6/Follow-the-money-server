@@ -175,7 +175,7 @@ public class PaymentService {
 
     private PaymentDTO makePaymentDTOFromTransaction(Transaction transaction, String accountName) {
         PaymentDTO newPaymentDTO = new PaymentDTO();
-        newPaymentDTO.setInternal(false);
+        newPaymentDTO.setIsInternal(false);
         newPaymentDTO.setId(transaction.getId());
         newPaymentDTO.setValue(transaction.getValue());
         newPaymentDTO.setDate(transaction.getDate());
@@ -193,7 +193,7 @@ public class PaymentService {
 
     private PaymentDTO makePaymentDTOFromTransferFrom(Transfer transfer, String accountName) {
         PaymentDTO newPaymentDTO = new PaymentDTO();
-        newPaymentDTO.setInternal(true);
+        newPaymentDTO.setIsInternal(true);
         newPaymentDTO.setId(transfer.getId());
         newPaymentDTO.setValue(0 - transfer.getValue());
         newPaymentDTO.setDate(transfer.getDate());
@@ -206,7 +206,7 @@ public class PaymentService {
 
     private PaymentDTO makePaymentDTOFromTransferTo(Transfer transfer, String accountName) {
         PaymentDTO newPaymentDTO = new PaymentDTO();
-        newPaymentDTO.setInternal(true);
+        newPaymentDTO.setIsInternal(true);
         newPaymentDTO.setId(transfer.getId());
         newPaymentDTO.setValue(transfer.getValue());
         newPaymentDTO.setDate(transfer.getDate());
@@ -223,5 +223,50 @@ public class PaymentService {
             currentBalance -= payment.getValue();
         }
     }
+
+    public boolean removeTransaction(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. User for this email does not exist");
+        }
+        Optional<Transaction> possibleTransaction = possibleUser.get().getAccounts().stream()
+                .flatMap(account -> account.getTransactions().stream())
+                .filter(transaction -> transaction.getId().equals(id))
+                .findFirst();
+        if(possibleTransaction.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Transaction doesn't exist");
+        }
+        System.out.print("Delete - ");
+        System.out.println(id);
+        transactionRepository.deleteById(id);
+
+        return true;
+    }
+
+    public boolean removeTransfer(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transfer. User for this email does not exist");
+        }
+        Optional<Transfer> possibleTransfer = possibleUser.get().getAccounts().stream()
+                .flatMap(account -> account.getTransfersTo().stream())
+                .filter(transfer -> transfer.getId().equals(id))
+                .findFirst();
+        if(possibleTransfer.isEmpty()){
+            possibleTransfer = possibleUser.get().getAccounts().stream()
+                    .flatMap(account -> account.getTransfersFrom().stream())
+                    .filter(transfer -> transfer.getId().equals(id))
+                    .findFirst();
+        }
+        if(possibleTransfer.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transfer. Transfer doesn't exist");
+        }
+        System.out.print("Delete - ");
+        System.out.println(id);
+        transferRepository.deleteById(id);
+
+        return true;
+    }
+
 }
 
