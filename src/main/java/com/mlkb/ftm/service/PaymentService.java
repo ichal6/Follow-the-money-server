@@ -226,21 +226,50 @@ public class PaymentService {
 
     public boolean removeTransaction(Long id, String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
-        if(possibleUser.isEmpty()){
-            throw new ResourceNotFoundException("Couldn't delete this transaction. User for this email does not exist");
+
+        Optional<Transaction> possibleTransaction = findTransaction(possibleUser, id);
+        Optional<Account> possibleAccountToUpdate = findAccount(possibleUser, id);
+
+        if(possibleAccountToUpdate.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't exist update.");
         }
-        Optional<Transaction> possibleTransaction = possibleUser.get().getAccounts().stream()
-                .flatMap(account -> account.getTransactions().stream())
-                .filter(transaction -> transaction.getId().equals(id))
-                .findFirst();
         if(possibleTransaction.isEmpty()){
             throw new ResourceNotFoundException("Couldn't delete this transaction. Transaction doesn't exist");
         }
+
+        modifyTotalBalanceForAccount(possibleAccountToUpdate.get(), (possibleTransaction.get().getValue()*-1));
+
         System.out.print("Delete - ");
         System.out.println(id);
         transactionRepository.deleteById(id);
 
         return true;
+    }
+
+    private Optional<Account> findAccount(Optional<User> possibleUser, Long transactionId){
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("User for this email does not exist");
+        }
+        Set<Account> allAccountsForUser = possibleUser.get().getAccounts();
+        for(Account account: allAccountsForUser){
+            for(Transaction transaction: account.getTransactions()){
+                if(transaction.getId().equals(transactionId)){
+                    return Optional.of(account);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<Transaction> findTransaction(Optional<User> possibleUser, Long transactionId){
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("User for this email does not exist");
+        }
+        return possibleUser.get().getAccounts().stream()
+                .flatMap(account -> account.getTransactions().stream())
+                .filter(transaction -> transaction.getId().equals(transactionId))
+                .findFirst();
     }
 
     public boolean removeTransfer(Long id, String email) {
