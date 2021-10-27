@@ -2,8 +2,11 @@ package com.mlkb.ftm;
 
 import com.mlkb.ftm.controller.AccountController;
 import com.mlkb.ftm.exception.GlobalExceptionHandler;
+import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.service.AccountService;
+import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.validation.AccessValidator;
+import com.mlkb.ftm.validation.InputValidator;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,5 +32,44 @@ public class ApplicationConfig {
     @Bean
     public GlobalExceptionHandler globalExceptionHandler() {
         return new GlobalExceptionHandler();
+    }
+
+    @Bean
+    public PaymentService paymentService() {
+        return Mockito.mock(PaymentService.class);
+    }
+
+    @Bean
+    public UserRepository userRepository() {
+        return Mockito.mock(UserRepository.class);
+    }
+    @Bean
+    public InputValidator inputValidator() {
+        return Mockito.mock(InputValidator.class);
+    }
+
+    @Bean
+    public TransactionRepository transactionRepository() {
+        return Mockito.mock(TransactionRepository.class);
+    }
+
+    @Bean
+    public TransferRepository transferRepository() {
+        return Mockito.mock(TransferRepository.class);
+    }
+
+    @Bean
+    public AccountRepository accountRepository() {
+        return Mockito.mock(AccountRepository.class);
+    }
+
+    @Bean
+    public CategoryRepository categoryRepository() {
+        return Mockito.mock(CategoryRepository.class);
+    }
+
+    @Bean
+    public PayeeRepository payeeRepository() {
+        return Mockito.mock(PayeeRepository.class);
     }
 }
