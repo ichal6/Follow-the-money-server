@@ -48,10 +48,10 @@ List of improve:
 
 
 ## Screenshots
-###Dashboard view:
+### Dashboard view:
 ![Dashboard](./img/dashboard.png)
 
-###Mobile view:
+### Mobile view:
 ![Mobile](./img/mobile.png)
 
 
