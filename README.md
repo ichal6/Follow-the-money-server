@@ -91,8 +91,6 @@ Michał Lechowicz
 Created by [@flynerdpl](https://www.flynerd.pl/)
 
 
-Test
-
 <!-- Optional -->
 <!-- ## License -->
 <!-- This project is open source and available under the [... License](). -->
