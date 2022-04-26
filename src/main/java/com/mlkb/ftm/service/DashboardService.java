@@ -93,7 +93,6 @@ public class DashboardService {
 
     private Double getTotalBalance() {
         return user.getAccounts().stream()
-                .filter(account -> account.getIsEnabled() == true)
                 .mapToDouble(Account::getCurrentBalance)
                 .reduce(0, Double::sum);
     }
