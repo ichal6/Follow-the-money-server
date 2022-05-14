@@ -71,8 +71,6 @@ public class AccountControllerIntegrationTest {
                 .andReturn();
     }
 
-    // TODO Repair test
-    @Disabled
     @Test
     public void should_return_created_status_code_and_created_object_when_adding_new_account() throws Exception {
         //given
@@ -94,12 +92,10 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
         //then
-        verify(accountService, times(2)).createAccount(any(NewAccountDTO.class));
+        verify(accountService, times(1)).createAccount(any(NewAccountDTO.class));
     }
 
-    // TODO Repair Test
     @Test
-    @Disabled
     public void should_return_ok_status_code_and_updated_object_when_modifying_account() throws Exception {
         // given
         NewAccountDTO accountDTO = new NewAccountDTO(1L, "Name", "CASH", 100.00, 40.00, "email@email.pl");
@@ -120,7 +116,7 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
         // then
-        verify(accountService, times(2)).updateAccount(any(NewAccountDTO.class));
+        verify(accountService, times(1)).updateAccount(any(NewAccountDTO.class));
     }
 
     @Test
