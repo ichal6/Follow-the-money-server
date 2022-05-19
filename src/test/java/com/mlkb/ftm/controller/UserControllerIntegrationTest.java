@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.service.UserService;
@@ -66,6 +67,18 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.name").value("User Userowy"))
                 .andExpect(jsonPath("$.email").value("user@user.pl"))
                 .andExpect(jsonPath("$.date").value("07/05/2020")) //JSON return UTC time (-1 by Warsaw time)
+                .andReturn();
+        //then
+        verify(userService, atLeast(1)).getUser(anyString());
+    }
+    @Test
+    void should_throw_resource_not_found_exception() throws Exception {
+        //given
+        //when
+        when(userService.getUser(anyString())).thenThrow(ResourceNotFoundException.class);
+
+        mockMvc.perform(get("/api/user/anyEmail"))
+                .andExpect(status().isNotFound())
                 .andReturn();
         //then
         verify(userService, atLeast(1)).getUser(anyString());
