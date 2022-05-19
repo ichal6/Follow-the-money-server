@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
@@ -55,7 +56,11 @@ class UserControllerIntegrationTest {
     @Test
     void should_get_user_by_email() throws Exception {
         //given
-        Date date = new GregorianCalendar(2020, Calendar.MAY, 8).getTime();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        calendar.set(2020, Calendar.MAY, 8);
+        Date date = calendar.getTime();
+
         UserDTO user = new UserDTO("User Userowy", "user@user.pl", date);
         //when
         when(userService.getUser(anyString()))
@@ -66,7 +71,7 @@ class UserControllerIntegrationTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$.name").value("User Userowy"))
                 .andExpect(jsonPath("$.email").value("user@user.pl"))
-                .andExpect(jsonPath("$.date").value("07/05/2020")) //JSON return UTC time (-1 by Warsaw time)
+                .andExpect(jsonPath("$.date").value("08/05/2020"))
                 .andReturn();
         //then
         verify(userService, atLeast(1)).getUser(anyString());
