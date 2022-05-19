@@ -1,6 +1,10 @@
 package com.mlkb.ftm.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mlkb.ftm.ApplicationConfig;
+import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.modelDTO.NewUserDTO;
 import com.mlkb.ftm.modelDTO.UserDTO;
 import com.mlkb.ftm.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -67,6 +72,39 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void createUser() {
+    void should_create_new_user_when_provide_correct_data() throws Exception {
+        //given
+        NewUserDTO user = new NewUserDTO("new-extra-password");
+        user.setName("User Userowy");
+        user.setEmail("user@user.pl");
+
+        String newUserDTOtoJSON = convertUserDtoToJson(user);
+
+        //when
+        when(userService.isValidNewUser(user)).thenReturn(true);
+
+        when(userService.isUserInDB(anyString()))
+                .thenReturn(false);
+
+        when(userService.createUser(any())).thenReturn(user);
+
+        mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON)
+                .content(newUserDTOtoJSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value("User Userowy"))
+                .andExpect(jsonPath("$.email").value("user@user.pl"))
+                .andExpect(jsonPath("$.password").value("new-extra-password"))
+                .andReturn();
+
+        //then
+        verify(userService, atLeast(1)).isValidNewUser(any());
+        verify(userService, atLeast(1)).isUserInDB(anyString());
+
+    }
+
+    private String convertUserDtoToJson(NewUserDTO user) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(user);
     }
 }
