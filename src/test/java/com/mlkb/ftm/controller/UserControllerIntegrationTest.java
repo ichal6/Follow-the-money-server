@@ -101,7 +101,59 @@ class UserControllerIntegrationTest {
         //then
         verify(userService, atLeast(1)).isValidNewUser(any());
         verify(userService, atLeast(1)).isUserInDB(anyString());
+        verify(userService, atLeast(1)).createUser(any());
 
+    }
+
+    @Test
+    void should_return_conflict_when_try_create_new_user_with_the_same_email_address() throws Exception {
+        //given
+        NewUserDTO user = new NewUserDTO("new-extra-password");
+        user.setName("User Userowy");
+        user.setEmail("user@user.pl");
+
+        String newUserDTOtoJSON = convertUserDtoToJson(user);
+
+        //when
+        when(userService.isValidNewUser(user)).thenReturn(true);
+
+        when(userService.isUserInDB(anyString()))
+                .thenReturn(true);
+
+        when(userService.createUser(any())).thenReturn(user);
+
+        mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON)
+                        .content(newUserDTOtoJSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andReturn();
+
+        //then
+        verify(userService, atLeast(1)).isValidNewUser(any());
+        verify(userService, atLeast(1)).isUserInDB(anyString());
+    }
+
+    @Test
+    void should_return_bad_request_when_body_is_not_correct() throws Exception {
+        //given
+        NewUserDTO user = new NewUserDTO();
+        user.setName("User Userowy");
+        user.setEmail("user@user.pl");
+
+        String newUserDTOtoJSON = convertUserDtoToJson(user);
+
+        //when
+        when(userService.isValidNewUser(any())).thenThrow(InputIncorrectException.class);
+
+        mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON)
+                        .content(newUserDTOtoJSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        //then
+        verify(userService, atLeast(1)).isValidNewUser(any());
+        verify(userService, times(0)).isUserInDB(anyString());
     }
 
     private String convertUserDtoToJson(NewUserDTO user) throws JsonProcessingException {
