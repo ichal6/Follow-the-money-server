@@ -11,6 +11,7 @@ import com.mlkb.ftm.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -63,8 +64,9 @@ class UserControllerIntegrationTest {
 
         UserDTO user = new UserDTO("User Userowy", "user@user.pl", date);
         //when
-        when(userService.getUser(anyString()))
-                .thenReturn(user);
+        doReturn(user).when(userService).getUser(anyString());
+//        when(userService.getUser(anyString()))
+//                .thenReturn(user);
 
         mockMvc.perform(get("/api/user/anyEmail"))
                 .andExpect(status().isOk())
@@ -161,7 +163,7 @@ class UserControllerIntegrationTest {
         String newUserDTOtoJSON = convertUserDtoToJson(user);
 
         //when
-        when(userService.isValidNewUser(any())).thenThrow(InputIncorrectException.class);
+        when(userService.isValidNewUser(any())).thenThrow(InputIncorrectException.class).thenReturn(true);
 
         mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON)
                         .content(newUserDTOtoJSON)
