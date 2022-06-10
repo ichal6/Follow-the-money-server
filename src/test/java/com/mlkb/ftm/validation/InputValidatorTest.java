@@ -208,11 +208,28 @@ class InputValidatorTest {
     }
 
     @Test
-    void checkBalance() {
+    void should_return_true_if_email_is_ok() throws InputIncorrectException {
+        // given
+        String email = "example@domain.com";
+
+        // when
+        boolean isOk = this.inputValidator.checkEmail(email);
+
+        // then
+        assertTrue(isOk);
     }
 
     @Test
-    void checkBalancePositive() {
+    void should_throw_an_exception_if_email_is_not_ok() {
+        // given
+        String email = "wrong@@@|com";
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkEmail(email));
+
+        // then
+        assertEquals(InputValidationMessage.EMAIL.message, thrown.getMessage());
     }
 
     @Test
