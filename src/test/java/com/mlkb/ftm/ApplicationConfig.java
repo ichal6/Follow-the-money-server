@@ -9,7 +9,6 @@ import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.service.UserService;
 import com.mlkb.ftm.validation.AccessValidator;
 import com.mlkb.ftm.validation.InputValidator;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
