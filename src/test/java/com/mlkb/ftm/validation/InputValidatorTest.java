@@ -170,6 +170,44 @@ class InputValidatorTest {
     }
 
     @Test
+    void should_return_true_if_balance_positive_is_ok() throws InputIncorrectException {
+        // given
+        Double balance = 123.0;
+
+        // when
+        boolean isOk = this.inputValidator.checkBalancePositive(balance);
+
+        // then
+        assertTrue(isOk);
+    }
+
+    @Test
+    void should_throw_an_exception_if_balance_positive_is_null() {
+        // given
+        Double balance = null;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkBalancePositive(balance));
+
+        // then
+        assertEquals(InputValidationMessage.BALANCE_POSITIVE.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_an_exception_if_balance_positive_is_less_than_0() {
+        // given
+        Double balance = -123.0;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkBalancePositive(balance));
+
+        // then
+        assertEquals(InputValidationMessage.BALANCE_POSITIVE.message, thrown.getMessage());
+    }
+
+    @Test
     void checkBalance() {
     }
 
