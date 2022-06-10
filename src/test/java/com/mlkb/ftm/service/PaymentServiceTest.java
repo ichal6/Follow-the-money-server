@@ -4,9 +4,13 @@ import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.InputValidationMessage;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,10 +74,24 @@ public class PaymentServiceTest {
         user.setAccounts(Collections.singleton(account));
 
         // when
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail("user@user.pl")).thenReturn(Optional.of(user));
         paymentService.removeTransaction(transaction.getId(), email);
 
         // then
         assertEquals(currentBalance - transactionValue, account.getCurrentBalance());
+    }
+
+    @Test
+    void should_return_exception_if_user_does_not_exists(){
+        //given
+        String email = "NoOne@example.com";
+        //when
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.removeTransaction(1L, email));
+
+        // then
+        assertEquals("User for this email does not exist", thrown.getMessage());
+        //then
+
     }
 }
