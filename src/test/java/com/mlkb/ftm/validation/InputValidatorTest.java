@@ -117,6 +117,34 @@ class InputValidatorTest {
     }
 
     @Test
+    void should_return_true_if_general_type_in_enum() throws InputIncorrectException {
+        // given
+        String typeIncome = "INCOME";
+        String typeExpense = "Expense";
+
+        // when
+        boolean isIncomeOk = this.inputValidator.checkIfGeneralTypeInEnum(typeIncome);
+        boolean isExpenseOk = this.inputValidator.checkIfGeneralTypeInEnum(typeExpense);
+
+        // then
+        assertTrue(isIncomeOk);
+        assertTrue(isExpenseOk);
+    }
+
+    @Test
+    void should_throw_an_exception_if_general_type_is_not_in_enum() {
+        // given
+        String type = "Multiply";
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkIfGeneralTypeInEnum(type));
+
+        // then
+        assertEquals(InputValidationMessage.GENERAL_TYPE.message, thrown.getMessage());
+    }
+
+    @Test
     void checkIfGeneralTypeInEnum() {
 
     }
