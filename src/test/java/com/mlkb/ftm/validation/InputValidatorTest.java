@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -271,6 +273,27 @@ class InputValidatorTest {
     }
 
     @Test
-    void checkDate() {
+    void should_return_true_if_date_is_ok() throws InputIncorrectException {
+        // given
+        Date date = new Date(System.currentTimeMillis());
+
+        // when
+        boolean isOk = this.inputValidator.checkDate(date);
+
+        // then
+        assertTrue(isOk);
+    }
+
+    @Test
+    void should_throw_an_exception_if_date_is_null() {
+        // given
+        Date date = null;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkDate(date));
+
+        // then
+        assertEquals(InputValidationMessage.DATE.message, thrown.getMessage());
     }
 }
