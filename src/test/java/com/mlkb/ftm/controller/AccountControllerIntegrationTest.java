@@ -7,7 +7,6 @@ import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,7 +28,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ApplicationConfig.class})
 @WebAppConfiguration
@@ -71,8 +68,6 @@ public class AccountControllerIntegrationTest {
                 .andReturn();
     }
 
-    // TODO Repair test
-    @Disabled
     @Test
     public void should_return_created_status_code_and_created_object_when_adding_new_account() throws Exception {
         //given
@@ -81,6 +76,7 @@ public class AccountControllerIntegrationTest {
 
         // when
         doReturn(newAccountDTO).when(accountService).createAccount(any());
+        when(accountService.isValidNewAccount(any())).thenReturn(true);
         mockMvc.perform(post("/api/account").contentType(MediaType.APPLICATION_JSON)
                 .content(newAccountDTOtoJSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -94,12 +90,10 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
         //then
-        verify(accountService, times(2)).createAccount(any(NewAccountDTO.class));
+        verify(accountService, atLeast(1)).createAccount(any(NewAccountDTO.class));
     }
 
-    // TODO Repair Test
     @Test
-    @Disabled
     public void should_return_ok_status_code_and_updated_object_when_modifying_account() throws Exception {
         // given
         NewAccountDTO accountDTO = new NewAccountDTO(1L, "Name", "CASH", 100.00, 40.00, "email@email.pl");
@@ -107,6 +101,7 @@ public class AccountControllerIntegrationTest {
 
         // when
         doReturn(accountDTO).when(accountService).updateAccount(any());
+        when(accountService.isValidNewAccount(any())).thenReturn(true);
         mockMvc.perform(put("/api/account").contentType(MediaType.APPLICATION_JSON)
                 .content(accountDTOtoJSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -120,7 +115,7 @@ public class AccountControllerIntegrationTest {
                 .andExpect(jsonPath("$.userEmail").value("email@email.pl"));
 
         // then
-        verify(accountService, times(2)).updateAccount(any(NewAccountDTO.class));
+        verify(accountService, atLeast(1)).updateAccount(any(NewAccountDTO.class));
     }
 
     @Test

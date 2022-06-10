@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ApplicationConfig.class})
-//@WebAppConfiguration
 @SpringBootTest
 public class PaymentServiceTest {
     private PaymentService paymentService;

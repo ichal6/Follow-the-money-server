@@ -1,12 +1,15 @@
 package com.mlkb.ftm;
 
 import com.mlkb.ftm.controller.AccountController;
+import com.mlkb.ftm.controller.UserController;
 import com.mlkb.ftm.exception.GlobalExceptionHandler;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.service.AccountService;
 import com.mlkb.ftm.service.PaymentService;
+import com.mlkb.ftm.service.UserService;
 import com.mlkb.ftm.validation.AccessValidator;
 import com.mlkb.ftm.validation.InputValidator;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +27,16 @@ public class ApplicationConfig {
     @Bean
     public AccountService accountService() {
         return Mockito.mock(AccountService.class);
+    }
+
+    @Bean
+    public UserController userController(){
+        return new UserController(userService(), accessValidator());
+    }
+
+    @Bean
+    public UserService userService() {
+        return Mockito.mock(UserService.class);
     }
 
     @Bean
