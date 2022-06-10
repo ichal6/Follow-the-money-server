@@ -65,8 +65,6 @@ class UserControllerIntegrationTest {
         UserDTO user = new UserDTO("User Userowy", "user@user.pl", date);
         //when
         doReturn(user).when(userService).getUser(anyString());
-//        when(userService.getUser(anyString()))
-//                .thenReturn(user);
 
         mockMvc.perform(get("/api/user/anyEmail"))
                 .andExpect(status().isOk())
