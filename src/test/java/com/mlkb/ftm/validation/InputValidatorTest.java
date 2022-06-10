@@ -3,13 +3,11 @@ package com.mlkb.ftm.validation;
 import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.InputValidationMessage;
-import io.swagger.models.auth.In;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -91,15 +89,36 @@ class InputValidatorTest {
     }
 
     @Test
-    void checkName() {
+    void should_return_true_if_account_type_in_enum() throws InputIncorrectException {
+        // given
+        String typeCash = "CAsH";
+        String typeBank = "banK";
+
+        // when
+        boolean isCashOk = this.inputValidator.checkIfAccountTypeInEnum(typeCash);
+        boolean isBankOk = this.inputValidator.checkIfAccountTypeInEnum(typeBank);
+
+        // then
+        assertTrue(isCashOk);
+        assertTrue(isBankOk);
     }
 
     @Test
-    void checkIfAccountTypeInEnum() {
+    void should_throw_an_exception_if_account_type_is_not_in_enum() {
+        // given
+        String type = "Card";
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkIfAccountTypeInEnum(type));
+
+        // then
+        assertEquals(InputValidationMessage.ACCOUNT_TYPE.message, thrown.getMessage());
     }
 
     @Test
     void checkIfGeneralTypeInEnum() {
+
     }
 
     @Test
