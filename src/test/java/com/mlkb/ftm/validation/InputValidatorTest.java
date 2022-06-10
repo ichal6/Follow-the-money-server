@@ -233,11 +233,41 @@ class InputValidatorTest {
     }
 
     @Test
-    void checkEmail() {
+    void should_return_true_if_password_is_ok() throws InputIncorrectException {
+        // given
+        String password = "2na6~<_Ga;M`3sCOY]%d";
+
+        // when
+        boolean isOk = this.inputValidator.checkPassword(password);
+
+        // then
+        assertTrue(isOk);
     }
 
     @Test
-    void checkPassword() {
+    void should_throw_an_exception_if_password_is_blank() {
+        // given
+        String password = "";
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkPassword(password));
+
+        // then
+        assertEquals(InputValidationMessage.PASSWORD.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_an_exception_if_password_is_null() {
+        // given
+        String password = null;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkPassword(password));
+
+        // then
+        assertEquals(InputValidationMessage.PASSWORD.message, thrown.getMessage());
     }
 
     @Test
