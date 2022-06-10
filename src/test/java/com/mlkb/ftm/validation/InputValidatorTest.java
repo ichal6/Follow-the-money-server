@@ -2,6 +2,7 @@ package com.mlkb.ftm.validation;
 
 import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import io.swagger.models.auth.In;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,44 @@ class InputValidatorTest {
 
         // then
         assertEquals("Id should be a number greater than 0.", thrown.getMessage());
+    }
+
+    @Test
+    void should_return_true_if_name_is_ok() throws InputIncorrectException {
+        // given
+        String name = "Smith";
+
+        // when
+        boolean isOk = this.inputValidator.checkName(name);
+
+        // then
+        assertTrue(isOk);
+    }
+
+    @Test
+    void should_throw_an_exception_if_name_is_empty() {
+        // given
+        String name = "";
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkName(name));
+
+        // then
+        assertEquals(InputValidationMessage.NAME.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_an_exception_if_name_has_wrong_size() {
+        // given
+        String name = "ML";
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkName(name));
+
+        // then
+        assertEquals(InputValidationMessage.NAME.message, thrown.getMessage());
     }
 
     @Test
