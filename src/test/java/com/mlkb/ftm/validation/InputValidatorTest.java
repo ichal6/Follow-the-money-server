@@ -2,10 +2,13 @@ package com.mlkb.ftm.validation;
 
 import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import io.swagger.models.auth.In;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -33,6 +36,19 @@ class InputValidatorTest {
 
         // then
         assertTrue(isOk);
+    }
+
+    @Test
+    void should_throw_an_exception_if_id_is_not_ok() {
+        // given
+        Long id = -2L;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkId(id), "Wrong ID");
+
+        // then
+        assertEquals("Id should be a number greater than 0.", thrown.getMessage());
     }
 
     @Test
