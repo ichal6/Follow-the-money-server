@@ -145,8 +145,28 @@ class InputValidatorTest {
     }
 
     @Test
-    void checkIfGeneralTypeInEnum() {
+    void should_return_true_if_balance_is_ok() throws InputIncorrectException {
+        // given
+        Double balance = 123.0;
 
+        // when
+        boolean isOk = this.inputValidator.checkBalance(balance);
+
+        // then
+        assertTrue(isOk);
+    }
+
+    @Test
+    void should_throw_an_exception_if_balance_is_null() {
+        // given
+        Double balance = null;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkBalance(balance));
+
+        // then
+        assertEquals(InputValidationMessage.BALANCE.message, thrown.getMessage());
     }
 
     @Test
