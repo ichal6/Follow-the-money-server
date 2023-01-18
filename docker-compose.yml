@@ -7,7 +7,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ftm
+      FTM_DATASOURCE_URL: jdbc:postgresql://db:5432/ftm
+      FTM_DATASOURCE_USERNAME: admin
+      FTM_DATASOURCE_PASSWORD: 1234
     depends_on:
       - db
     links:
