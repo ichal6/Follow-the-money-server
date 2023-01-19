@@ -58,6 +58,41 @@ public class PaymentService {
         }
     }
 
+    public List<PaymentDTO> getPayments(String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if (possibleUser.isPresent()) {
+            User user = possibleUser.get();
+            var accounts = user.getAccounts();
+            List<PaymentDTO> payments = new ArrayList<>();
+            for(Account account: accounts) {
+                payments.addAll(extractPayments(account));
+            }
+            return payments;
+        } else {
+            throw new ResourceNotFoundException("Couldn't find user or account for given parameters");
+        }
+    }
+
+    private List<PaymentDTO> extractPayments(Account account){
+
+        List<PaymentDTO> payments = account.getTransactions().stream()
+                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName())).collect(Collectors.toList());
+
+        payments.addAll(account.getTransfersFrom().stream()
+                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
+                .collect(Collectors.toList()));
+
+        payments.addAll(account.getTransfersTo().stream()
+                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
+                .collect(Collectors.toList()));
+
+        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
+
+        calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
+
+        return payments;
+    }
+
     public boolean isValidNewTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
         return transactionDTO != null
                 && inputValidator.checkName(transactionDTO.getTitle())
