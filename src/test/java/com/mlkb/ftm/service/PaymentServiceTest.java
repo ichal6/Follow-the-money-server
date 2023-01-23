@@ -7,6 +7,7 @@ import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.fixture.PaymentDTOFixture;
 import com.mlkb.ftm.fixture.TransactionEntityFixture;
 import com.mlkb.ftm.fixture.TransferEntityFixture;
+import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.junit.jupiter.api.AfterEach;
@@ -113,14 +114,23 @@ public class PaymentServiceTest {
         when(wallet.getTransfersTo()).thenReturn(cashDepositTransferMilleniumAsSet);
 
         final var payments = paymentService.getPayments(email);
+
         // then
+        Optional<PaymentDTO> optionalPaymentDTO = payments
+                .stream()
+                .filter(PaymentDTO::getIsInternal)
+                .filter(paymentDTO -> paymentDTO.getValue() < 0)
+                .findFirst();
+
         assertThat(payments)
-                .hasSize(4)
+                .hasSize(3)
                 .containsExactlyInAnyOrder(
                         PaymentDTOFixture.buyCarTransaction(),
                         PaymentDTOFixture.cashDepositTransferMillenium(),
-                        PaymentDTOFixture.cashDepositTransWallet(),
                         PaymentDTOFixture.buyMilkTransaction()
                 );
+
+        assertThat(optionalPaymentDTO)
+                .isEmpty();
     }
 }

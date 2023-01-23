@@ -15,7 +15,6 @@ public class PaymentDTOFixture {
         transaction.setTo("Złomex");
         transaction.setFrom("Millenium");
         transaction.setCategoryName("Car");
-        transaction.setBalanceAfter(0.0);
         transaction.setIsInternal(false);
         return transaction;
     }
@@ -29,7 +28,6 @@ public class PaymentDTOFixture {
         transaction.setTo("Biedronka");
         transaction.setFrom("Wallet");
         transaction.setCategoryName("Daily");
-        transaction.setBalanceAfter(0.0);
         transaction.setIsInternal(false);
         return transaction;
     }
@@ -39,23 +37,9 @@ public class PaymentDTOFixture {
         transfer.setId(3L);
         transfer.setTitle("Cash Deposit January");
         transfer.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 5).getTime());
-        transfer.setValue(-100.0);
-        transfer.setTo("Wallet");
-        transfer.setFrom("Millenium");
-        transfer.setBalanceAfter(2500.0);
-        transfer.setIsInternal(true);
-        return transfer;
-    }
-
-    public static PaymentDTO cashDepositTransWallet() {
-        final var transfer = new PaymentDTO();
-        transfer.setId(3L);
-        transfer.setTitle("Cash Deposit January");
-        transfer.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 5).getTime());
         transfer.setValue(100.0);
         transfer.setTo("Wallet");
         transfer.setFrom("Millenium");
-        transfer.setBalanceAfter(5.0);
         transfer.setIsInternal(true);
         return transfer;
     }

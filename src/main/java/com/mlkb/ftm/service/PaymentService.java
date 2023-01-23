@@ -65,18 +65,21 @@ public class PaymentService {
             var accounts = user.getAccounts();
             List<PaymentDTO> payments = new ArrayList<>();
             for(Account account: accounts) {
-                payments.addAll(extractPayments(account));
+                payments.addAll(extractPayments(account, true));
             }
-            return payments;
+            return payments.stream()
+                    .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
+                    .collect(Collectors.toList());
         } else {
             throw new ResourceNotFoundException("Couldn't find user or account for given parameters");
         }
     }
 
-    private List<PaymentDTO> extractPayments(Account account){
+    private List<PaymentDTO> extractPayments(Account account, Boolean isForAllAccount){
 
         List<PaymentDTO> payments = account.getTransactions().stream()
-                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName())).collect(Collectors.toList());
+                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
+                .collect(Collectors.toList());
 
         payments.addAll(account.getTransfersFrom().stream()
                 .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
@@ -88,7 +91,8 @@ public class PaymentService {
 
         payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
 
-        calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
+        if(!isForAllAccount)
+            calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
 
         return payments;
     }
