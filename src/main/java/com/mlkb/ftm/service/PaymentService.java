@@ -71,7 +71,7 @@ public class PaymentService {
                     .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
                     .collect(Collectors.toList());
         } else {
-            throw new ResourceNotFoundException("Couldn't find user or account for given parameters");
+            throw new ResourceNotFoundException(String.format("Couldn't find user with email %s", email));
         }
     }
 

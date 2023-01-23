@@ -4,6 +4,7 @@ import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.PaymentDTOFixture;
 import com.mlkb.ftm.fixture.TransactionEntityFixture;
 import com.mlkb.ftm.fixture.TransferEntityFixture;
@@ -132,5 +133,24 @@ public class PaymentServiceTest {
 
         assertThat(optionalPaymentDTO)
                 .isEmpty();
+    }
+
+    @Test
+    void should_throw_exception_if_user_is_not_found_for_get_all_payments(){
+        // given
+        final String email = "user@user.pl";
+        final User user = new User();
+        user.setEmail(email);
+
+        // when/then
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        final var exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> paymentService.getPayments(email)
+        );
+
+        assertThat(exception.getMessage())
+                .isEqualTo(String.format("Couldn't find user with email %s", email));
+
     }
 }
