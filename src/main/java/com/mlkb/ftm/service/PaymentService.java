@@ -10,8 +10,13 @@ import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.Clock;
+
+import static java.lang.String.format;
 
 @Service
 public class PaymentService {
@@ -22,11 +27,12 @@ public class PaymentService {
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final PayeeRepository payeeRepository;
+    private final Clock clock;
 
     public PaymentService(UserRepository userRepository, InputValidator inputValidator,
                           TransactionRepository transactionRepository, AccountRepository accountRepository,
                           CategoryRepository categoryRepository, PayeeRepository payeeRepository,
-                          TransferRepository transferRepository) {
+                          TransferRepository transferRepository, Clock clock) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
         this.transactionRepository = transactionRepository;
@@ -34,6 +40,7 @@ public class PaymentService {
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
         this.payeeRepository = payeeRepository;
+        this.clock = clock;
     }
 
     public List<PaymentDTO> getPaymentsWithParameters(String email, String accountId, String period) {
@@ -46,7 +53,7 @@ public class PaymentService {
                 User user = userOptional.get();
                 Account account = accountOptional.get();
                 if (user.getAccounts().contains(account)) {
-                    return extractPaymentsForParameters(account, periodInDays);
+                    return extractPaymentsForParameters(account, periodInDays, false);
                 } else {
                     throw new ResourceNotFoundException("User with given email doesn't have an account with given id");
                 }
@@ -56,6 +63,87 @@ public class PaymentService {
         } catch (NumberFormatException e) {
             throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
         }
+    }
+
+    public List<PaymentDTO> getPaymentsForPeriod(String email, String period) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
+        }
+        try {
+            int periodInDays = Integer.parseInt(period);
+            User user = userOptional.get();
+            var accounts = user.getAccounts();
+            List<PaymentDTO> payments = new ArrayList<>();
+            for(Account account: accounts) {
+                payments.addAll(extractPaymentsForParameters(account, periodInDays, true));
+            }
+            return payments.stream()
+                    .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
+                    .collect(Collectors.toList());
+        } catch (NumberFormatException e) {
+            throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
+        }
+    }
+
+    public List<PaymentDTO> getPaymentsWithAccount(String email, String accountId) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
+        }
+        try {
+            Long accountIdLong = Long.parseLong(accountId);
+            Optional<Account> accountOptional = accountRepository.findById(accountIdLong);
+            if (accountOptional.isPresent()) {
+                User user = userOptional.get();
+                Account account = accountOptional.get();
+                if (user.getAccounts().contains(account)) {
+                    return extractPaymentsForAccount(account);
+                } else {
+                    throw new ResourceNotFoundException("User with given email doesn't have an account with given id");
+                }
+            } else {
+                throw new ResourceNotFoundException(format("Couldn't find account for account id %d", accountIdLong));
+            }
+        } catch (NumberFormatException e) {
+            throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
+        }
+    }
+
+    public List<PaymentDTO> getPayments(String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if (possibleUser.isPresent()) {
+            User user = possibleUser.get();
+            var accounts = user.getAccounts();
+            List<PaymentDTO> payments = new ArrayList<>();
+            for(Account account: accounts) {
+                payments.addAll(extractPayments(account));
+            }
+            return payments.stream()
+                    .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
+                    .collect(Collectors.toList());
+        } else {
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
+        }
+    }
+
+    private List<PaymentDTO> extractPayments(Account account){
+
+        List<PaymentDTO> payments = account.getTransactions().stream()
+                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
+                .collect(Collectors.toList());
+
+        payments.addAll(account.getTransfersFrom().stream()
+                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
+                .collect(Collectors.toList()));
+
+        payments.addAll(account.getTransfersTo().stream()
+                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
+                .collect(Collectors.toList()));
+
+        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
+
+        return payments;
     }
 
     public boolean isValidNewTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
@@ -142,10 +230,11 @@ public class PaymentService {
         accountRepository.save(accountTo);
     }
 
-    private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays) {
+    private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays, boolean isForAllAccount) {
         List<PaymentDTO> payments = new ArrayList<>();
-        long DAY_IN_MS = 1000 * 60 * 60 * 24;
-        Date dateFrom = new Date(System.currentTimeMillis() - (periodInDays * DAY_IN_MS));
+        Instant now = clock.instant();
+        Instant instantFrom = now.minus(periodInDays, ChronoUnit.DAYS);
+        Date dateFrom = Date.from(instantFrom);
 
         List<PaymentDTO> transactions = account.getTransactions().stream()
                 .filter(transaction -> transaction.getDate().getTime() > dateFrom.getTime())
@@ -159,6 +248,32 @@ public class PaymentService {
 
         List<PaymentDTO> transfersTo = account.getTransfersTo().stream()
                 .filter(transfer -> transfer.getDate().getTime() > dateFrom.getTime())
+                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
+                .collect(Collectors.toList());
+
+        payments.addAll(transactions);
+        payments.addAll(transfersFrom);
+        payments.addAll(transfersTo);
+
+        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
+        if(!isForAllAccount)
+            calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
+
+        return payments;
+    }
+
+    private List<PaymentDTO> extractPaymentsForAccount(Account account) {
+        List<PaymentDTO> payments = new ArrayList<>();
+
+        List<PaymentDTO> transactions = account.getTransactions().stream()
+                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
+                .collect(Collectors.toList());
+
+        List<PaymentDTO> transfersFrom = account.getTransfersFrom().stream()
+                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
+                .collect(Collectors.toList());
+
+        List<PaymentDTO> transfersTo = account.getTransfersTo().stream()
                 .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
                 .collect(Collectors.toList());
 

@@ -1,6 +1,7 @@
 package com.mlkb.ftm;
 
 import com.mlkb.ftm.controller.AccountController;
+import com.mlkb.ftm.controller.PaymentController;
 import com.mlkb.ftm.controller.UserController;
 import com.mlkb.ftm.exception.GlobalExceptionHandler;
 import com.mlkb.ftm.repository.*;
@@ -9,11 +10,12 @@ import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.service.UserService;
 import com.mlkb.ftm.validation.AccessValidator;
 import com.mlkb.ftm.validation.InputValidator;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import java.time.Clock;
 
 @EnableWebMvc
 @Configuration
@@ -22,6 +24,11 @@ public class ApplicationConfig {
     @Bean
     public AccountController accountController() {
         return new AccountController(accountService(), accessValidator());
+    }
+
+    @Bean
+    public PaymentController paymentController() {
+        return new PaymentController(paymentService(), accessValidator());
     }
 
     @Bean
@@ -84,5 +91,10 @@ public class ApplicationConfig {
     @Bean
     public PayeeRepository payeeRepository() {
         return Mockito.mock(PayeeRepository.class);
+    }
+
+    @Bean
+    public Clock clock() {
+        return Mockito.mock(Clock.class);
     }
 }
