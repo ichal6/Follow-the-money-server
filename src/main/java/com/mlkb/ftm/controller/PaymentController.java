@@ -47,7 +47,7 @@ public class PaymentController {
         } else if (possibleAccountId.isPresent()){
             paymentsDTOList = paymentService.getPaymentsWithAccount(email, possibleAccountId.get());
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            paymentsDTOList = paymentService.getPaymentsForPeriod(email, possiblePeriod.get());
         }
         return new ResponseEntity<>(paymentsDTOList, HttpStatus.OK);
     }

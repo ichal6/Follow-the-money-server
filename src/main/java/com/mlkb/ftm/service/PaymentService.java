@@ -48,13 +48,34 @@ public class PaymentService {
                 User user = userOptional.get();
                 Account account = accountOptional.get();
                 if (user.getAccounts().contains(account)) {
-                    return extractPaymentsForParameters(account, periodInDays);
+                    return extractPaymentsForParameters(account, periodInDays, false);
                 } else {
                     throw new ResourceNotFoundException("User with given email doesn't have an account with given id");
                 }
             } else {
                 throw new ResourceNotFoundException("Couldn't find user or account for given parameters");
             }
+        } catch (NumberFormatException e) {
+            throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
+        }
+    }
+
+    public List<PaymentDTO> getPaymentsForPeriod(String email, String period) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
+        }
+        try {
+            int periodInDays = Integer.parseInt(period);
+            User user = userOptional.get();
+            var accounts = user.getAccounts();
+            List<PaymentDTO> payments = new ArrayList<>();
+            for(Account account: accounts) {
+                payments.addAll(extractPaymentsForParameters(account, periodInDays, true));
+            }
+            return payments.stream()
+                    .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
+                    .collect(Collectors.toList());
         } catch (NumberFormatException e) {
             throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
         }
@@ -91,7 +112,7 @@ public class PaymentService {
             var accounts = user.getAccounts();
             List<PaymentDTO> payments = new ArrayList<>();
             for(Account account: accounts) {
-                payments.addAll(extractPayments(account, true));
+                payments.addAll(extractPayments(account));
             }
             return payments.stream()
                     .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
@@ -101,7 +122,7 @@ public class PaymentService {
         }
     }
 
-    private List<PaymentDTO> extractPayments(Account account, Boolean isForAllAccount){
+    private List<PaymentDTO> extractPayments(Account account){
 
         List<PaymentDTO> payments = account.getTransactions().stream()
                 .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
@@ -116,9 +137,6 @@ public class PaymentService {
                 .collect(Collectors.toList()));
 
         payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
-
-        if(!isForAllAccount)
-            calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
 
         return payments;
     }
@@ -207,7 +225,7 @@ public class PaymentService {
         accountRepository.save(accountTo);
     }
 
-    private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays) {
+    private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays, boolean isForAllAccount) {
         List<PaymentDTO> payments = new ArrayList<>();
         long DAY_IN_MS = 1000 * 60 * 60 * 24;
         Date dateFrom = new Date(System.currentTimeMillis() - (periodInDays * DAY_IN_MS));
@@ -232,8 +250,8 @@ public class PaymentService {
         payments.addAll(transfersTo);
 
         payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
-
-        calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
+        if(!isForAllAccount)
+            calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
 
         return payments;
     }
