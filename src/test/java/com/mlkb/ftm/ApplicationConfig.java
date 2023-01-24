@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.time.Clock;
+
 @EnableWebMvc
 @Configuration
 public class ApplicationConfig {
@@ -89,5 +91,10 @@ public class ApplicationConfig {
     @Bean
     public PayeeRepository payeeRepository() {
         return Mockito.mock(PayeeRepository.class);
+    }
+
+    @Bean
+    public Clock clock() {
+        return Mockito.mock(Clock.class);
     }
 }

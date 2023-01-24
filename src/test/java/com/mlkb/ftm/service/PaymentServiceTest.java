@@ -20,6 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,16 +30,16 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {ApplicationConfig.class})
 @SpringBootTest
 public class PaymentServiceTest {
     private PaymentService paymentService;
-
+    @Autowired
+    private Clock clock;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -54,7 +57,7 @@ public class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(userRepository, inputValidator, transactionRepository, accountRepository, categoryRepository, payeeRepository, transferRepository);
+        paymentService = new PaymentService(userRepository, inputValidator, transactionRepository, accountRepository, categoryRepository, payeeRepository, transferRepository, clock);
     }
 
     @AfterEach
@@ -195,6 +198,54 @@ public class PaymentServiceTest {
                 .containsExactlyInAnyOrder(
                         PaymentDTOFixture.buyCarTransactionWithBalance(),
                         PaymentDTOFixture.cashDepositTransferMilleniumWithBalance()
+                );
+    }
+
+    @Test
+    void should_get_payments_with_period_parameter() {
+        // given
+        final String email = "user@user.pl";
+        final User user = new User();
+        Account millenium = mock(Account.class);
+        Account wallet = mock(Account.class);
+        user.setEmail(email);
+        user.setAccounts(Set.of(millenium, wallet));
+        final var transactions = List.of(
+                TransactionEntityFixture.buyCarTransaction(),
+                TransactionEntityFixture.buyMilkTransaction()
+        );
+        final var transfers = List.of(TransferEntityFixture.cashDepositTransfer());
+        final var buyCarTransactionAsSet = Set.of(TransactionEntityFixture.buyCarTransaction());
+        final var cashDepositTransferMilleniumAsSet = Set.of(TransferEntityFixture.cashDepositTransfer());
+        final var buyMilkTransactionAsSet = Set.of(TransactionEntityFixture.buyMilkTransaction());
+
+        Instant instant = Instant.now(
+                Clock.fixed(
+                        Instant.parse("2023-01-23T12:34:56Z"), ZoneOffset.UTC
+                )
+        );
+
+        // when
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(transactionRepository.findAll()).thenReturn(transactions);
+        when(transferRepository.findAll()).thenReturn(transfers);
+        when(millenium.getName()).thenReturn("Millenium");
+        when(millenium.getTransactions()).thenReturn(buyCarTransactionAsSet);
+        when(millenium.getTransfersFrom()).thenReturn(cashDepositTransferMilleniumAsSet);
+        when(wallet.getName()).thenReturn("Wallet");
+        when(wallet.getTransactions()).thenReturn(buyMilkTransactionAsSet);
+        when(wallet.getTransfersTo()).thenReturn(cashDepositTransferMilleniumAsSet);
+        when(clock.instant()).thenReturn(instant);
+
+        final var payments = paymentService.getPaymentsForPeriod(email, "365");
+
+        // then
+        assertThat(payments)
+                .hasSize(3)
+                .containsExactlyInAnyOrder(
+                        PaymentDTOFixture.buyCarTransaction(),
+                        PaymentDTOFixture.cashDepositTransferMillenium(),
+                        PaymentDTOFixture.buyMilkTransaction()
                 );
     }
 }

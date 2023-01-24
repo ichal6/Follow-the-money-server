@@ -10,8 +10,11 @@ import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.Clock;
 
 import static java.lang.String.format;
 
@@ -24,11 +27,12 @@ public class PaymentService {
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final PayeeRepository payeeRepository;
+    private final Clock clock;
 
     public PaymentService(UserRepository userRepository, InputValidator inputValidator,
                           TransactionRepository transactionRepository, AccountRepository accountRepository,
                           CategoryRepository categoryRepository, PayeeRepository payeeRepository,
-                          TransferRepository transferRepository) {
+                          TransferRepository transferRepository, Clock clock) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
         this.transactionRepository = transactionRepository;
@@ -36,6 +40,7 @@ public class PaymentService {
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
         this.payeeRepository = payeeRepository;
+        this.clock = clock;
     }
 
     public List<PaymentDTO> getPaymentsWithParameters(String email, String accountId, String period) {
@@ -227,8 +232,9 @@ public class PaymentService {
 
     private List<PaymentDTO> extractPaymentsForParameters(Account account, int periodInDays, boolean isForAllAccount) {
         List<PaymentDTO> payments = new ArrayList<>();
-        long DAY_IN_MS = 1000 * 60 * 60 * 24;
-        Date dateFrom = new Date(System.currentTimeMillis() - (periodInDays * DAY_IN_MS));
+        Instant now = clock.instant();
+        Instant instantFrom = now.minus(periodInDays, ChronoUnit.DAYS);
+        Date dateFrom = Date.from(instantFrom);
 
         List<PaymentDTO> transactions = account.getTransactions().stream()
                 .filter(transaction -> transaction.getDate().getTime() > dateFrom.getTime())
