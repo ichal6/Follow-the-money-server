@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+
 @Service
 public class PaymentService {
     private final UserRepository userRepository;
@@ -58,6 +60,30 @@ public class PaymentService {
         }
     }
 
+    public List<PaymentDTO> getPaymentsWithAccount(String email, String accountId) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()){
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
+        }
+        try {
+            Long accountIdLong = Long.parseLong(accountId);
+            Optional<Account> accountOptional = accountRepository.findById(accountIdLong);
+            if (accountOptional.isPresent()) {
+                User user = userOptional.get();
+                Account account = accountOptional.get();
+                if (user.getAccounts().contains(account)) {
+                    return extractPaymentsForAccount(account);
+                } else {
+                    throw new ResourceNotFoundException("User with given email doesn't have an account with given id");
+                }
+            } else {
+                throw new ResourceNotFoundException(format("Couldn't find account for account id %d", accountIdLong));
+            }
+        } catch (NumberFormatException e) {
+            throw new ResourceNotFoundException("Given parameters for transactions are incorrect");
+        }
+    }
+
     public List<PaymentDTO> getPayments(String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
         if (possibleUser.isPresent()) {
@@ -71,7 +97,7 @@ public class PaymentService {
                     .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
                     .collect(Collectors.toList());
         } else {
-            throw new ResourceNotFoundException(String.format("Couldn't find user with email %s", email));
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
         }
     }
 
@@ -198,6 +224,32 @@ public class PaymentService {
 
         List<PaymentDTO> transfersTo = account.getTransfersTo().stream()
                 .filter(transfer -> transfer.getDate().getTime() > dateFrom.getTime())
+                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
+                .collect(Collectors.toList());
+
+        payments.addAll(transactions);
+        payments.addAll(transfersFrom);
+        payments.addAll(transfersTo);
+
+        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
+
+        calculateBalanceAfterEachPayment(payments, account.getCurrentBalance());
+
+        return payments;
+    }
+
+    private List<PaymentDTO> extractPaymentsForAccount(Account account) {
+        List<PaymentDTO> payments = new ArrayList<>();
+
+        List<PaymentDTO> transactions = account.getTransactions().stream()
+                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
+                .collect(Collectors.toList());
+
+        List<PaymentDTO> transfersFrom = account.getTransfersFrom().stream()
+                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
+                .collect(Collectors.toList());
+
+        List<PaymentDTO> transfersTo = account.getTransfersTo().stream()
                 .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
                 .collect(Collectors.toList());
 

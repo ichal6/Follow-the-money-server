@@ -39,11 +39,13 @@ public class PaymentController {
                                                   @RequestParam("period") Optional<String> possiblePeriod) {
         accessValidator.checkPermit(email);
         List<PaymentDTO> paymentsDTOList;
-        if(possibleAccountId.isEmpty() && possiblePeriod.isEmpty()){
+        if (possibleAccountId.isEmpty() && possiblePeriod.isEmpty()){
             paymentsDTOList = paymentService.getPayments(email);
         } else if (possibleAccountId.isPresent() && possiblePeriod.isPresent()){
             paymentsDTOList =
                     paymentService.getPaymentsWithParameters(email, possibleAccountId.get(), possiblePeriod.get());
+        } else if (possibleAccountId.isPresent()){
+            paymentsDTOList = paymentService.getPaymentsWithAccount(email, possibleAccountId.get());
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

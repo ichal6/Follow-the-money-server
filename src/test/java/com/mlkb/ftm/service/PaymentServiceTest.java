@@ -153,4 +153,48 @@ public class PaymentServiceTest {
                 .isEqualTo(String.format("Couldn't find user with email %s", email));
 
     }
+
+    @Test
+    void should_get_payments_with_account_parameter() {
+        // given
+        final String email = "user@user.pl";
+        final Long accountId = 1L;
+        final User user = new User();
+        Account millenium = mock(Account.class);
+        Account wallet = mock(Account.class);
+        user.setEmail(email);
+        user.setAccounts(Set.of(millenium, wallet));
+
+        final var transactions = List.of(
+                TransactionEntityFixture.buyCarTransaction(),
+                TransactionEntityFixture.buyMilkTransaction()
+        );
+        final var transfers = List.of(TransferEntityFixture.cashDepositTransfer());
+        final var buyCarTransactionAsSet = Set.of(TransactionEntityFixture.buyCarTransaction());
+        final var cashDepositTransferMilleniumAsSet = Set.of(TransferEntityFixture.cashDepositTransfer());
+        final var buyMilkTransactionAsSet = Set.of(TransactionEntityFixture.buyMilkTransaction());
+
+        // when
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(transactionRepository.findAll()).thenReturn(transactions);
+        when(transferRepository.findAll()).thenReturn(transfers);
+        when(accountRepository.findById(accountId)).thenReturn(Optional.of(millenium));
+        when(millenium.getName()).thenReturn("Millenium");
+        when(millenium.getId()).thenReturn(accountId);
+        when(millenium.getTransactions()).thenReturn(buyCarTransactionAsSet);
+        when(millenium.getTransfersFrom()).thenReturn(cashDepositTransferMilleniumAsSet);
+        when(wallet.getName()).thenReturn("Wallet");
+        when(wallet.getTransactions()).thenReturn(buyMilkTransactionAsSet);
+        when(wallet.getTransfersTo()).thenReturn(cashDepositTransferMilleniumAsSet);
+
+        final var payments = paymentService.getPaymentsWithAccount(email, "1");
+
+        // then
+        assertThat(payments)
+                .hasSize(2)
+                .containsExactlyInAnyOrder(
+                        PaymentDTOFixture.buyCarTransactionWithBalance(),
+                        PaymentDTOFixture.cashDepositTransferMilleniumWithBalance()
+                );
+    }
 }

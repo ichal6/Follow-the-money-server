@@ -19,6 +19,20 @@ public class PaymentDTOFixture {
         return transaction;
     }
 
+    public static PaymentDTO buyCarTransactionWithBalance() {
+        final var transaction = new PaymentDTO();
+        transaction.setId(1L);
+        transaction.setTitle("Buy Car");
+        transaction.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 19).getTime());
+        transaction.setValue(-2500.0);
+        transaction.setTo("Złomex");
+        transaction.setFrom("Millenium");
+        transaction.setCategoryName("Car");
+        transaction.setIsInternal(false);
+        transaction.setBalanceAfter(0.0);
+        return transaction;
+    }
+
     public static PaymentDTO buyMilkTransaction() {
         final var transaction = new PaymentDTO();
         transaction.setId(2L);
@@ -41,6 +55,19 @@ public class PaymentDTOFixture {
         transfer.setTo("Wallet");
         transfer.setFrom("Millenium");
         transfer.setIsInternal(true);
+        return transfer;
+    }
+
+    public static PaymentDTO cashDepositTransferMilleniumWithBalance() {
+        final var transfer = new PaymentDTO();
+        transfer.setId(3L);
+        transfer.setTitle("Cash Deposit January");
+        transfer.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 5).getTime());
+        transfer.setValue(-100.0);
+        transfer.setTo("Wallet");
+        transfer.setFrom("Millenium");
+        transfer.setIsInternal(true);
+        transfer.setBalanceAfter(2500.0);
         return transfer;
     }
 }
