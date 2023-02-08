@@ -1,5 +1,6 @@
 package com.mlkb.ftm.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class JwtController {
 
+    @Value("${spring.profiles.active:Unknown}")
+    private String activeProfile;
+
     @PostMapping("/login")
     public void login(@RequestBody LoginCredentials credentials) {
     }
@@ -24,12 +28,23 @@ public class JwtController {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
+    private ResponseCookie.ResponseCookieBuilder getResponseCookieBuilder(String cookieName) {
+        return ResponseCookie
+                .from(cookieName, null)
+                .maxAge(0);
+    }
+
     private void removeEmailCookie(HttpServletResponse response){
-        ResponseCookie responseCookie = ResponseCookie.from("e-mail", null)
-                //TODO Active on PROD .sameSite("None")
-                .secure(false) //TODO set to true on PROD
-                .maxAge(0)
-                .build();
+        ResponseCookie.ResponseCookieBuilder responseCookieBuilder = getResponseCookieBuilder("e-mail");
+                if(activeProfile.equals("prod")) {
+                    responseCookieBuilder
+                            .sameSite("None")
+                            .secure(true);
+                } else{
+                    responseCookieBuilder
+                            .secure(false);
+                }
+        ResponseCookie responseCookie = responseCookieBuilder.build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
