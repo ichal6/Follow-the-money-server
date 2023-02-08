@@ -40,7 +40,7 @@ public class JwtController {
                     responseCookieBuilder
                             .sameSite("None")
                             .secure(true);
-                } else{
+                } else {
                     responseCookieBuilder
                             .secure(false);
                 }
@@ -50,13 +50,15 @@ public class JwtController {
     }
 
     private void removeJwtCookie(HttpServletResponse response){
-        ResponseCookie responseCookie = ResponseCookie.from("token", null)
-                //TODO Active on PROD .sameSite("None")
-                .httpOnly(true)
-                .secure(false)
-                .maxAge(0)
-                .build();
-
+        ResponseCookie.ResponseCookieBuilder responseCookieBuilder = getResponseCookieBuilder("token");
+                if(activeProfile.equals("prod")) {
+                    responseCookieBuilder
+                            .sameSite("None");
+                }
+                ResponseCookie responseCookie = responseCookieBuilder
+                        .httpOnly(true)
+                        .secure(false)
+                        .build();
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
