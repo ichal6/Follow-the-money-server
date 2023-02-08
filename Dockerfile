@@ -15,4 +15,4 @@ EXPOSE 8080
 MAINTAINER mlkb.com
 
 # set the startup command to execute the jar
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/ftm.jar"]
+CMD ["java","-Dspring.profiles.active=prod", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/ftm.jar"]
