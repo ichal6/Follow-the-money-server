@@ -1,5 +1,3 @@
-LABEL com.mlkb.ftm=https://github.com/ichal6/
-
 FROM maven:3.8-openjdk-18-slim AS MAVEN_BUILD
 
 # copy the pom and src code to the container
