@@ -11,7 +11,7 @@ FROM openjdk:18.0.2.1-slim
 COPY --from=MAVEN_BUILD /target/follow-the-money-server-0.0.1-SNAPSHOT.jar /ftm.jar
 
 # VOLUME /tmp
-EXPOSE 8080
+# EXPOSE 8080
 MAINTAINER mlkb.com
 
 # set the startup command to execute the jar
