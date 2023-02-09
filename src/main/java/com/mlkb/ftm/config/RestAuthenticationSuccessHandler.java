@@ -75,7 +75,8 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
         ResponseCookie.ResponseCookieBuilder responseCookieBuilder = getResponseCookieBuilder("token", token);
             if(activeProfile.equals("prod")) {
                 responseCookieBuilder
-                        .sameSite("None");
+                        .sameSite("None")
+                        .secure(true);
             }
             ResponseCookie responseCookie = responseCookieBuilder
                     .httpOnly(true)
