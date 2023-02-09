@@ -53,11 +53,14 @@ public class JwtController {
         ResponseCookie.ResponseCookieBuilder responseCookieBuilder = getResponseCookieBuilder("token");
                 if(activeProfile.equals("prod")) {
                     responseCookieBuilder
-                            .sameSite("None");
+                            .sameSite("None")
+                            .secure(true);
+                } else {
+                    responseCookieBuilder
+                            .secure(false);
                 }
                 ResponseCookie responseCookie = responseCookieBuilder
                         .httpOnly(true)
-                        .secure(false)
                         .build();
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
