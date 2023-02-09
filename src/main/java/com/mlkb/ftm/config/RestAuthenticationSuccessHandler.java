@@ -77,10 +77,12 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                 responseCookieBuilder
                         .sameSite("None")
                         .secure(true);
+            } else {
+                responseCookieBuilder
+                        .secure(false);
             }
             ResponseCookie responseCookie = responseCookieBuilder
                     .httpOnly(true)
-                    .secure(false)
                     .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
