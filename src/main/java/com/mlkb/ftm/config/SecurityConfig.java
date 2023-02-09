@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,8 +21,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import javax.sql.DataSource;
 
 @Configuration
-//@RequiredArgsConstructor
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final RestAuthenticationSuccessHandler authenticationSuccessHandler;
@@ -29,16 +29,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final DataSource dataSource;
     private final String secret;
     private final ObjectMapper objectMapper;
+    private final boolean isDebugMode;
 
     public SecurityConfig(RestAuthenticationSuccessHandler authenticationSuccessHandler,
                           RestAuthenticationFailureHandler authenticationFailureHandler,
                           DataSource dataSource,
                           @Value("${jwt.secret}") String secret,
+                          @Value("${spring.profiles.active:Unknown}") String profile,
                           ObjectMapper objectMapper) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.dataSource = dataSource;
         this.secret = secret;
+        this.isDebugMode = profile.equals("dev");
         this.objectMapper = objectMapper;
     }
 
@@ -46,6 +49,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         PasswordEncoder encoder = NoOpPasswordEncoder.getInstance();
         return encoder;
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.debug(isDebugMode);
     }
 
     @Override
