@@ -30,4 +30,4 @@ jobs:
           privateKey: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
           local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
-          remote: ftmServerJar
+          remote: ftmServerJar/ftm-server.jar
