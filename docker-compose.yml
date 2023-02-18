@@ -11,6 +11,7 @@ services:
       FTM_DATASOURCE_USERNAME: admin
       FTM_DATASOURCE_PASSWORD: 1234
       FTM_SECRET: secretPassword
+      PORT: 8080
     depends_on:
       - db
     links:
