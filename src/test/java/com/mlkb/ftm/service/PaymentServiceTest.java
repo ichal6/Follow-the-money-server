@@ -11,10 +11,10 @@ import com.mlkb.ftm.fixture.TransferEntityFixture;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,6 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -248,4 +249,18 @@ public class PaymentServiceTest {
                         PaymentDTOFixture.buyMilkTransaction()
                 );
     }
+
+    @Test
+    void should_return_exception_if_user_does_not_exists(){
+        //given
+        String email = "NoOne@example.com";
+        //when
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.removeTransaction(1L, email));
+
+        // then
+        assertEquals("User for this email does not exist", thrown.getMessage());
+    }
 }
+
