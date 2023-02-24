@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class TestController {
     @GetMapping("/")
     public String greetings() {
-        return "Wejście Smoka. Pull request test";
+        return "Wejście Smoka. Test Endpoint";
     }
 }

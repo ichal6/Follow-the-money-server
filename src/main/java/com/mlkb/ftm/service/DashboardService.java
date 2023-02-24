@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Month;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -49,6 +50,7 @@ public class DashboardService {
         Date previousYear = cal.getTime();
 
         return accounts.stream()
+                .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(
                         account -> account.getTransactions().stream())
                 .filter(transaction -> transaction.getType() == GeneralType.EXPENSE)
@@ -67,6 +69,7 @@ public class DashboardService {
         Date previousYear = cal.getTime();
 
         return accounts.stream()
+                .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(
                         account -> account.getTransactions().stream())
                 .filter(transaction -> transaction.getType() == GeneralType.INCOME)
@@ -83,7 +86,9 @@ public class DashboardService {
 
         Set<Account> accounts = user.getAccounts();
 
-        return accounts.stream().flatMap(account -> {
+        return accounts.stream()
+                .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
+                .flatMap(account -> {
             return account.getTransactions().stream();
         }).filter(transaction -> {
             return transaction.getDate().
@@ -93,6 +98,7 @@ public class DashboardService {
 
     private Double getTotalBalance() {
         return user.getAccounts().stream()
+                .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .mapToDouble(Account::getCurrentBalance)
                 .reduce(0, Double::sum);
     }

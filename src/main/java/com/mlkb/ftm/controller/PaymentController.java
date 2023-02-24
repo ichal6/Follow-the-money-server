@@ -6,11 +6,16 @@ import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.validation.AccessValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -23,12 +28,27 @@ public class PaymentController {
         this.accessValidator = accessValidator;
     }
 
-    @GetMapping("/{email}")
+    @GetMapping( value ="/{email}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Get all transaction for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful operation")
+    })
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getTransactions(@PathVariable("email") String email,
-                                                  @RequestParam("id") String accountId,
-                                                  @RequestParam("period") String period) {
+                                                  @RequestParam("id") Optional<String> possibleAccountId,
+                                                  @RequestParam("period") Optional<String> possiblePeriod) {
         accessValidator.checkPermit(email);
-        List<PaymentDTO> paymentsDTOList = paymentService.getPaymentsWithParameters(email, accountId, period);
+        List<PaymentDTO> paymentsDTOList;
+        if (possibleAccountId.isEmpty() && possiblePeriod.isEmpty()){
+            paymentsDTOList = paymentService.getPayments(email);
+        } else if (possibleAccountId.isPresent() && possiblePeriod.isPresent()){
+            paymentsDTOList =
+                    paymentService.getPaymentsWithParameters(email, possibleAccountId.get(), possiblePeriod.get());
+        } else if (possibleAccountId.isPresent()){
+            paymentsDTOList = paymentService.getPaymentsWithAccount(email, possibleAccountId.get());
+        } else {
+            paymentsDTOList = paymentService.getPaymentsForPeriod(email, possiblePeriod.get());
+        }
         return new ResponseEntity<>(paymentsDTOList, HttpStatus.OK);
     }
 
