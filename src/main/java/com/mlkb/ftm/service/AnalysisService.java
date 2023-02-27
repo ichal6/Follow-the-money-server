@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,7 +28,7 @@ public class AnalysisService {
         this.userRepository = userRepository;
     }
 
-    public Set<AnalysisFinancialTableDTO> getTableData(String email) {
+    public Set<AnalysisFinancialTableDTO> getTableData(String email, Instant dateStart) {
         if(!this.userRepository.existsByEmail(email)) {
             throw new ResourceNotFoundException("Couldn't find a user for email: " + email);
         }
@@ -37,13 +42,20 @@ public class AnalysisService {
         Set<Account> accounts = user.getAccounts();
         return accounts.stream().map(a -> AnalysisFinancialTableDTO.builder()
                 .name(a.getName())
-                .income(getValueFromTransactions(a, GeneralType.INCOME))
-                .expense(getValueFromTransactions(a, GeneralType.EXPENSE))
+                .income(getValueFromTransactions(a, GeneralType.INCOME, dateStart))
+                .expense(getValueFromTransactions(a, GeneralType.EXPENSE, dateStart))
                 .build()).collect(Collectors.toSet());
     }
 
-    private BigDecimal getValueFromTransactions(Account account, GeneralType type) {
+    public Instant convertParamToInstant(Optional<String> possibleDate) throws DateTimeParseException {
+        return possibleDate
+                .map(date -> LocalDate.parse(date).atStartOfDay(ZoneId.of("UTC")).toInstant())
+                .orElse(Instant.ofEpochMilli(0L));
+    }
+
+    private BigDecimal getValueFromTransactions(Account account, GeneralType type, Instant dateStart) {
         Double value = account.getTransactions().stream()
+                .filter(t -> t.getDate().after(Date.from(dateStart)))
                 .filter(t -> t.getType().equals(type))
                 .map(t -> Math.abs(t.getValue()))
                 .reduce(0.0, Double::sum);

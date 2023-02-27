@@ -21,4 +21,20 @@ public class AnalysisFinancialTableDTOFixture {
                 .name("Wallet")
                 .build();
     }
+
+    public static AnalysisFinancialTableDTO bankAnalysisFinancialTableDTOFromStartDate() {
+        return AnalysisFinancialTableDTO.builder()
+                .expense(new BigDecimal("50.98").setScale(2, RoundingMode.HALF_UP))
+                .income(new BigDecimal("1700").setScale(2, RoundingMode.HALF_UP))
+                .name("Millenium")
+                .build();
+    }
+
+    public static AnalysisFinancialTableDTO walletAnalysisFinancialTableDTOFromStartDate() {
+        return AnalysisFinancialTableDTO.builder()
+                .expense(new BigDecimal("27.99").setScale(2, RoundingMode.HALF_UP))
+                .income(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))
+                .name("Wallet")
+                .build();
+    }
 }
