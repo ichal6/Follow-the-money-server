@@ -40,11 +40,14 @@ public class AnalysisService {
             throw new ResourceNotFoundException("Couldn't find a analysis for user with given email");
         }
         Set<Account> accounts = user.getAccounts();
-        return accounts.stream().map(a -> AnalysisFinancialTableDTO.builder()
+        return accounts.stream()
+                .filter(Account::getIsEnabled)
+                .map(a -> AnalysisFinancialTableDTO.builder()
                 .name(a.getName())
                 .income(getValueFromTransactions(a, GeneralType.INCOME, dateStart))
                 .expense(getValueFromTransactions(a, GeneralType.EXPENSE, dateStart))
-                .build()).collect(Collectors.toSet());
+                .build())
+                .collect(Collectors.toSet());
     }
 
     public Instant convertParamToInstant(Optional<String> possibleDate) throws DateTimeParseException {
