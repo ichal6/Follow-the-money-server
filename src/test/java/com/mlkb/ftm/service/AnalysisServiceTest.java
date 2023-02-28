@@ -42,7 +42,7 @@ class AnalysisServiceTest {
 
     @BeforeEach
     void setUp() {
-        analysisService = new AnalysisService(userRepository);
+        analysisService = new AnalysisService(userRepository, transactionRepository);
     }
 
     @Test
@@ -74,7 +74,7 @@ class AnalysisServiceTest {
         when(wallet.getTransactions()).thenReturn(walletTransaction);
         when(wallet.getIsEnabled()).thenReturn(true);
 
-        final var tableData = analysisService.getTableData(email, Instant.ofEpochMilli(0L));
+        final var tableData = analysisService.getTableDataTypeAccounts(email, Instant.ofEpochMilli(0L));
 
         // then
         assertThat(tableData)
@@ -114,7 +114,7 @@ class AnalysisServiceTest {
         when(wallet.getTransactions()).thenReturn(walletTransaction);
         when(wallet.getIsEnabled()).thenReturn(true);
 
-        final var tableData = analysisService.getTableData(email, Instant.ofEpochMilli(0L));
+        final var tableData = analysisService.getTableDataTypeAccounts(email, Instant.ofEpochMilli(0L));
 
         // then
         assertThat(tableData)
@@ -133,7 +133,7 @@ class AnalysisServiceTest {
         when(userRepository.existsByEmail(email)).thenReturn(false);
         final var exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> analysisService.getTableData(email, Instant.ofEpochMilli(0L))
+                () -> analysisService.getTableDataTypeAccounts(email, Instant.ofEpochMilli(0L))
         );
 
         assertThat(exception.getMessage())
@@ -171,7 +171,7 @@ class AnalysisServiceTest {
         when(wallet.getTransactions()).thenReturn(walletTransaction);
         when(wallet.getIsEnabled()).thenReturn(true);
 
-        final var tableData = analysisService.getTableData(email, dateStart);
+        final var tableData = analysisService.getTableDataTypeAccounts(email, dateStart);
 
         // then
         assertThat(tableData)

@@ -43,4 +43,9 @@ public class GlobalExceptionHandler {
                 String.format("Value = %s, shouldn't be parse as date format like: yyyy-mm-dd",
                         dateTimeParseException.getParsedString()));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleTypeParseException(IllegalArgumentException illegalArgumentException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(illegalArgumentException.getMessage());
+    }
 }

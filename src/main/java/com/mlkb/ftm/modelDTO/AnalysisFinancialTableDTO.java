@@ -19,4 +19,10 @@ public class AnalysisFinancialTableDTO {
         this.expense = expense;
         this.balance = income.subtract(expense);
     }
+
+    public enum AnalysisType {
+        categories,
+        payees,
+        accounts
+    }
 }

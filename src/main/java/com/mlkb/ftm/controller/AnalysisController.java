@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/analysis")
@@ -25,11 +24,19 @@ public class AnalysisController {
 
     @GetMapping("/{email}")
     public ResponseEntity<Object> getAnalysisTableForUser(@PathVariable("email") String email,
-                                                          @RequestParam("start") Optional<String> possibleStart) {
+                                                          @RequestParam("start") Optional<String> possibleStart,
+                                                          @RequestParam("type") Optional<String> possibleType) {
         this.accessValidator.checkPermit(email);
 
         Instant startDate = this.analysisService.convertParamToInstant(possibleStart);
-        Set<AnalysisFinancialTableDTO> analysisFinancialTableDTOSet = analysisService.getTableData(email, startDate);
+        var type = AnalysisFinancialTableDTO.AnalysisType.accounts;
+
+        if (possibleType.isPresent()) {
+            type = AnalysisFinancialTableDTO.AnalysisType.valueOf(possibleType.get());
+        }
+
+        var analysisFinancialTableDTOSet = analysisService.getTableData(email, startDate, type);
+
         return new ResponseEntity<>(analysisFinancialTableDTOSet, HttpStatus.OK);
     }
 }
