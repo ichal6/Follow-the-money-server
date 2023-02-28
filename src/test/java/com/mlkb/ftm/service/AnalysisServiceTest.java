@@ -69,8 +69,10 @@ class AnalysisServiceTest {
         when(transactionRepository.findAll()).thenReturn(transactions);
         when(millenium.getName()).thenReturn("Millenium");
         when(millenium.getTransactions()).thenReturn(bankTransaction);
+        when(millenium.getIsEnabled()).thenReturn(true);
         when(wallet.getName()).thenReturn("Wallet");
         when(wallet.getTransactions()).thenReturn(walletTransaction);
+        when(wallet.getIsEnabled()).thenReturn(true);
 
         final var tableData = analysisService.getTableData(email, Instant.ofEpochMilli(0L));
 
@@ -80,6 +82,45 @@ class AnalysisServiceTest {
                 .containsExactlyInAnyOrder(
                         AnalysisFinancialTableDTOFixture.walletAnalysisFinancialTableDTO(),
                         AnalysisFinancialTableDTOFixture.bankAnalysisFinancialTableDTO()
+                );
+    }
+
+    @Test
+    void should_return_only_enabled_accounts() {
+        // given
+        final String email = "user@user.pl";
+        final User user = new User();
+        Account millenium = mock(Account.class);
+        Account wallet = mock(Account.class);
+        user.setEmail(email);
+        user.setAccounts(Set.of(millenium, wallet));
+        final var transactions = List.of(
+                TransactionEntityFixture.buyCarTransaction(),
+                TransactionEntityFixture.buyMilkTransaction()
+        );
+        final var walletTransaction = Set.of(TransactionEntityFixture.buyCarTransaction(),
+                TransactionEntityFixture.billiardTransaction(), TransactionEntityFixture.buySugarTransaction());
+        final var bankTransaction = Set.of(TransactionEntityFixture.buyMilkTransaction(),
+                TransactionEntityFixture.abonamentAWSTransaction(), TransactionEntityFixture.salaryTransaction());
+
+        // when
+        when(userRepository.existsByEmail(email)).thenReturn(true);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(transactionRepository.findAll()).thenReturn(transactions);
+        when(millenium.getName()).thenReturn("Millenium");
+        when(millenium.getTransactions()).thenReturn(bankTransaction);
+        when(millenium.getIsEnabled()).thenReturn(false);
+        when(wallet.getName()).thenReturn("Wallet");
+        when(wallet.getTransactions()).thenReturn(walletTransaction);
+        when(wallet.getIsEnabled()).thenReturn(true);
+
+        final var tableData = analysisService.getTableData(email, Instant.ofEpochMilli(0L));
+
+        // then
+        assertThat(tableData)
+                .hasSize(1)
+                .containsExactlyInAnyOrder(
+                        AnalysisFinancialTableDTOFixture.walletAnalysisFinancialTableDTO()
                 );
     }
 
@@ -125,8 +166,10 @@ class AnalysisServiceTest {
         when(transactionRepository.findAll()).thenReturn(transactions);
         when(millenium.getName()).thenReturn("Millenium");
         when(millenium.getTransactions()).thenReturn(bankTransaction);
+        when(millenium.getIsEnabled()).thenReturn(true);
         when(wallet.getName()).thenReturn("Wallet");
         when(wallet.getTransactions()).thenReturn(walletTransaction);
+        when(wallet.getIsEnabled()).thenReturn(true);
 
         final var tableData = analysisService.getTableData(email, dateStart);
 
