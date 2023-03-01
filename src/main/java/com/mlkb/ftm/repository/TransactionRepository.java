@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+public interface TransactionRepository extends JpaRepository<Transaction, Long>, CustomTransactionRepository {
     @Override
     @Modifying
     @Query("DELETE FROM Transaction t where t.id = ?1")

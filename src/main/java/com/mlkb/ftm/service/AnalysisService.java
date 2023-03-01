@@ -37,10 +37,29 @@ public class AnalysisService {
             case categories -> {
                 return getTableDataTypeCategories(email, dateStart);
             }
+            case payees -> {
+                return getTableDataTypePayee(email, dateStart);
+            }
             default -> {
                 return getTableDataTypeAccounts(email, dateStart);
             }
         }
+    }
+
+    private Set<AnalysisFinancialTableDTO> getTableDataTypePayee(String email, Instant dateStart) {
+        User user = getUser(email);
+        Set<Payee> payees = user.getPayees();
+        Map<String, BigDecimal> valueExpenseMap = this.transactionRepository
+                .getMapTransactionsValueForPayee(payees, GeneralType.EXPENSE, dateStart);
+        Map<String, BigDecimal> valueIncomeMap = this.transactionRepository
+                .getMapTransactionsValueForPayee(payees, GeneralType.INCOME, dateStart);
+
+        return  payees.stream().map(p -> AnalysisFinancialTableDTO.builder()
+                    .name(p.getName())
+                    .expense(valueExpenseMap.getOrDefault(p.getName(), BigDecimal.ZERO))
+                    .income(valueIncomeMap.getOrDefault(p.getName(), BigDecimal.ZERO))
+                    .build())
+                .collect(Collectors.toSet());
     }
 
     public Set<AnalysisFinancialTableDTO> getTableDataTypeAccounts(String email, Instant dateStart) {
