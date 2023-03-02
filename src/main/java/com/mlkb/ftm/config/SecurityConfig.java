@@ -18,12 +18,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-
-import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
@@ -31,7 +27,6 @@ public class SecurityConfig {
 
     private final RestAuthenticationSuccessHandler authenticationSuccessHandler;
     private final RestAuthenticationFailureHandler authenticationFailureHandler;
-    private final DataSource dataSource;
     private final String secret;
     private final ObjectMapper objectMapper;
     private final boolean isDebugMode;
@@ -40,7 +35,6 @@ public class SecurityConfig {
 
     public SecurityConfig(RestAuthenticationSuccessHandler authenticationSuccessHandler,
                           RestAuthenticationFailureHandler authenticationFailureHandler,
-                          DataSource dataSource,
                           @Value("${jwt.secret}") String secret,
                           @Value("${spring.profiles.active:Unknown}") String profile,
                           ObjectMapper objectMapper,
@@ -48,7 +42,6 @@ public class SecurityConfig {
                           AuthenticationConfiguration authenticationConfiguration) {
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.authenticationFailureHandler = authenticationFailureHandler;
-        this.dataSource = dataSource;
         this.secret = secret;
         this.isDebugMode = profile.equals("dev");
         this.objectMapper = objectMapper;
@@ -116,11 +109,6 @@ public class SecurityConfig {
         filter.setAuthenticationFailureHandler(authenticationFailureHandler);
         filter.setAuthenticationManager(authenticationManager(this.authenticationConfiguration));
         return filter;
-    }
-
-    @Bean
-    public UserDetailsManager userDetailsManager(){
-        return new JdbcUserDetailsManager(dataSource);
     }
 
     @Bean
