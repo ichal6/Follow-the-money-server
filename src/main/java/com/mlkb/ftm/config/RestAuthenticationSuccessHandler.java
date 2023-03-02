@@ -29,7 +29,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                                             @Value("${spring.profiles.active:Unknown}") String activeProfile) {
         this.expirationTime = expirationTime;
         this.secret = secret;
-        this.log = LoggerFactory.getLogger(CORSFilter.class);
+        this.log = LoggerFactory.getLogger(CORSFilter.class); // TODO Create separately Logger instance for RestAuthenticationFilter
         this.activeProfile = activeProfile;
     }
 
