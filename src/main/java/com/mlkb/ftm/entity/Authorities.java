@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Set;
 
 @Getter
@@ -13,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Authorities {
+public class Authorities implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -22,10 +23,11 @@ public class Authorities {
     @Column(unique = true)
     private AuthorityType name;
 
-    public Authorities(AuthorityType name) {
-        this.name = name;
-    }
-
     @ManyToMany(mappedBy = "authorities")
     Set<User> users;
+
+    @Override
+    public String getAuthority() {
+        return this.name.name();
+    }
 }

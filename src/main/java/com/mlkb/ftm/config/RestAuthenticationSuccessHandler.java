@@ -12,8 +12,9 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.http.ResponseCookie;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.sql.Date;
 
 @Component
@@ -29,7 +30,7 @@ public class RestAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
                                             @Value("${spring.profiles.active:Unknown}") String activeProfile) {
         this.expirationTime = expirationTime;
         this.secret = secret;
-        this.log = LoggerFactory.getLogger(CORSFilter.class);
+        this.log = LoggerFactory.getLogger(CORSFilter.class); // TODO Create separately Logger instance for RestAuthenticationFilter
         this.activeProfile = activeProfile;
     }
 

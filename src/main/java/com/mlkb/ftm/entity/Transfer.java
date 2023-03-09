@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.*;
-import javax.validation.constraints.DecimalMin;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Getter

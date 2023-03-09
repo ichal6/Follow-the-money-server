@@ -46,28 +46,28 @@ public class UserController {
 
     // DELETE - delete by id
 //    @DeleteMapping("/api/user/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
-        if (userService.deleteUser(id)) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully!");
-        } else {
-            return ResponseEntity.unprocessableEntity().body("Could not delete user!");
-        }
-    }
-
-    // PUT - update
-//    @PutMapping("/api/user")
-    public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
-        try {
-            if (userService.isValidWithoutId(updateUser)) {
-                if (userService.updateUser(updateUser)) {
-                    return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
-                } else {
-                    ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
-                }
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
-        } catch (InputIncorrectException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+//        if (userService.deleteUser(id)) {
+//            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully!");
+//        } else {
+//            return ResponseEntity.unprocessableEntity().body("Could not delete user!");
+//        }
+//    }
+//
+//    // PUT - update
+////    @PutMapping("/api/user")
+//    public ResponseEntity<String> updateUser(@RequestBody UserDTO updateUser) {
+//        try {
+//            if (userService.isValidWithoutId(updateUser)) {
+//                if (userService.updateUser(updateUser)) {
+//                    return ResponseEntity.status(HttpStatus.CREATED).body("User updated successfully!");
+//                } else {
+//                    ResponseEntity.unprocessableEntity().body("Could not update user. This user does not exist!");
+//                }
+//            }
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your JSON request is invalid.");
+//        } catch (InputIncorrectException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 }
