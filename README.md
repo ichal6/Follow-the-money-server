@@ -23,7 +23,7 @@
 
 ## Technologies Used
 Server side:
-- Java - version 11
+- Java - version 17
 - Spring Boot
 - Hibernate
 - PostgreSQL
