@@ -17,6 +17,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <spring-security.version>5.8.2</spring-security.version>
     </properties>
 
     <dependencies>
