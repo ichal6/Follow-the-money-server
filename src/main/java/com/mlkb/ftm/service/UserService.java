@@ -12,7 +12,6 @@ import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -84,26 +83,26 @@ public class UserService {
 
     // NOT CORRECT - TO UPDATE:
 
-    @Transactional
-    public boolean updateUser(UserDTO updateUser) {
-        Optional<User> userOptional = userRepository.findByEmail(updateUser.getEmail());
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setName(updateUser.getName());
-            userRepository.save(user);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean deleteUser(Long id) {
-        System.out.println(userRepository.findById(id));
-        if (userRepository.findById(id).isPresent()) {
-            userRepository.deleteById(id);
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    @Transactional
+//    public boolean updateUser(UserDTO updateUser) {
+//        Optional<User> userOptional = userRepository.findByEmail(updateUser.getEmail());
+//        if (userOptional.isPresent()) {
+//            User user = userOptional.get();
+//            user.setName(updateUser.getName());
+//            userRepository.save(user);
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//
+//    public boolean deleteUser(Long id) {
+//        System.out.println(userRepository.findById(id));
+//        if (userRepository.findById(id).isPresent()) {
+//            userRepository.deleteById(id);
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 }
