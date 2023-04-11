@@ -70,10 +70,6 @@ List of improve:
       1. dev -> Drop all database and insert dump data, enable debug mode 
       2. prod -> enable security connection
       3. [none] -> run app ond efault port and only connect with db
-   8. If you run app from jar file you have to disable MultiRelease -> [bug in Spring Boot](https://github.com/spring-projects/spring-boot/issues/33633):
-   ```bash
-   java -Djdk.util.jar.enableMultiRelease=false -jar -Dspring.profiles.active=dev
-   ```
 4. Now program should work
 
 ## Project Status
