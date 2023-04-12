@@ -18,6 +18,7 @@
     <properties>
         <java.version>17</java.version>
         <juniper.version>5.9.2</juniper.version>
+        <liquibase.propertyFile>liquibase.properties</liquibase.propertyFile>
     </properties>
 
     <dependencies>
@@ -26,6 +27,12 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${juniper.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.20.0</version>
         </dependency>
 
         <dependency>
@@ -164,7 +171,26 @@
                     </dependency>
                 </dependencies>
             </plugin>
-
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>4.20.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.liquibase.ext</groupId>
+                        <artifactId>liquibase-hibernate5</artifactId>
+                        <version>4.20.0</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <propertyFile>${liquibase.propertyFile}</propertyFile>
+                    <changeLogFile>src/main/resources/db/changelog/db.changelog-master.yaml</changeLogFile>
+                    <verbose>true</verbose>
+                    <driver>org.postgresql.Driver</driver>
+                    <outputChangeLogFile>src/main/resources/liquibase-outputChangeLog.yaml</outputChangeLogFile>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
