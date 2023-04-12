@@ -27,6 +27,7 @@ Server side:
 - Spring Boot
 - Hibernate
 - PostgreSQL
+- Liquibase
 
 Client side:
 - Angular
@@ -43,7 +44,7 @@ List the ready features:
 
 List of improve:
 - Edit payments
-- Add transfers
+- Edit transfers
 - Add subcategories in payments
 - Add Financial analysis
 
@@ -69,7 +70,7 @@ List of improve:
    7. If you run server from jar file active profile:
       1. dev -> Drop all database and insert dump data, enable debug mode 
       2. prod -> enable security connection
-      3. [none] -> run app ond efault port and only connect with db
+      3. [none] -> run app on default port and only connect with db
 4. Now program should work
 
 ## Project Status
@@ -80,7 +81,7 @@ Project is: _in progress_ .
 
 - Repair bug in view
 - Add payments edit
-- Add transfer
+- Add transfer edit
 - Include subcategories in payments
 - Add migrate database
 - Improve dashboard with loan subsection
