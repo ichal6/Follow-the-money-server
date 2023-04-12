@@ -18,6 +18,7 @@
     <properties>
         <java.version>17</java.version>
         <juniper.version>5.9.2</juniper.version>
+        <liquibase.version>4.20.0</liquibase.version>
         <liquibase.propertyFile>liquibase.properties</liquibase.propertyFile>
     </properties>
 
@@ -32,7 +33,7 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>4.20.0</version>
+            <version>${liquibase.version}</version>
         </dependency>
 
         <dependency>
@@ -174,12 +175,12 @@
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.20.0</version>
+                <version>${liquibase.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
                         <artifactId>liquibase-hibernate5</artifactId>
-                        <version>4.20.0</version>
+                        <version>${liquibase.version}</version>
                         <scope>runtime</scope>
                     </dependency>
                 </dependencies>
