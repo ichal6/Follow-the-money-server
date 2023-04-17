@@ -5,6 +5,7 @@ import com.mlkb.ftm.entity.Transfer;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,18 @@ public class TransferEntityFixture {
         transfer.setValue(100.0);
         transfer.setAccountFrom(accountFrom);
         transfer.setAccountTo(accountTo);
+        return transfer;
+    }
+
+    public static Transfer repaymentLoan() {
+        final var transfer = new Transfer();
+        transfer.setId(4L);
+        transfer.setTitle("Repayment Loan");
+        transfer.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 17).getTime());
+        transfer.setValue(100.0);
+        Account accountsFrom = AccountEntityFixture.millennium();
+        transfer.setAccountFrom(accountsFrom);
+        transfer.setAccountTo(AccountEntityFixture.allegroPay());
         return transfer;
     }
 }
