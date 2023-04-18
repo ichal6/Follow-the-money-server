@@ -54,7 +54,16 @@ public class DashboardService {
         Instant instantFrom = now.minus(365, ChronoUnit.DAYS);
         Date previousYear = Date.from(instantFrom);
 
-        return accounts.stream()
+        TreeMap<Month, Double> mapForTransfers = accounts.stream()
+                .filter(a -> a.getAccountType().equals(AccountType.LOAN))
+                .flatMap(a -> a.getTransfersTo().stream())
+                .filter(transfer -> transfer.getDate().getTime() > previousYear.getTime())
+                .collect(groupingBy(transfer -> Month.from(transfer.getDate().toInstant()
+                                .atZone(ZoneId.systemDefault()).toLocalDate()),
+                        TreeMap::new,
+                        Collectors.summingDouble(Transfer::getValue
+                        )));
+        TreeMap<Month, Double> mapForTransactions = accounts.stream()
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(
                         account -> account.getTransactions().stream())
@@ -64,6 +73,15 @@ public class DashboardService {
                                 .atZone(ZoneId.systemDefault()).toLocalDate()),
                         TreeMap::new,
                         Collectors.summingDouble(Transaction::getAbsoluteValue)));
+
+        return Arrays.stream(Month.values())
+                .collect(Collectors.toMap(
+                        month -> month,
+                        month -> (mapForTransactions.getOrDefault(month, 0.0)
+                                + mapForTransfers.getOrDefault(month, 0.0)),
+                        Double::sum,
+                        TreeMap::new
+                ));
     }
 
     private TreeMap<Month, Double> getIncomeFromLast12Months() {
