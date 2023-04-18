@@ -116,7 +116,7 @@ public class DashboardService {
                 .filter(t -> t.getDate().getTime() >= thirtyDaysAgo.getTime())
                 .mapToDouble(Transfer::getValue).reduce(0, Double::sum);
 
-        return accounts.stream()
+       return accounts.stream()
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(account -> {
             return account.getTransactions().stream();
