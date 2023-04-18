@@ -247,5 +247,201 @@ public class TransactionEntityFixture {
         return transaction;
     }
 
+    public static Transaction february2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
 
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(17L);
+        transaction.setTitle("February Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.FEBRUARY, 15).getTime());
+        transaction.setValue(1500.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction march2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(18L);
+        transaction.setTitle("March Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.MARCH, 15).getTime());
+        transaction.setValue(1600.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction april2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(13L);
+        transaction.setTitle("April Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.APRIL, 15).getTime());
+        transaction.setValue(1700.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction may2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(14L);
+        transaction.setTitle("May Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.MAY, 15).getTime());
+        transaction.setValue(1500.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction june2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(15L);
+        transaction.setTitle("June Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.JUNE, 15).getTime());
+        transaction.setValue(1400.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction july2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(16L);
+        transaction.setTitle("July Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.JULY, 15).getTime());
+        transaction.setValue(1600.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction august2022Income() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Salary");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Income");
+
+        final var transaction = new Transaction();
+        transaction.setId(17L);
+        transaction.setTitle("August Income");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.AUGUST, 15).getTime());
+        transaction.setValue(1800.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction salaryTransaction_October2022() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("ABC Company");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Salary");
+
+        final var transaction = new Transaction();
+        transaction.setId(14L);
+        transaction.setTitle("October Salary");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.OCTOBER, 5).getTime());
+        transaction.setValue(1500.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction salaryTransaction_December2022() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("ABC Company");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Salary");
+
+        final var transaction = new Transaction();
+        transaction.setId(16L);
+        transaction.setTitle("December Salary");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.DECEMBER, 5).getTime());
+        transaction.setValue(1900.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction buyBooksAllegroPay_November2022() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Allegro Pay");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Online shop");
+
+        final var transaction = new Transaction();
+        transaction.setId(19L);
+        transaction.setTitle("Buy books");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.NOVEMBER, 5).getTime());
+        transaction.setValue(230.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.EXPENSE);
+        return transaction;
+    }
+
+    public static Transaction buyAlcoholAllegroPay_December2022() {
+        Payee payee = mock(Payee.class);
+        when(payee.getName()).thenReturn("Allegro Pay");
+
+        Category category = mock(Category.class);
+        when(category.getName()).thenReturn("Online shop");
+
+        final var transaction = new Transaction();
+        transaction.setId(20L);
+        transaction.setTitle("Black Doctor");
+        transaction.setDate(new GregorianCalendar(2022, Calendar.DECEMBER, 5).getTime());
+        transaction.setValue(39.0);
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setType(GeneralType.EXPENSE);
+        return transaction;
+    }
 }

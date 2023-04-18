@@ -150,4 +150,61 @@ class DashboardServiceTest {
 
         assertThat(dashboard.getExpenseFunds()).isEqualTo(expected);
     }
+
+    @Test
+    void should_calculate_correct_get_income_from_last_12_months_for_loan_type() {
+        // given
+        final String email = "user@user.pl";
+        final User user = new User();
+        Account millennium = AccountEntityFixture.millennium();
+        Account allegroPay = AccountEntityFixture.allegroPay();
+
+        user.setEmail(email);
+        user.setAccounts(Set.of(millennium, allegroPay));
+
+        Instant instant = Instant.now(
+                Clock.fixed(
+                        Instant.parse("2023-01-23T12:34:56Z"), ZoneOffset.UTC
+                )
+        );
+
+        // when
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(clock.instant()).thenReturn(instant);
+        var transactions = Set.of(
+                TransactionEntityFixture.february2022Income(),
+                TransactionEntityFixture.march2022Income(),
+                TransactionEntityFixture.april2022Income(),
+                TransactionEntityFixture.may2022Income(),
+                TransactionEntityFixture.june2022Income(),
+                TransactionEntityFixture.july2022Income(),
+                TransactionEntityFixture.august2022Income(),
+                TransactionEntityFixture.salaryTransaction_October2022(),
+                TransactionEntityFixture.salaryTransaction_December2022()
+        );
+        var transactionSetAllegro = Set.of(
+                TransactionEntityFixture.buyAlcoholAllegroPay_December2022(),
+                TransactionEntityFixture.buyBooksAllegroPay_November2022()
+        );
+        when(allegroPay.getTransactions()).thenReturn(transactionSetAllegro);
+
+        when(millennium.getTransactions()).thenReturn(transactions);
+
+        DashboardDTO dashboard = dashboardService.getDashboard(email);
+
+        // then
+        var expected = Map.ofEntries (
+                Map.entry(Month.FEBRUARY, 1500.0),
+                Map.entry(Month.MARCH, 1600.0),
+                Map.entry(Month.APRIL, 1700.0),
+                Map.entry(Month.MAY, 1500.0),
+                Map.entry(Month.JUNE, 1400.0),
+                Map.entry(Month.JULY, 1600.0),
+                Map.entry(Month.AUGUST, 1800.0),
+                Map.entry(Month.OCTOBER, 1500.0),
+                Map.entry(Month.DECEMBER, 1900.0)
+        );
+
+        assertThat(dashboard.getIncomeFunds()).isEqualTo(expected);
+    }
 }
