@@ -14,10 +14,10 @@ import static org.mockito.Mockito.when;
 public class TransactionEntityFixture {
     public static Transaction buyCarTransaction() {
         Payee payee = mock(Payee.class);
-//        when(payee.getName()).thenReturn("Złomex");
+        when(payee.getName()).thenReturn("Złomex");
 
         Category category = mock(Category.class);
-//        when(category.getName()).thenReturn("Car");
+        when(category.getName()).thenReturn("Car");
 
 
         final var transaction = new Transaction();
@@ -33,10 +33,10 @@ public class TransactionEntityFixture {
 
     public static Transaction buyMilkTransaction() {
         Payee payee = mock(Payee.class);
-//        when(payee.getName()).thenReturn("Biedronka");
+        when(payee.getName()).thenReturn("Biedronka");
 
         Category category = mock(Category.class);
-//        when(category.getName()).thenReturn("Daily");
+        when(category.getName()).thenReturn("Daily");
 
         final var transaction = new Transaction();
         transaction.setId(2L);

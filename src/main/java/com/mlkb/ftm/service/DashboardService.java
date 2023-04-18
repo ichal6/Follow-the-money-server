@@ -51,7 +51,7 @@ public class DashboardService {
         Set<Account> accounts = user.getAccounts();
 
         Instant now = clock.instant();
-        Instant instantFrom = now.minus(1, ChronoUnit.YEARS);
+        Instant instantFrom = now.minus(365, ChronoUnit.DAYS);
         Date previousYear = Date.from(instantFrom);
 
         return accounts.stream()
@@ -70,7 +70,7 @@ public class DashboardService {
         Set<Account> accounts = user.getAccounts();
 
         Instant now = clock.instant();
-        Instant instantFrom = now.minus(1, ChronoUnit.YEARS);
+        Instant instantFrom = now.minus(365, ChronoUnit.DAYS);
         Date previousYear = Date.from(instantFrom);
 
         return accounts.stream()
@@ -122,7 +122,7 @@ public class DashboardService {
                 .collect(Collectors.toSet());
         Map<AccountDTO, Date> accountsWithLastModifiedDate = new HashMap<>();
         Instant now = clock.instant();
-        Instant instantFrom = now.minus(5, ChronoUnit.YEARS);
+        Instant instantFrom = now.minus(5*365, ChronoUnit.DAYS);
         Date fiveYearsAgo = Date.from(instantFrom);
         final int LIMIT = 4;
 

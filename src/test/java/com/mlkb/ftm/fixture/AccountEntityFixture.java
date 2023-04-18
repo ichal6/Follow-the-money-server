@@ -16,8 +16,6 @@ public class AccountEntityFixture {
         when(account.getId()).thenReturn(1L);
         when(account.getAccountType()).thenReturn(AccountType.BANK);
         when(account.getCurrentBalance()).thenReturn(0.0);
-        when(account.getTransactions()).thenReturn(Set.of(TransactionEntityFixture.buyCarTransaction(),
-                TransactionEntityFixture.buyMilkTransaction()));
         when(account.getIsEnabled()).thenReturn(true);
         when(account.getTransfersFrom()).thenReturn(Set.of());
 
@@ -30,8 +28,7 @@ public class AccountEntityFixture {
         when(account.getId()).thenReturn(2L);
         when(account.getAccountType()).thenReturn(AccountType.LOAN);
         when(account.getCurrentBalance()).thenReturn(0.0);
-        var transfers = Set.of(TransferEntityFixture.repaymentLoan());
-        when(account.getTransfersTo()).thenReturn(transfers);
+        when(account.getTransfersTo()).thenReturn(Set.of());
         when(account.getTransactions()).thenReturn(Set.of());
         when(account.getIsEnabled()).thenReturn(true);
         when(account.getTransfersFrom()).thenReturn(Set.of());

@@ -4,11 +4,11 @@ import com.mlkb.ftm.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.fixture.AccountEntityFixture;
+import com.mlkb.ftm.fixture.TransactionEntityFixture;
+import com.mlkb.ftm.fixture.TransferEntityFixture;
 import com.mlkb.ftm.modelDTO.DashboardDTO;
 import com.mlkb.ftm.repository.UserRepository;
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,6 @@ class DashboardServiceTest {
     }
 
     @Test
-    @Disabled
     void should_calculate_correct_last_30_days_value_for_loan_type() {
         // given
         final String email = "user@user.pl";
@@ -65,10 +64,15 @@ class DashboardServiceTest {
         // when
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
         when(clock.instant()).thenReturn(instant);
+        var transactions = Set.of(TransactionEntityFixture.buyCarTransaction(),
+                TransactionEntityFixture.buyMilkTransaction());
+        when(millennium.getTransactions()).thenReturn(transactions);
+        var transfers = Set.of(TransferEntityFixture.repaymentLoan());
+        when(allegroPay.getTransfersTo()).thenReturn(transfers);
 
         DashboardDTO dashboard = dashboardService.getDashboard(email);
 
         // then
-        assertThat(dashboard.getDifference()).isCloseTo(100.0, withPrecision(0.01));
+        assertThat(dashboard.getDifference()).isCloseTo(-2605.0, withPrecision(0.01));
     }
 }
