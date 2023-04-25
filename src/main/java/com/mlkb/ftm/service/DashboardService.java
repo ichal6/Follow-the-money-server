@@ -8,8 +8,11 @@ import com.mlkb.ftm.modelDTO.DashboardDTO;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -20,9 +23,11 @@ import static java.util.stream.Collectors.groupingBy;
 public class DashboardService {
     private final UserRepository userRepository;
     private User user;
+    private final Clock clock;
 
-    public DashboardService(UserRepository userRepository) {
+    public DashboardService(UserRepository userRepository, Clock clock) {
         this.userRepository = userRepository;
+        this.clock = clock;
     }
 
     public DashboardDTO getDashboard(String email) {
@@ -45,11 +50,20 @@ public class DashboardService {
     private TreeMap<Month, Double> getExpenseFromLast12Months() {
         Set<Account> accounts = user.getAccounts();
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.YEAR, -1);
-        Date previousYear = cal.getTime();
+        Instant now = clock.instant();
+        Instant instantFrom = now.minus(365, ChronoUnit.DAYS);
+        Date previousYear = Date.from(instantFrom);
 
-        return accounts.stream()
+        TreeMap<Month, Double> mapForTransfers = accounts.stream()
+                .filter(a -> a.getAccountType().equals(AccountType.LOAN))
+                .flatMap(a -> a.getTransfersTo().stream())
+                .filter(transfer -> transfer.getDate().getTime() > previousYear.getTime())
+                .collect(groupingBy(transfer -> Month.from(transfer.getDate().toInstant()
+                                .atZone(ZoneId.systemDefault()).toLocalDate()),
+                        TreeMap::new,
+                        Collectors.summingDouble(Transfer::getValue
+                        )));
+        TreeMap<Month, Double> mapForTransactions = accounts.stream()
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(
                         account -> account.getTransactions().stream())
@@ -59,14 +73,23 @@ public class DashboardService {
                                 .atZone(ZoneId.systemDefault()).toLocalDate()),
                         TreeMap::new,
                         Collectors.summingDouble(Transaction::getAbsoluteValue)));
+
+        return Arrays.stream(Month.values())
+                .collect(Collectors.toMap(
+                        month -> month,
+                        month -> (mapForTransactions.getOrDefault(month, 0.0)
+                                + mapForTransfers.getOrDefault(month, 0.0)),
+                        Double::sum,
+                        TreeMap::new
+                ));
     }
 
     private TreeMap<Month, Double> getIncomeFromLast12Months() {
         Set<Account> accounts = user.getAccounts();
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.YEAR, -1);
-        Date previousYear = cal.getTime();
+        Instant now = clock.instant();
+        Instant instantFrom = now.minus(365, ChronoUnit.DAYS);
+        Date previousYear = Date.from(instantFrom);
 
         return accounts.stream()
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
@@ -81,19 +104,26 @@ public class DashboardService {
     }
 
     private Double getDifferenceFromLast30Days() {
-        long thirtyDays = 2592000000L;
-        Date thirtyDaysAgo = new Date(System.currentTimeMillis() - thirtyDays);
+        Instant now = clock.instant();
+        Instant instantFrom = now.minus(30, ChronoUnit.DAYS);
+        Date thirtyDaysAgo = Date.from(instantFrom);
 
         Set<Account> accounts = user.getAccounts();
 
-        return accounts.stream()
+        double repaymentValue = accounts.stream()
+                .filter(a -> a.getAccountType().equals(AccountType.LOAN))
+                .flatMap(a -> a.getTransfersTo().stream())
+                .filter(t -> t.getDate().getTime() >= thirtyDaysAgo.getTime())
+                .mapToDouble(Transfer::getValue).reduce(0, Double::sum);
+
+       return accounts.stream()
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(account -> {
             return account.getTransactions().stream();
         }).filter(transaction -> {
             return transaction.getDate().
                     getTime() >= thirtyDaysAgo.getTime();
-        }).mapToDouble(Transaction::getValue).reduce(0, Double::sum);
+        }).mapToDouble(Transaction::getValue).reduce(0, Double::sum) - repaymentValue;
     }
 
     private Double getTotalBalance() {
@@ -109,8 +139,9 @@ public class DashboardService {
                 .filter(account -> account.getIsEnabled() == true)
                 .collect(Collectors.toSet());
         Map<AccountDTO, Date> accountsWithLastModifiedDate = new HashMap<>();
-        long fiveYears = 157784760000L;
-        Date fiveYearsAgo = new Date(System.currentTimeMillis() - fiveYears);
+        Instant now = clock.instant();
+        Instant instantFrom = now.minus(5*365, ChronoUnit.DAYS);
+        Date fiveYearsAgo = Date.from(instantFrom);
         final int LIMIT = 4;
 
         for (Account account : accounts) {
