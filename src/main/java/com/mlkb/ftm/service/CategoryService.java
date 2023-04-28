@@ -2,7 +2,6 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.Category;
 import com.mlkb.ftm.entity.GeneralType;
-import com.mlkb.ftm.entity.Subcategory;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
@@ -59,10 +58,10 @@ public class CategoryService {
                 .collect(Collectors.toList());
     }
 
-    private List<SubcategoryDTO> getListOfSubcategories(Set<Subcategory> subcategories){
+    private List<SubcategoryDTO> getListOfSubcategories(Set<Category> subcategories){
         return subcategories.stream()
                 .map(subcategory -> new SubcategoryDTO(subcategory.getId(),
-                        subcategory.getName(), subcategory.getType()))
+                        subcategory.getName(), subcategory.getGeneralType()))
                 .collect(Collectors.toList());
     }
 
@@ -83,10 +82,11 @@ public class CategoryService {
 
     public void deleteSubcategory(String email, Long catId, Long subId) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
+
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Set<Category> userCategories = user.getCategories();
-            Set<Subcategory> newCategories = userCategories.stream()
+            Set<Category> newCategories = userCategories.stream()
                     .filter(category -> category.getId().equals(catId))
                     .findFirst().get()
                     .getSubcategories().stream()
@@ -126,7 +126,7 @@ public class CategoryService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Set<Category> userCategories = user.getCategories();
-            Subcategory subcategoryToEdit = userCategories.stream()
+            Category subcategoryToEdit = userCategories.stream()
                     .filter(category -> category.getId().equals(catId))
                     .findFirst().get()
                     .getSubcategories().stream()
@@ -150,7 +150,7 @@ public class CategoryService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             Set<Category> userCategories = user.getCategories();
-            userCategories.add(new Category(null, newCategory.getName(), newCategory.getType(), new HashSet<>()));
+            userCategories.add(new Category(newCategory.getName(), newCategory.getType()));
             user.setCategories(userCategories);
             userRepository.save(user);
         } else {
@@ -167,7 +167,7 @@ public class CategoryService {
                     .filter(category -> category.getId().equals(id))
                     .findFirst().get();
             categoryToEdit.getSubcategories()
-                    .add(new Subcategory(null, newSubcategory.getName(), newSubcategory.getType()));
+                    .add(new Category(newSubcategory.getName(), newSubcategory.getType()));
             userCategories.add(categoryToEdit);
             userRepository.save(user);
         } else {
