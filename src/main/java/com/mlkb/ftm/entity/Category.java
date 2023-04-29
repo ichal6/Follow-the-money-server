@@ -21,10 +21,17 @@ public class Category {
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private GeneralType generalType;
+    @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
+    private Category parentCategory;
     private Boolean isEnabled = true;
     @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Set<Category> subcategories;
+
+    @OneToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User owner;
 
     public Category(String name, GeneralType generalType) {
         this.name = name;

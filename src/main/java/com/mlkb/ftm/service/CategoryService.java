@@ -7,6 +7,7 @@ import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.CategoryDTO;
 import com.mlkb.ftm.modelDTO.SubcategoryDTO;
+import com.mlkb.ftm.repository.CategoryRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,12 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final InputValidator inputValidator;
 
-    public CategoryService(UserRepository userRepository, InputValidator inputValidator) {
+    public CategoryService(UserRepository userRepository, CategoryRepository categoryRepository, InputValidator inputValidator) {
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
         this.inputValidator = inputValidator;
     }
 
@@ -52,6 +55,7 @@ public class CategoryService {
 
     private List<CategoryDTO> getListOfCategories(Set<Category> categories){
         return categories.stream()
+                .filter(c -> c.getParentCategory() == null)
                 .map(category -> new CategoryDTO(category.getId(),
                     category.getName(), category.getGeneralType(),
                         getListOfSubcategories(category.getSubcategories())))
@@ -60,6 +64,7 @@ public class CategoryService {
 
     private List<SubcategoryDTO> getListOfSubcategories(Set<Category> subcategories){
         return subcategories.stream()
+                .filter(Category::getIsEnabled)
                 .map(subcategory -> new SubcategoryDTO(subcategory.getId(),
                         subcategory.getName(), subcategory.getGeneralType()))
                 .collect(Collectors.toList());
@@ -81,26 +86,25 @@ public class CategoryService {
     }
 
     public void deleteSubcategory(String email, Long catId, Long subId) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        var userId = userRepository.getUserId(email);
 
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            Set<Category> userCategories = user.getCategories();
-            Set<Category> newCategories = userCategories.stream()
-                    .filter(category -> category.getId().equals(catId))
-                    .findFirst().get()
-                    .getSubcategories().stream()
-                    .filter(subcategory -> !subcategory.getId().equals(subId))
-                    .collect(Collectors.toSet());
+        if (userId == null)
+            throw new ResourceNotFoundException(String.format("Couldn't find a user with email: %s", email));
 
-            userCategories.stream()
-                    .filter(category -> category.getId().equals(catId))
-                    .findFirst().get().setSubcategories(newCategories);
-            user.setCategories(userCategories);
-            userRepository.save(user);
-        } else {
-            throw new ResourceNotFoundException("Couldn't find a user with give email");
+        boolean isSubcategoryId = categoryRepository.existsByIdAndSubcategoryIdAndOwnerId(catId, subId, userId);
+        if (!isSubcategoryId) {
+            throw new ResourceNotFoundException(
+                    String.format("Couldn't find a subcategory for given category id = %s and subcategory id = %s",
+                            catId, subId)
+            );
         }
+        Optional<Category> subcategoryToDisable = categoryRepository.findById(subId);
+
+        subcategoryToDisable.ifPresent(sub -> {
+            sub.setOwner(null);
+            sub.setIsEnabled(false);
+            categoryRepository.save(sub);
+        });
     }
 
     public void updateCategory(String email, Long id, CategoryDTO categoryDTO) {
