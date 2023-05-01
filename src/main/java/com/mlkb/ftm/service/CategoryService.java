@@ -91,8 +91,8 @@ public class CategoryService {
         if (userId == null)
             throw new ResourceNotFoundException(String.format("Couldn't find a user with email: %s", email));
 
-        boolean isSubcategoryId = categoryRepository.existsByIdAndSubcategoryIdAndOwnerId(catId, subId, userId);
-        if (!isSubcategoryId) {
+        boolean isSubcategory = categoryRepository.existsByIdAndSubcategoryIdAndOwnerId(catId, subId, userId);
+        if (!isSubcategory) {
             throw new ResourceNotFoundException(
                     String.format("Couldn't find a subcategory for given category id = %s and subcategory id = %s",
                             catId, subId)
