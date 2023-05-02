@@ -31,7 +31,6 @@ class CategoryServiceTestIT extends AcceptanceTest {
         // given
         Long subcategoryIdToRemove = 8L;
         Long categoryId = 3L;
-        Long userId = 1L;
         CategoryService categoryService = new CategoryService(this.userRepository, this.categoryRepository, this.inputValidator);
         String email = "user@user.pl";
         //when
