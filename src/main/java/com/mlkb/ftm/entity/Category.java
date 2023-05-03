@@ -25,16 +25,22 @@ public class Category {
     @JoinColumn(name = "category_id")
     private Category parentCategory;
     private Boolean isEnabled = true;
-    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Set<Category> subcategories;
 
-    @OneToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User owner;
 
     public Category(String name, GeneralType generalType) {
         this.name = name;
         this.generalType = generalType;
+    }
+
+    public Category(String name, GeneralType generalType, User owner) {
+        this.name = name;
+        this.generalType = generalType;
+        this.owner = owner;
     }
 }

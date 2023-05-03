@@ -1,7 +1,9 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.AcceptanceTest;
+import com.mlkb.ftm.entity.Category;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
+import com.mlkb.ftm.fixture.CategoryDTOFixture;
 import com.mlkb.ftm.repository.CategoryRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import com.mlkb.ftm.validation.InputValidator;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.sql.*;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -163,5 +166,22 @@ class CategoryServiceTestIT extends AcceptanceTest {
                 assertThat(rs.getBoolean(1)).isFalse();
             }
         }
+    }
+
+    @Test
+    void add_subcategory_to_database() {
+        // given
+        Long categoryId = 5L;
+        CategoryService categoryService = new CategoryService(this.userRepository, this.categoryRepository, this.inputValidator);
+        String email = "user@user.pl";
+
+        var subcategoryDto = CategoryDTOFixture.carSubcategory();
+
+        //when
+        categoryService.addSubcategory(email, categoryId, subcategoryDto);
+
+        // then
+        Optional<Category> category = categoryRepository.findById(categoryId);
+        category.ifPresent(c -> assertEquals(1, c.getSubcategories().size()));
     }
 }

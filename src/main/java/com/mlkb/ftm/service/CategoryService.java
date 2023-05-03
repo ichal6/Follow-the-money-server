@@ -170,7 +170,7 @@ public class CategoryService {
                     .filter(category -> category.getId().equals(id))
                     .findFirst().get();
             categoryToEdit.getSubcategories()
-                    .add(new Category(newSubcategory.getName(), newSubcategory.getType()));
+                    .add(new Category(newSubcategory.getName(), newSubcategory.getType(), user));
             userCategories.add(categoryToEdit);
             userRepository.save(user);
         } else {
