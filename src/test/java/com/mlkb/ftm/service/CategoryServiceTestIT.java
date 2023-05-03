@@ -192,7 +192,7 @@ class CategoryServiceTestIT extends AcceptanceTest {
                 // Query the database for the data
                 ResultSet rs = stmt.executeQuery(String.format("SELECT user_id FROM category WHERE category_id = %d", categoryId));
 
-                // Check if the data is removed
+                // Check if the user_id is set
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getLong(1)).isNotNull();
             }
