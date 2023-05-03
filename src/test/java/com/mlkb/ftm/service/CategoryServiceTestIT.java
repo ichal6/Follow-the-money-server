@@ -2,6 +2,7 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.AcceptanceTest;
 import com.mlkb.ftm.entity.Category;
+import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.CategoryDTOFixture;
 import com.mlkb.ftm.repository.CategoryRepository;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Sql({
         "classpath:/sql/user.sql",
@@ -169,7 +171,7 @@ class CategoryServiceTestIT extends AcceptanceTest {
     }
 
     @Test
-    void add_subcategory_to_database() {
+    void add_subcategory_to_database() throws SQLException {
         // given
         Long categoryId = 5L;
         CategoryService categoryService = new CategoryService(this.userRepository, this.categoryRepository, this.inputValidator);
@@ -182,6 +184,18 @@ class CategoryServiceTestIT extends AcceptanceTest {
 
         // then
         Optional<Category> category = categoryRepository.findById(categoryId);
-        category.ifPresent(c -> assertEquals(1, c.getSubcategories().size()));
+        category.ifPresentOrElse(c -> assertEquals(1, c.getSubcategories().size()), Assertions::fail);
+
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT user_id FROM category WHERE category_id = %d", categoryId));
+
+                // Check if the data is removed
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getLong(1)).isNotNull();
+            }
+        }
     }
 }
