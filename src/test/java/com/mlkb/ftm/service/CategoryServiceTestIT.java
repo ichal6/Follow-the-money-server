@@ -13,9 +13,10 @@ import java.sql.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Sql({
-        "classpath:/data.sql"
+        "classpath:/sql/user.sql",
+        "classpath:/sql/category.sql"
 })
-@Sql(value = "classpath:/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(value = "classpath:/sql/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class CategoryServiceTestIT extends AcceptanceTest {
     @Autowired
     private UserRepository userRepository;
