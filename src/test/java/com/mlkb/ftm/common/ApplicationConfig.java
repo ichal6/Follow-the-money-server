@@ -1,4 +1,4 @@
-package com.mlkb.ftm;
+package com.mlkb.ftm.common;
 
 import com.mlkb.ftm.controller.AccountController;
 import com.mlkb.ftm.controller.PaymentController;

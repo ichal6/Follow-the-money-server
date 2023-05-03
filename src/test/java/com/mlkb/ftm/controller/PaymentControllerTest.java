@@ -1,6 +1,6 @@
 package com.mlkb.ftm.controller;
 
-import com.mlkb.ftm.ApplicationConfig;
+import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.fixture.PaymentDTOFixture;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.service.PaymentService;
