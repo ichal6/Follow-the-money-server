@@ -2,7 +2,7 @@ package com.mlkb.ftm.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mlkb.ftm.ApplicationConfig;
+import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.service.AccountService;

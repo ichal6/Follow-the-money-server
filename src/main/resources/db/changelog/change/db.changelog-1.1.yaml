@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove-subcategory
+      author: Michael Lechowicz
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: subcategory
+            constraintName: fke4hdbsmrx9bs9gpj1fh4mg0ku
+        - dropTable:
+            tableName: "subcategory"
+  - changeSet:
+      id: add-is_subcategory-column
+      author: Michael Lechowicz
+      changes:
+        - addColumn:
+            tableName: category
+            columns:
+              - column:
+                  name: category_id
+                  type: BIGINT
+              - column:
+                  name: is_enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: category
+            constraintName: subcategory_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            referencedColumnNames: id
+            referencedTableName: category
+            validate: true
