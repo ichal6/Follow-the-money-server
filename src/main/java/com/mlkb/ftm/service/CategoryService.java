@@ -101,7 +101,6 @@ public class CategoryService {
         Optional<Category> subcategoryToDisable = categoryRepository.findById(subId);
 
         subcategoryToDisable.ifPresent(sub -> {
-            sub.setOwner(null);
             sub.setIsEnabled(false);
             categoryRepository.save(sub);
         });
