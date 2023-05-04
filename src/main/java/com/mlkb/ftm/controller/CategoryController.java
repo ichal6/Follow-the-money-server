@@ -16,13 +16,13 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final AccessValidator accessValidator;
-    
+
     public CategoryController(CategoryService categoryService, AccessValidator accessValidator) {
         this.categoryService = categoryService;
         this.accessValidator = accessValidator;
     }
 
-    @GetMapping("/{email}")
+    @GetMapping(value = {"/{email}", "/expense/{email}", "/income/{email}"})
     public ResponseEntity<Object> getCategories(@PathVariable String email) {
         accessValidator.checkPermit(email);
         List<CategoryDTO> categoriesDTO = categoryService.getCategories(email);
