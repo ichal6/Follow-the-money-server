@@ -18,9 +18,6 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @Enumerated(EnumType.STRING)
-    @Column(length = 8)
-    private GeneralType generalType;
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Category parentCategory;
@@ -33,14 +30,12 @@ public class Category {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    public Category(String name, GeneralType generalType) {
+    public Category(String name) {
         this.name = name;
-        this.generalType = generalType;
     }
 
-    public Category(String name, GeneralType generalType, User owner) {
+    public Category(String name, User owner) {
         this.name = name;
-        this.generalType = generalType;
         this.owner = owner;
     }
 }

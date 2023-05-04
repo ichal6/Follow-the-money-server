@@ -33,20 +33,6 @@ public class CategoryController {
         return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/expense/{email}")
-    public ResponseEntity<Object> getCategoriesForExpense(@PathVariable String email) {
-        accessValidator.checkPermit(email);
-        List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForExpense(email);
-        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/income/{email}")
-    public ResponseEntity<Object> getCategoriesForIncome(@PathVariable String email) {
-        accessValidator.checkPermit(email);
-        List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForIncome(email);
-        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-    }
-
     @DeleteMapping("/{email}/{id}")
     public ResponseEntity<Object> deleteCategory(@PathVariable String email, @PathVariable Long id) {
         accessValidator.checkPermit(email);
