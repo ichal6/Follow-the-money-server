@@ -5,7 +5,6 @@ import com.mlkb.ftm.modelDTO.CategoryDTO;
 import com.mlkb.ftm.modelDTO.SubcategoryDTO;
 import com.mlkb.ftm.service.CategoryService;
 import com.mlkb.ftm.validation.AccessValidator;
-import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,33 +16,16 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final AccessValidator accessValidator;
-    private final InputValidator inputValidator;
 
-    public CategoryController(CategoryService categoryService, AccessValidator accessValidator,
-                              InputValidator inputValidator) {
+    public CategoryController(CategoryService categoryService, AccessValidator accessValidator) {
         this.categoryService = categoryService;
         this.accessValidator = accessValidator;
-        this.inputValidator = inputValidator;
     }
 
-    @GetMapping("/{email}")
+    @GetMapping(value = {"/{email}", "/expense/{email}", "/income/{email}"})
     public ResponseEntity<Object> getCategories(@PathVariable String email) {
         accessValidator.checkPermit(email);
         List<CategoryDTO> categoriesDTO = categoryService.getCategories(email);
-        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/expense/{email}")
-    public ResponseEntity<Object> getCategoriesForExpense(@PathVariable String email) {
-        accessValidator.checkPermit(email);
-        List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForExpense(email);
-        return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/income/{email}")
-    public ResponseEntity<Object> getCategoriesForIncome(@PathVariable String email) {
-        accessValidator.checkPermit(email);
-        List<CategoryDTO> categoriesDTO = categoryService.getCategoriesForIncome(email);
         return new ResponseEntity<>(categoriesDTO, HttpStatus.OK);
     }
 
