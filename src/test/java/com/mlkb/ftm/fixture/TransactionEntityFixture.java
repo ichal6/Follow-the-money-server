@@ -1,7 +1,7 @@
 package com.mlkb.ftm.fixture;
 
 import com.mlkb.ftm.entity.Category;
-import com.mlkb.ftm.entity.GeneralType;
+import com.mlkb.ftm.entity.PaymentType;
 import com.mlkb.ftm.entity.Payee;
 import com.mlkb.ftm.entity.Transaction;
 
@@ -27,7 +27,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-2500.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -45,7 +45,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-5.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -63,7 +63,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-45.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -81,7 +81,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-55.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -99,7 +99,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-80.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -117,7 +117,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-30.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -135,7 +135,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-1000.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -153,7 +153,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-35.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -171,7 +171,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-50.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -189,7 +189,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-40.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -207,7 +207,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-70.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -225,7 +225,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-30.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -243,7 +243,7 @@ public class TransactionEntityFixture {
         transaction.setValue(-50.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -261,7 +261,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1500.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -279,7 +279,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1600.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -297,7 +297,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1700.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -315,7 +315,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1500.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -333,7 +333,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1400.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -351,7 +351,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1600.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -369,7 +369,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1800.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -387,7 +387,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1500.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -405,7 +405,7 @@ public class TransactionEntityFixture {
         transaction.setValue(1900.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.INCOME);
+        transaction.setType(PaymentType.INCOME);
         return transaction;
     }
 
@@ -423,7 +423,7 @@ public class TransactionEntityFixture {
         transaction.setValue(230.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 
@@ -441,7 +441,7 @@ public class TransactionEntityFixture {
         transaction.setValue(39.0);
         transaction.setPayee(payee);
         transaction.setCategory(category);
-        transaction.setType(GeneralType.EXPENSE);
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 }

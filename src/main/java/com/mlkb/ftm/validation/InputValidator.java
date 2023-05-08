@@ -1,7 +1,7 @@
 package com.mlkb.ftm.validation;
 
 import com.mlkb.ftm.entity.AccountType;
-import com.mlkb.ftm.entity.GeneralType;
+import com.mlkb.ftm.entity.PaymentType;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.InputValidationMessage;
 import org.springframework.stereotype.Component;
@@ -42,9 +42,9 @@ public class InputValidator {
     }
 
     public boolean checkIfGeneralTypeInEnum(String type) throws InputIncorrectException {
-        List<GeneralType> types = Arrays.asList(GeneralType.values());
+        List<PaymentType> types = Arrays.asList(PaymentType.values());
         try {
-            return types.contains(GeneralType.valueOf(type.toUpperCase()));
+            return types.contains(PaymentType.valueOf(type.toUpperCase()));
         } catch (IllegalArgumentException e) {
             throw new InputIncorrectException(InputValidationMessage.GENERAL_TYPE);
         }

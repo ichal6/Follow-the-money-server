@@ -20,7 +20,7 @@ public class Transaction {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
-    private GeneralType type;
+    private PaymentType type;
     private Double value;
     @CreatedDate
     private Date date;
