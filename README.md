@@ -28,6 +28,7 @@ Server side:
 - Hibernate
 - PostgreSQL
 - Liquibase
+- Testcontainers
 
 Client side:
 - Angular
