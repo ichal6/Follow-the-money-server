@@ -63,17 +63,17 @@ VALUES (9, 'extra hours', 1, 3);
 
 SELECT setval('category_id_seq', 9);
 
-INSERT INTO "payee" (id, general_type, name, user_id)
-VALUES (1, 'INCOME', 'Job', 1);
+INSERT INTO "payee" (id,  name, user_id)
+VALUES (1, 'Job', 1);
 
-INSERT INTO "payee" (id, general_type, name, user_id)
-VALUES (2, 'EXPENSE', 'Bank', 3);
+INSERT INTO "payee" (id,  name, user_id)
+VALUES (2,  'Bank', 3);
 
-INSERT INTO "payee" (id, general_type, name, user_id)
-VALUES (3, 'EXPENSE', 'Biedronka', 1);
+INSERT INTO "payee" (id,  name, user_id)
+VALUES (3,  'Biedronka', 1);
 
-INSERT INTO "payee" (id, general_type, name, user_id)
-VALUES (4, 'EXPENSE', 'Mariusz-trans komis', 1);
+INSERT INTO "payee" (id,  name, user_id)
+VALUES (4,  'Mariusz-trans komis', 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
 VALUES (1, TO_DATE('2022-05-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 5, 4, 4);
