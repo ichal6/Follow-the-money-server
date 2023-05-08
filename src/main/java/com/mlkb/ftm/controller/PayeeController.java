@@ -4,7 +4,6 @@ import com.mlkb.ftm.modelDTO.PayeeDTO;
 import com.mlkb.ftm.service.PayeeService;
 import com.mlkb.ftm.service.UserService;
 import com.mlkb.ftm.validation.AccessValidator;
-import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,29 +16,18 @@ public class PayeeController {
     private final PayeeService payeeService;
     private final UserService userService;
     private final AccessValidator accessValidator;
-    private final InputValidator inputValidator;
-
     PayeeController(PayeeService payeeService,
                     UserService userService,
-                    AccessValidator accessValidator,
-                    InputValidator inputValidator){
+                    AccessValidator accessValidator){
         this.payeeService = payeeService;
         this.userService = userService;
         this.accessValidator = accessValidator;
-        this.inputValidator = inputValidator;
     }
 
-    @GetMapping("/income/{email}")
-    public ResponseEntity<Object> getPayeeForIncome(@PathVariable String email){
+    @GetMapping(value = {"/expense/{email}", "/income/{email}", "/{email}"})
+    public ResponseEntity<Set<PayeeDTO>> getPayees(@PathVariable String email) {
         accessValidator.checkPermit(email);
-        Set<PayeeDTO> payeesDTO = payeeService.getPayeeForIncome(email);
-        return new ResponseEntity<>(payeesDTO, HttpStatus.OK);
-    }
-
-    @GetMapping("/expense/{email}")
-    public ResponseEntity<Object> getPayeeForExpense(@PathVariable String email){
-        accessValidator.checkPermit(email);
-        Set<PayeeDTO> payeesDTO = payeeService.getPayeeForExpense(email);
+        Set<PayeeDTO> payeesDTO = payeeService.getAllPayees(email);
         return new ResponseEntity<>(payeesDTO, HttpStatus.OK);
     }
 

@@ -1,6 +1,5 @@
 package com.mlkb.ftm.repository;
 
-import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Payee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
