@@ -28,6 +28,7 @@ Server side:
 - Hibernate
 - PostgreSQL
 - Liquibase
+- Testcontainers
 
 Client side:
 - Angular
@@ -83,7 +84,6 @@ Project is: _in progress_ .
 - Add payments edit
 - Add transfer edit
 - Include subcategories in payments
-- Add migrate database
 - Improve dashboard with loan subsection
 - Add User settings
 - Add notification

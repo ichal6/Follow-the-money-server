@@ -172,7 +172,7 @@ public class PaymentService {
         Optional<Payee> payeeOptional = payeeRepository.findById(transactionDTO.getPayeeId());
         if (categoryOptional.isPresent() && accountOptional.isPresent() && payeeOptional.isPresent()) {
             Transaction transaction = new Transaction();
-            transaction.setType(GeneralType.valueOf(transactionDTO.getType()));
+            transaction.setType(PaymentType.valueOf(transactionDTO.getType()));
             transaction.setValue(transactionDTO.getValue());
             transaction.setDate(transactionDTO.getDate());
             transaction.setTitle(transactionDTO.getTitle());

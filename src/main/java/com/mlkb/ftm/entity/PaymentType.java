@@ -1,6 +1,6 @@
 package com.mlkb.ftm.entity;
 
-public enum GeneralType {
+public enum PaymentType {
     INCOME,
     EXPENSE
 }

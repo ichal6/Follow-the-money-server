@@ -67,7 +67,7 @@ public class DashboardService {
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(
                         account -> account.getTransactions().stream())
-                .filter(transaction -> transaction.getType() == GeneralType.EXPENSE)
+                .filter(transaction -> transaction.getType() == PaymentType.EXPENSE)
                 .filter(transaction -> transaction.getDate().getTime() > previousYear.getTime())
                 .collect(groupingBy(transaction -> Month.from(transaction.getDate().toInstant()
                                 .atZone(ZoneId.systemDefault()).toLocalDate()),
@@ -95,7 +95,7 @@ public class DashboardService {
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .flatMap(
                         account -> account.getTransactions().stream())
-                .filter(transaction -> transaction.getType() == GeneralType.INCOME)
+                .filter(transaction -> transaction.getType() == PaymentType.INCOME)
                 .filter(transaction -> transaction.getDate().getTime() > previousYear.getTime())
                 .collect(groupingBy(transaction -> Month.from(transaction.getDate().toInstant()
                                 .atZone(ZoneId.systemDefault()).toLocalDate()),
