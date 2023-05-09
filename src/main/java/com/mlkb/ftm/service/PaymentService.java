@@ -10,6 +10,8 @@ import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -334,7 +336,7 @@ public class PaymentService {
 
     private void calculateBalanceAfterEachPayment(List<PaymentDTO> payments, Double currentBalance) {
         for (PaymentDTO payment : payments) {
-            payment.setBalanceAfter(currentBalance);
+            payment.setBalanceAfter(BigDecimal.valueOf(currentBalance).setScale(2, RoundingMode.HALF_UP));
             currentBalance -= payment.getValue();
         }
     }

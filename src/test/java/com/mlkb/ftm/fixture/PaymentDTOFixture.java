@@ -2,6 +2,8 @@ package com.mlkb.ftm.fixture;
 
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -29,7 +31,7 @@ public class PaymentDTOFixture {
         transaction.setFrom("Millenium");
         transaction.setCategoryName("Car");
         transaction.setIsInternal(false);
-        transaction.setBalanceAfter(0.0);
+        transaction.setBalanceAfter(BigDecimal.valueOf(0.0).setScale(2, RoundingMode.HALF_UP));
         return transaction;
     }
 
@@ -67,7 +69,7 @@ public class PaymentDTOFixture {
         transfer.setTo("Wallet");
         transfer.setFrom("Millenium");
         transfer.setIsInternal(true);
-        transfer.setBalanceAfter(2500.0);
+        transfer.setBalanceAfter(BigDecimal.valueOf(2500.0).setScale(2, RoundingMode.HALF_UP));
         return transfer;
     }
 }
