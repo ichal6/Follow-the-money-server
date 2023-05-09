@@ -24,10 +24,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -121,12 +118,6 @@ public class PaymentServiceTest {
         final var payments = paymentService.getPayments(email);
 
         // then
-        Optional<PaymentDTO> optionalPaymentDTO = payments
-                .stream()
-                .filter(PaymentDTO::getIsInternal)
-                .filter(paymentDTO -> paymentDTO.getValue() < 0)
-                .findFirst();
-
         assertThat(payments)
                 .hasSize(3)
                 .containsExactlyInAnyOrder(
@@ -135,7 +126,21 @@ public class PaymentServiceTest {
                         PaymentDTOFixture.buyMilkTransaction()
                 );
 
+        Optional<PaymentDTO> optionalPaymentDTO = payments
+                .stream()
+                .filter(PaymentDTO::getIsInternal)
+                .filter(paymentDTO -> paymentDTO.getValue() < 0)
+                .findFirst();
+
         assertThat(optionalPaymentDTO)
+                .isEmpty();
+
+        var possibleWrongBalance = payments.stream()
+                .map(PaymentDTO::getBalanceAfter)
+                .filter(Objects::nonNull)
+                .findAny();
+
+        assertThat(possibleWrongBalance)
                 .isEmpty();
     }
 
@@ -200,6 +205,14 @@ public class PaymentServiceTest {
                         PaymentDTOFixture.buyCarTransactionWithBalance(),
                         PaymentDTOFixture.cashDepositTransferMilleniumWithBalance()
                 );
+
+        Optional<Integer> possibleWrongScale = payments.stream()
+                .map(p -> p.getBalanceAfter().scale())
+                .filter(s -> s != 2)
+                .findAny();
+
+        assertThat(possibleWrongScale).isEmpty();
+
     }
 
     @Test
@@ -248,6 +261,14 @@ public class PaymentServiceTest {
                         PaymentDTOFixture.cashDepositTransferMillenium(),
                         PaymentDTOFixture.buyMilkTransaction()
                 );
+
+        var possibleWrongBalance = payments.stream()
+                .map(PaymentDTO::getBalanceAfter)
+                .filter(Objects::nonNull)
+                .findAny();
+
+        assertThat(possibleWrongBalance)
+                .isEmpty();
     }
 
     @Test

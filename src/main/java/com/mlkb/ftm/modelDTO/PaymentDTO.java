@@ -2,6 +2,7 @@ package com.mlkb.ftm.modelDTO;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -16,5 +17,5 @@ public class PaymentDTO {
     private String from;
     private String to;
     private String categoryName;
-    private Double balanceAfter;
+    private BigDecimal balanceAfter;
 }
