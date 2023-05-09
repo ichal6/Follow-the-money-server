@@ -18,7 +18,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Category parentCategory;
     private Boolean isEnabled = true;
