@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.*;
 
 @Getter
@@ -29,7 +29,7 @@ public class User {
     @OneToMany(targetEntity = Account.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<Account> accounts;
-    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private Set<Category> categories;
     @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL)

@@ -1,11 +1,15 @@
 package com.mlkb.ftm.entity;
 
+import jakarta.validation.constraints.Digits;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Set;
 
 @Getter
@@ -24,7 +28,8 @@ public class Account {
     @Column(columnDefinition = "double precision default 0.00")
     private Double startingBalance;
     @Column(columnDefinition = "double precision default 0.00")
-    private Double currentBalance;
+    @Digits(integer = Integer.MAX_VALUE, fraction = 2)
+    private BigDecimal currentBalance;
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private Currency currency;
@@ -39,4 +44,12 @@ public class Account {
     @OneToMany
     @JoinColumn(name = "account_to_id")
     private Set<Transfer> transfersTo;
+
+    public Double getCurrentBalance() {
+        return this.currentBalance.setScale(2, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public void setCurrentBalance(Double currentBalance) {
+        this.currentBalance = BigDecimal.valueOf(currentBalance).setScale(2, RoundingMode.HALF_UP);
+    }
 }

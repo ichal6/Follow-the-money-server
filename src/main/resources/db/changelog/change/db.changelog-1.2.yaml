@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove-general_type-from-category
+      author: Michael Lechowicz
+      changes:
+        - dropColumn:
+            tableName: category
+            columnName: general_type

@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove-general_type-from-payee
+      author: Michael Lechowicz
+      changes:
+        - dropColumn:
+            tableName: payee
+            columnName: general_type

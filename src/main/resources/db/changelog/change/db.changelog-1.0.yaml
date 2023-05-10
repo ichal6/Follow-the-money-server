@@ -1,0 +1,467 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1681296552679-1
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: account_pkey
+                  name: id
+                  startWith: 6
+                  type: BIGINT
+              - column:
+                  name: account_type
+                  type: VARCHAR(8)
+              - column:
+                  name: currency
+                  type: VARCHAR(8)
+              - column:
+                  defaultValueNumeric: 0.0
+                  name: current_balance
+                  type: FLOAT8
+              - column:
+                  defaultValueBoolean: true
+                  name: is_enabled
+                  type: BOOLEAN
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  defaultValueNumeric: 0.0
+                  name: starting_balance
+                  type: FLOAT8
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: account
+  - changeSet:
+      id: 1681296552679-2
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: category_pkey
+                  name: id
+                  startWith: 5
+                  type: BIGINT
+              - column:
+                  name: general_type
+                  type: VARCHAR(8)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: category
+  - changeSet:
+      id: 1681296552679-3
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: payee_pkey
+                  name: id
+                  startWith: 5
+                  type: BIGINT
+              - column:
+                  name: general_type
+                  type: VARCHAR(8)
+              - column:
+                  defaultValueBoolean: true
+                  name: is_enabled
+                  type: BOOLEAN
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: payee
+  - changeSet:
+      id: 1681296552679-4
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: subcategory_pkey
+                  name: id
+                  startWith: 5
+                  type: BIGINT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: type
+                  type: VARCHAR(8)
+              - column:
+                  name: category_id
+                  type: BIGINT
+            tableName: subcategory
+  - changeSet:
+      id: 1681296552679-5
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: transaction_pkey
+                  name: id
+                  startWith: 11
+                  type: BIGINT
+              - column:
+                  name: date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: type
+                  type: VARCHAR(8)
+              - column:
+                  name: value
+                  type: FLOAT8
+              - column:
+                  name: category_id
+                  type: BIGINT
+              - column:
+                  name: payee_id
+                  type: BIGINT
+              - column:
+                  name: account_id
+                  type: BIGINT
+            tableName: transaction
+  - changeSet:
+      id: 1681296552679-6
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: transfer_pkey
+                  name: id
+                  startWith: 5
+                  type: BIGINT
+              - column:
+                  name: date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: value
+                  type: FLOAT8
+              - column:
+                  name: account_from_id
+                  type: BIGINT
+              - column:
+                  name: account_to_id
+                  type: BIGINT
+            tableName: transfer
+  - changeSet:
+      id: 1681296552679-7
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_data_pkey
+                  name: id
+                  startWith: 4
+                  type: BIGINT
+              - column:
+                  name: date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: enabled
+                  type: INTEGER
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+            tableName: user_data
+  - changeSet:
+      id: 1681296552679-8
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: authorities_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+            tableName: authorities
+  - changeSet:
+      id: 1681296552679-9
+      author: michael (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: uk_dhxuydjj5l1vds6s9eex23dcr
+            tableName: user_data
+  - changeSet:
+      id: 1681296552679-10
+      author: michael (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: uk_nb3atvjf9ov5d0egnuk47o5e
+            tableName: authorities
+  - changeSet:
+      id: 1681296552679-11
+      author: michael (generated)
+      changes:
+        - createSequence:
+            cacheSize: 1
+            cycle: false
+            dataType: bigint
+            incrementBy: 50
+            maxValue: 9223372036854775807
+            minValue: 1
+            sequenceName: authorities_seq
+            startValue: 1
+  - changeSet:
+      id: 1681296552679-12
+      author: michael (generated)
+      changes:
+        - createSequence:
+            cacheSize: 1
+            cycle: false
+            dataType: bigint
+            incrementBy: 1
+            maxValue: 9223372036854775807
+            minValue: 1
+            sequenceName: hibernate_sequence
+            startValue: 1
+  - changeSet:
+      id: 1681296552679-13
+      author: michael (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_authority_pkey
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_authority_pkey
+                  name: authority_id
+                  type: INTEGER
+            tableName: user_authority
+  - changeSet:
+      id: 1681296552679-14
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: account_id
+            baseTableName: transaction
+            constraintName: fk6g20fcr3bhr6bihgy24rq1r1b
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: account
+            validate: true
+  - changeSet:
+      id: 1681296552679-15
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: payee_id
+            baseTableName: transaction
+            constraintName: fk6ysw7ksvi2ahp0j2crslguy7o
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: payee
+            validate: true
+  - changeSet:
+      id: 1681296552679-16
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: category
+            constraintName: fk8dcna8xqno63aurm540vc0uer
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: user_data
+            validate: true
+  - changeSet:
+      id: 1681296552679-17
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: account
+            constraintName: fk8jqcf8w53rdinjtmcc0u9rno5
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: user_data
+            validate: true
+  - changeSet:
+      id: 1681296552679-18
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: account_to_id
+            baseTableName: transfer
+            constraintName: fkcgola9iv0xchmnnl6lmiympwl
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: account
+            validate: true
+  - changeSet:
+      id: 1681296552679-19
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_authority
+            constraintName: fkcryfwopj0tqi8le7e8db9q056
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: user_data
+            validate: true
+  - changeSet:
+      id: 1681296552679-20
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: subcategory
+            constraintName: fke4hdbsmrx9bs9gpj1fh4mg0ku
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: category
+            validate: true
+  - changeSet:
+      id: 1681296552679-21
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: transaction
+            constraintName: fkgik7ruym8r1n4xngrclc6kiih
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: category
+            validate: true
+  - changeSet:
+      id: 1681296552679-22
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: account_from_id
+            baseTableName: transfer
+            constraintName: fkhlwlykt9nnaob773n2cm1fxa1
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: account
+            validate: true
+  - changeSet:
+      id: 1681296552679-23
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: authority_id
+            baseTableName: user_authority
+            constraintName: fkil6f39w6fgqh4gk855pstsnmy
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: authorities
+            validate: true
+  - changeSet:
+      id: 1681296552679-24
+      author: michael (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: payee
+            constraintName: fkjhxakq98q3sss5kwsraanrn9b
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: user_data
+            validate: true
+

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Getter
@@ -20,7 +20,7 @@ public class Transaction {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
-    private GeneralType type;
+    private PaymentType type;
     private Double value;
     @CreatedDate
     private Date date;

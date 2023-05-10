@@ -1,12 +1,12 @@
 package com.mlkb.ftm.repository;
 
-import com.mlkb.ftm.entity.GeneralType;
+import com.mlkb.ftm.entity.PaymentType;
 import com.mlkb.ftm.entity.Payee;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TemporalType;
-import javax.persistence.Tuple;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.Tuple;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
@@ -20,7 +20,7 @@ public class CustomTransactionRepositoryImpl implements CustomTransactionReposit
     private EntityManager entityManager;
 
     @Override
-    public Map<String, BigDecimal> getMapTransactionsValueForPayee(Set<Payee> payees, GeneralType type, Instant dateStart) {
+    public Map<String, BigDecimal> getMapTransactionsValueForPayee(Set<Payee> payees, PaymentType type, Instant dateStart) {
         return this.entityManager.createQuery("""
     SELECT
         SUM(t.value) AS value, p.name AS name

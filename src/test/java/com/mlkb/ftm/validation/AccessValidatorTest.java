@@ -1,6 +1,6 @@
 package com.mlkb.ftm.validation;
 
-import com.mlkb.ftm.ApplicationConfig;
+import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.exception.IllegalAccessRuntimeException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -50,9 +50,9 @@ public class AnalysisService {
         User user = getUser(email);
         Set<Payee> payees = user.getPayees();
         Map<String, BigDecimal> valueExpenseMap = this.transactionRepository
-                .getMapTransactionsValueForPayee(payees, GeneralType.EXPENSE, dateStart);
+                .getMapTransactionsValueForPayee(payees, PaymentType.EXPENSE, dateStart);
         Map<String, BigDecimal> valueIncomeMap = this.transactionRepository
-                .getMapTransactionsValueForPayee(payees, GeneralType.INCOME, dateStart);
+                .getMapTransactionsValueForPayee(payees, PaymentType.INCOME, dateStart);
 
         return  payees.stream().map(p -> AnalysisFinancialTableDTO.builder()
                     .name(p.getName())
@@ -69,8 +69,8 @@ public class AnalysisService {
                 .filter(Account::getIsEnabled)
                 .map(a -> AnalysisFinancialTableDTO.builder()
                     .name(a.getName())
-                    .income(getValueFromTransactions(a.getTransactions(), GeneralType.INCOME, dateStart))
-                    .expense(getValueFromTransactions(a.getTransactions(), GeneralType.EXPENSE, dateStart))
+                    .income(getValueFromTransactions(a.getTransactions(), PaymentType.INCOME, dateStart))
+                    .expense(getValueFromTransactions(a.getTransactions(), PaymentType.EXPENSE, dateStart))
                     .build())
                 .collect(Collectors.toSet());
     }
@@ -81,8 +81,8 @@ public class AnalysisService {
         return categories.stream()
                 .map(c -> AnalysisFinancialTableDTO.builder()
                         .name(c.getName())
-                        .income(getValueFromTransactions(transactionRepository.findByCategoryId(c.getId()), GeneralType.INCOME, dateStart))
-                        .expense(getValueFromTransactions(transactionRepository.findByCategoryId(c.getId()), GeneralType.EXPENSE, dateStart))
+                        .income(getValueFromTransactions(transactionRepository.findByCategoryId(c.getId()), PaymentType.INCOME, dateStart))
+                        .expense(getValueFromTransactions(transactionRepository.findByCategoryId(c.getId()), PaymentType.EXPENSE, dateStart))
                         .build())
                 .collect(Collectors.collectingAndThen(Collectors.toMap(AnalysisFinancialTableDTO::getName, Function.identity(), this::mergeAnalysis),
                         m -> new HashSet(m.values()))
@@ -125,7 +125,7 @@ public class AnalysisService {
         }
     }
 
-    private BigDecimal getValueFromTransactions(Set<Transaction> transactions, GeneralType type, Instant dateStart) {
+    private BigDecimal getValueFromTransactions(Set<Transaction> transactions, PaymentType type, Instant dateStart) {
         Double value = transactions.stream()
                 .filter(t -> t.getDate().after(Date.from(dateStart)))
                 .filter(t -> t.getType().equals(type))

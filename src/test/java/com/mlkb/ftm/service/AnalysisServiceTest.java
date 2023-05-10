@@ -1,6 +1,6 @@
 package com.mlkb.ftm.service;
 
-import com.mlkb.ftm.ApplicationConfig;
+import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
