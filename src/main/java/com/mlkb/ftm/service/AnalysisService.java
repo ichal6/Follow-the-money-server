@@ -3,6 +3,7 @@ package com.mlkb.ftm.service;
 import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.AnalysisFinancialTableDTO;
+import com.mlkb.ftm.repository.CategoryRepository;
 import com.mlkb.ftm.repository.TransactionRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -14,16 +15,19 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class AnalysisService {
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
 
-    public AnalysisService(UserRepository userRepository, TransactionRepository transactionRepository) {
+    public AnalysisService(UserRepository userRepository,
+                           CategoryRepository categoryRepository,
+                           TransactionRepository transactionRepository) {
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
         this.transactionRepository = transactionRepository;
     }
 
@@ -31,9 +35,6 @@ public class AnalysisService {
     public Set<AnalysisFinancialTableDTO> getTableData(String email, Instant dateStart,
                                                                    AnalysisFinancialTableDTO.AnalysisType type) {
         switch (type) {
-            case accounts -> {
-                return getTableDataTypeAccounts(email, dateStart);
-            }
             case categories -> {
                 return getTableDataTypeCategories(email, dateStart);
             }
@@ -62,7 +63,7 @@ public class AnalysisService {
                 .collect(Collectors.toSet());
     }
 
-    public Set<AnalysisFinancialTableDTO> getTableDataTypeAccounts(String email, Instant dateStart) {
+    private Set<AnalysisFinancialTableDTO> getTableDataTypeAccounts(String email, Instant dateStart) {
         User user = getUser(email);
         Set<Account> accounts = user.getAccounts();
         return accounts.stream()
@@ -75,35 +76,22 @@ public class AnalysisService {
                 .collect(Collectors.toSet());
     }
 
-    public HashSet getTableDataTypeCategories(String email, Instant dateStart) {
-        User user = getUser(email);
-        Set<Category> categories = user.getCategories();
+    private Set<AnalysisFinancialTableDTO> getTableDataTypeCategories(String email, Instant dateStart) {
+        Long userId = this.getUserId(email);
+        Set<Category> categories = this.categoryRepository.findAllByOwnerId(userId);
+
+        Map<String, BigDecimal> valueExpenseMap = this.transactionRepository
+                .getMapTransactionValueForCategories(categories, PaymentType.EXPENSE, dateStart);
+        Map<String, BigDecimal> valueIncomeMap = this.transactionRepository
+                .getMapTransactionValueForCategories(categories, PaymentType.INCOME, dateStart);
+
         return categories.stream()
                 .map(c -> AnalysisFinancialTableDTO.builder()
                         .name(c.getName())
-                        .income(getValueFromTransactions(transactionRepository.findByCategoryId(c.getId()), PaymentType.INCOME, dateStart))
-                        .expense(getValueFromTransactions(transactionRepository.findByCategoryId(c.getId()), PaymentType.EXPENSE, dateStart))
+                        .expense(valueExpenseMap.getOrDefault(c.getName(), BigDecimal.ZERO))
+                        .income(valueIncomeMap.getOrDefault(c.getName(), BigDecimal.ZERO))
                         .build())
-                .collect(Collectors.collectingAndThen(Collectors.toMap(AnalysisFinancialTableDTO::getName, Function.identity(), this::mergeAnalysis),
-                        m -> new HashSet(m.values()))
-                );
-    }
-
-    private AnalysisFinancialTableDTO mergeAnalysis(AnalysisFinancialTableDTO a, AnalysisFinancialTableDTO b) {
-        BigDecimal expense, income;
-        if (a.getExpense().compareTo(b.getExpense()) > 0) {
-            expense = a.getExpense();
-            income = b.getIncome();
-        } else {
-            expense = b.getExpense();
-            income = a.getIncome();
-        }
-
-       return AnalysisFinancialTableDTO.builder()
-               .name(a.getName())
-               .expense(expense)
-               .income(income)
-               .build();
+                .collect(Collectors.toSet());
     }
 
     public Instant convertParamToInstant(Optional<String> possibleDate) throws DateTimeParseException {
@@ -123,6 +111,13 @@ public class AnalysisService {
         } else {
             throw new ResourceNotFoundException("Couldn't find a analysis for user with given email");
         }
+    }
+
+    private Long getUserId(String email) {
+        if(!this.userRepository.existsByEmail(email)) {
+            throw new ResourceNotFoundException(String.format("Couldn't find a user for email: %s", email));
+        }
+        return this.userRepository.getUserId(email);
     }
 
     private BigDecimal getValueFromTransactions(Set<Transaction> transactions, PaymentType type, Instant dateStart) {

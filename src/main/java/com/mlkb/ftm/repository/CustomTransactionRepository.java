@@ -1,5 +1,6 @@
 package com.mlkb.ftm.repository;
 
+import com.mlkb.ftm.entity.Category;
 import com.mlkb.ftm.entity.PaymentType;
 import com.mlkb.ftm.entity.Payee;
 
@@ -10,4 +11,8 @@ import java.util.Set;
 
 public interface CustomTransactionRepository {
     Map<String, BigDecimal> getMapTransactionsValueForPayee(Set<Payee> payees, PaymentType type, Instant dateStart);
+
+    Map<String, BigDecimal> getMapTransactionValueForCategories(Set<Category> categories,
+                                                                PaymentType type,
+                                                                Instant dateStart);
 }

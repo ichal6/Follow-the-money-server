@@ -6,6 +6,8 @@ import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.AnalysisFinancialTableDTOFixture;
 import com.mlkb.ftm.fixture.TransactionEntityFixture;
+import com.mlkb.ftm.modelDTO.AnalysisFinancialTableDTO;
+import com.mlkb.ftm.repository.CategoryRepository;
 import com.mlkb.ftm.repository.TransactionRepository;
 import com.mlkb.ftm.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,11 +40,14 @@ class AnalysisServiceTest {
     private UserRepository userRepository;
 
     @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private TransactionRepository transactionRepository;
 
     @BeforeEach
     void setUp() {
-        analysisService = new AnalysisService(userRepository, transactionRepository);
+        analysisService = new AnalysisService(userRepository, categoryRepository, transactionRepository);
     }
 
     @Test
@@ -74,7 +79,11 @@ class AnalysisServiceTest {
         when(wallet.getTransactions()).thenReturn(walletTransaction);
         when(wallet.getIsEnabled()).thenReturn(true);
 
-        final var tableData = analysisService.getTableDataTypeAccounts(email, Instant.ofEpochMilli(0L));
+        final var tableData = analysisService.getTableData(
+                email,
+                Instant.ofEpochMilli(0L),
+                AnalysisFinancialTableDTO.AnalysisType.accounts
+        );
 
         // then
         assertThat(tableData)
@@ -114,7 +123,11 @@ class AnalysisServiceTest {
         when(wallet.getTransactions()).thenReturn(walletTransaction);
         when(wallet.getIsEnabled()).thenReturn(true);
 
-        final var tableData = analysisService.getTableDataTypeAccounts(email, Instant.ofEpochMilli(0L));
+        final var tableData = analysisService.getTableData(
+                email,
+                Instant.ofEpochMilli(0L),
+                AnalysisFinancialTableDTO.AnalysisType.accounts
+        );
 
         // then
         assertThat(tableData)
@@ -122,22 +135,6 @@ class AnalysisServiceTest {
                 .containsExactlyInAnyOrder(
                         AnalysisFinancialTableDTOFixture.walletAnalysisFinancialTableDTO()
                 );
-    }
-
-    @Test
-    void should_throw_exception_for_incorrect_credentials() {
-        // given
-        final String email = "user@user.pl";
-
-        // when/then
-        when(userRepository.existsByEmail(email)).thenReturn(false);
-        final var exception = assertThrows(
-                ResourceNotFoundException.class,
-                () -> analysisService.getTableDataTypeAccounts(email, Instant.ofEpochMilli(0L))
-        );
-
-        assertThat(exception.getMessage())
-                .isEqualTo(String.format("Couldn't find a user for email: %s", email));
     }
 
     @Test
@@ -171,7 +168,11 @@ class AnalysisServiceTest {
         when(wallet.getTransactions()).thenReturn(walletTransaction);
         when(wallet.getIsEnabled()).thenReturn(true);
 
-        final var tableData = analysisService.getTableDataTypeAccounts(email, dateStart);
+        final var tableData = analysisService.getTableData(
+                email,
+                dateStart,
+                AnalysisFinancialTableDTO.AnalysisType.accounts
+        );
 
         // then
         assertThat(tableData)
@@ -180,5 +181,62 @@ class AnalysisServiceTest {
                         AnalysisFinancialTableDTOFixture.walletAnalysisFinancialTableDTOFromStartDate(),
                         AnalysisFinancialTableDTOFixture.bankAnalysisFinancialTableDTOFromStartDate()
                 );
+    }
+
+    @Test
+    void should_throw_exception_for_incorrect_email_when_get_table_data_for_categories() {
+        // given
+        String email = "wrong@email.org";
+        Instant periodOfTime = Instant.ofEpochMilli(0L);
+        AnalysisFinancialTableDTO.AnalysisType type = AnalysisFinancialTableDTO.AnalysisType.categories;
+
+        // when
+        when(this.userRepository.existsByEmail(email)).thenReturn(false);
+        final var exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> analysisService.getTableData(email, periodOfTime, type)
+        );
+        // then
+        assertThat(exception.getMessage())
+                .isEqualTo(String.format("Couldn't find a user for email: %s", email));
+
+    }
+
+    @Test
+    void should_throw_exception_for_incorrect_email_when_get_table_data_for_payees() {
+        // given
+        String email = "wrong@email.org";
+        Instant periodOfTime = Instant.ofEpochMilli(0L);
+        AnalysisFinancialTableDTO.AnalysisType type = AnalysisFinancialTableDTO.AnalysisType.payees;
+
+        // when
+        when(this.userRepository.existsByEmail(email)).thenReturn(false);
+        final var exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> analysisService.getTableData(email, periodOfTime, type)
+        );
+        // then
+        assertThat(exception.getMessage())
+                .isEqualTo(String.format("Couldn't find a user for email: %s", email));
+
+    }
+
+    @Test
+    void should_throw_exception_for_incorrect_email_when_get_table_data_for_accounts() {
+        // given
+        String email = "wrong@email.org";
+        Instant periodOfTime = Instant.ofEpochMilli(0L);
+        AnalysisFinancialTableDTO.AnalysisType type = AnalysisFinancialTableDTO.AnalysisType.accounts;
+
+        // when
+        when(this.userRepository.existsByEmail(email)).thenReturn(false);
+        final var exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> analysisService.getTableData(email, periodOfTime, type)
+        );
+        // then
+        assertThat(exception.getMessage())
+                .isEqualTo(String.format("Couldn't find a user for email: %s", email));
+
     }
 }
