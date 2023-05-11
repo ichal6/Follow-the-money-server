@@ -1,11 +1,13 @@
 package com.mlkb.ftm.common;
 
 import com.mlkb.ftm.controller.AccountController;
+import com.mlkb.ftm.controller.AnalysisController;
 import com.mlkb.ftm.controller.PaymentController;
 import com.mlkb.ftm.controller.UserController;
 import com.mlkb.ftm.exception.GlobalExceptionHandler;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.service.AccountService;
+import com.mlkb.ftm.service.AnalysisService;
 import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.service.UserService;
 import com.mlkb.ftm.validation.AccessValidator;
@@ -29,6 +31,11 @@ public class ApplicationConfig {
     @Bean
     public PaymentController paymentController() {
         return new PaymentController(paymentService(), accessValidator());
+    }
+
+    @Bean
+    public AnalysisController analysisController() {
+        return new AnalysisController(analysisService(), accessValidator());
     }
 
     @Bean
@@ -57,6 +64,11 @@ public class ApplicationConfig {
     @Bean
     public PaymentService paymentService() {
         return Mockito.mock(PaymentService.class);
+    }
+
+    @Bean
+    public AnalysisService analysisService() {
+        return Mockito.mock(AnalysisService.class);
     }
 
     @Bean

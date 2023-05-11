@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.modelDTO.NewAccountDTO;
 import com.mlkb.ftm.service.AccountService;
+import com.mlkb.ftm.service.AnalysisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -37,6 +41,9 @@ public class GlobalExceptionHandlerIntegrationTest {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private AnalysisService analysisService;
 
     @BeforeEach
     public void setUp() {
@@ -94,6 +101,20 @@ public class GlobalExceptionHandlerIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$").value(InputValidationMessage.NAME.message));
+    }
+
+    @Test
+    public void should_return_bad_request_code_when_provided_wrong_date() throws Exception {
+        // given
+        String valueToParse = "20";
+        // when
+        when(analysisService.convertParamToInstant(Optional.of(valueToParse)))
+                .thenThrow(new DateTimeParseException("Text could not be parsed at index 0", valueToParse, 0));
+        // then
+        mockMvc.perform(get("/api/analysis/anyValidEmail?start=20"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").value(
+                        String.format("Value = %s, shouldn't be parse as date format like: yyyy-mm-dd", valueToParse)));
     }
 
     private String convertAccountDtoToJson(NewAccountDTO accountDTO) throws JsonProcessingException {

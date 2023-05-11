@@ -1,6 +1,6 @@
 package com.mlkb.ftm.service;
 
-import com.mlkb.ftm.common.AcceptanceTest;
+import com.mlkb.ftm.common.IntegrationTest;
 import com.mlkb.ftm.entity.Category;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.CategoryDTOFixture;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
         "classpath:/sql/category.sql"
 })
 @Sql(value = "classpath:/sql/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class CategoryServiceTestIT extends AcceptanceTest {
+class CategoryServiceTestIT extends IntegrationTest {
     @Autowired
     private UserRepository userRepository;
 

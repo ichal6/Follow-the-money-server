@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.format.DateTimeParseException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -33,5 +35,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InputIncorrectException.class)
     public ResponseEntity<String> handleInputIncorrectException(InputIncorrectException inputIncorrectException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(inputIncorrectException.getMessage());
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<String> handleDateTimeParseException(DateTimeParseException dateTimeParseException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                String.format("Value = %s, shouldn't be parse as date format like: yyyy-mm-dd",
+                        dateTimeParseException.getParsedString()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleTypeParseException(IllegalArgumentException illegalArgumentException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(illegalArgumentException.getMessage());
     }
 }
