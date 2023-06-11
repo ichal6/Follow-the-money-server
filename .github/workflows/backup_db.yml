@@ -18,6 +18,8 @@ jobs:
         uses: actions/checkout@v3
 
       - run: |
+          mkdir backup
+      - run: |
           pg_dump ${{ secrets.PG_DB_URI }} > ${{ secrets.PG_SERVER_PATH }}
 
 #      - name: DB Backup
