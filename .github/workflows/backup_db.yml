@@ -1,4 +1,4 @@
-name: FTM-server-Backup
+name: FTM-DB-Backup
 
 on:
   pull_request:
@@ -32,12 +32,12 @@ jobs:
 #          path: ${{ secrets.PG_SERVER_PATH }}
 #          options: "-O"
 
-      - name: sent backup to mikr.us
+      - name: Sent backup to mikr.us
         uses: garygrossgarten/github-action-scp@release
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
-          local: ${{ steps.create-backup.FILENAME }}
+          local: ${{ steps.create-backup.outputs.FILENAME }}
           remote: ${{ secrets.PG_SERVER_PATH }}
