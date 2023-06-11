@@ -17,12 +17,13 @@ jobs:
       - name: Checkout changes
         uses: actions/checkout@v3
 
-      - run: |
-          mkdir backup
-      - run: |
-          pg_dump ${{ secrets.PG_DB_URI }} > ${{ secrets.PG_SERVER_PATH }}
+      - name: Create backup
+        run: |
+          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
+          echo $DATE >> $GITHUB_ENV
+          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql      
 
-#      - name: DB Backup
+      #      - name: DB Backup
 #        uses: tj-actions/pg-dump@v2.6
 #        with:
 #          database_url: ${{ secrets.PG_DB_URI }}
@@ -36,5 +37,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
-          local: ${{ secrets.PG_SERVER_PATH }}
+          local: ftm_$DATE.sql
           remote: ${{ secrets.PG_SERVER_PATH }}
