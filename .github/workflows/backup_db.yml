@@ -20,7 +20,7 @@ jobs:
       - name: Create backup
         run: |
           DATE=$(date +"%Y-%m-%d_%H:%M:%S")
-          echo $DATE >> $GITHUB_ENV
+          echo "DATE=$DATE" >> $GITHUB_ENV
           pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql      
 
       #      - name: DB Backup
