@@ -23,14 +23,6 @@ jobs:
           DATE=$(date +"%Y-%m-%d_%H:%M:%S")
           pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
           echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
-          
-
-      #      - name: DB Backup
-#        uses: tj-actions/pg-dump@v2.6
-#        with:
-#          database_url: ${{ secrets.PG_DB_URI }}
-#          path: ${{ secrets.PG_SERVER_PATH }}
-#          options: "-O"
 
       - name: Sent backup to mikr.us
         uses: garygrossgarten/github-action-scp@release
@@ -40,4 +32,4 @@ jobs:
           privateKey: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
           local: ${{ steps.create-backup.outputs.FILENAME }}
-          remote: ${{ secrets.PG_SERVER_PATH }}
+          remote: "${{ secrets.PG_SERVER_PATH }}/${{ steps.create-backup.outputs.FILENAME }}"
