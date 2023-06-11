@@ -37,5 +37,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
-          local: ftm_$DATE.sql
+          local: ftm_${{DATE}}.sql
           remote: ${{ secrets.PG_SERVER_PATH }}
