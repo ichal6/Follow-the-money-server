@@ -1,0 +1,45 @@
+name: FTM-server CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      PG_DATABASE_URI: ${{ secrets.PG_DB_URI }}
+      PG_SERVER_PATH: ${{ secrets.PG_SERVER_PATH }}
+
+    steps:
+      - name: Checkout changes
+        uses: actions/checkout@v3
+
+      - name: Postgres Dump Backup
+        uses: tj-actions/pg-dump@v2
+        with:
+          database_url: ${{ secrets.PG_DB_URI }}
+          path: ${{ secrets.PG_SERVER_PATH }}
+          options: "-O"
+#
+#      - name: Deploy jar to mikr.us
+#        if: github.event_name == 'pull_request'
+#        uses: garygrossgarten/github-action-scp@release
+#        with:
+#          host: ${{ secrets.HOST }}
+#          username: ${{ secrets.USERNAME }}
+#          privateKey: ${{ secrets.KEY_ED25519 }}
+#          port: ${{ secrets.PORT }}
+#          local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
+#          remote: ftmServerJar/ftm-server.jar
+#
+#      - name: Run server on mikr.us
+#        if: github.event_name == 'pull_request'
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.HOST }}
+#          username: ${{ secrets.USERNAME }}
+#          key: ${{ secrets.KEY_ED25519 }}
+#          port: ${{ secrets.PORT }}
+#          script: sh run-ftm-server.sh
