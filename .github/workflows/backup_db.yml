@@ -31,3 +31,12 @@ jobs:
           port: ${{ secrets.PORT }}
           local: ${{ steps.create-backup.outputs.FILENAME }}
           remote: "${{ secrets.PG_SERVER_PATH }}/${{ steps.create-backup.outputs.FILENAME }}"
+
+      - name: Remove old backups
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY_ED25519 }}
+          port: ${{ secrets.PORT }}
+          script: (cd "${{ secrets.PG_SERVER_PATH }}" && sh ${{ PG_REMOVE_OLD_BACKUPS_SCRIPT }})
