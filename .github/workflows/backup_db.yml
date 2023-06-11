@@ -39,4 +39,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
-          script: (cd "${{ secrets.PG_SERVER_PATH }}" && sh ${{ PG_REMOVE_OLD_BACKUPS_SCRIPT }})
+          script: (cd "${{ secrets.PG_SERVER_PATH }}" && sh ${{ secrets.PG_REMOVE_OLD_BACKUPS_SCRIPT }})
