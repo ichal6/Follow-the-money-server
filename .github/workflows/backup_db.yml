@@ -17,8 +17,8 @@ jobs:
       - name: Checkout changes
         uses: actions/checkout@v3
 
-      - name: Postgres Dump Backup
-        uses: tj-actions/pg-dump@v2
+      - name: DB Backup
+        uses: tj-actions/pg-dump@v2.6
         with:
           database_url: ${{ secrets.PG_DB_URI }}
           path: ${{ secrets.PG_SERVER_PATH }}
