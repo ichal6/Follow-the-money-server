@@ -1,4 +1,4 @@
-name: FTM-server CI/CD
+name: FTM-server-Backup
 
 on:
   pull_request:
