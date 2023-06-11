@@ -23,17 +23,16 @@ jobs:
           database_url: ${{ secrets.PG_DB_URI }}
           path: ${{ secrets.PG_SERVER_PATH }}
           options: "-O"
-#
-#      - name: Deploy jar to mikr.us
-#        if: github.event_name == 'pull_request'
-#        uses: garygrossgarten/github-action-scp@release
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          privateKey: ${{ secrets.KEY_ED25519 }}
-#          port: ${{ secrets.PORT }}
-#          local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
-#          remote: ftmServerJar/ftm-server.jar
+
+      - name: sent backup to mikr.us
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.KEY_ED25519 }}
+          port: ${{ secrets.PORT }}
+          local: ${{ secrets.PG_SERVER_PATH }}
+          remote: ${{ secrets.PG_SERVER_PATH }}
 #
 #      - name: Run server on mikr.us
 #        if: github.event_name == 'pull_request'
