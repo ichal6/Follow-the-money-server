@@ -17,12 +17,15 @@ jobs:
       - name: Checkout changes
         uses: actions/checkout@v3
 
-      - name: DB Backup
-        uses: tj-actions/pg-dump@v2.6
-        with:
-          database_url: ${{ secrets.PG_DB_URI }}
-          path: ${{ secrets.PG_SERVER_PATH }}
-          options: "-O"
+      - run: |
+          pg_dump {{ secrets.PG_DB_URI }} > {{ secrets.PG_SERVER_PATH }}
+
+#      - name: DB Backup
+#        uses: tj-actions/pg-dump@v2.6
+#        with:
+#          database_url: ${{ secrets.PG_DB_URI }}
+#          path: ${{ secrets.PG_SERVER_PATH }}
+#          options: "-O"
 
       - name: sent backup to mikr.us
         uses: garygrossgarten/github-action-scp@release
@@ -33,13 +36,3 @@ jobs:
           port: ${{ secrets.PORT }}
           local: ${{ secrets.PG_SERVER_PATH }}
           remote: ${{ secrets.PG_SERVER_PATH }}
-#
-#      - name: Run server on mikr.us
-#        if: github.event_name == 'pull_request'
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          key: ${{ secrets.KEY_ED25519 }}
-#          port: ${{ secrets.PORT }}
-#          script: sh run-ftm-server.sh
