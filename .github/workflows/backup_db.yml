@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PG_DATABASE_URI: ${{ secrets.PG_DB_URI }}
+      PGPASSWORD: ${{ secrets.PG_PASSWORD }}
       PG_SERVER_PATH: ${{ secrets.PG_SERVER_PATH }}
 
     steps:
