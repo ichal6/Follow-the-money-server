@@ -63,6 +63,13 @@ List of improve:
 2. Install [PostgreSQL](https://www.postgresql.org/download/) 
 3. Set up a new system environment: [tutorial for Windows](https://docs.oracle.com/en/database/oracle/machine-learning/oml4r/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html)
    1. FTM_DATASOURCE_URL -> the url address for database (default for localhost: **jdbc:postgresql://localhost:5432/postgres**)
+
+      URL Scheme ```protocol//[hosts][/database]```:
+      1. *protocol* -> (**jdbc:postgresql:**) protocol for connection. It always **jdbc:** and name of database provider (example **postgresql:** or **mysql:** ).  
+      2. *hosts* -> (**localhost:5432**) domain name to identify a server to connection. Use localhost or website (example: **container.railway.app**) and number of port after colon (**:6622**).
+      3. *database* -> (**postgres**) the database to open on server.
+      
+      Documentation for MySQL [link](https://docs.oracle.com/cd/E17952_01/connector-j-8.0-en/connector-j-reference-jdbc-url-format.html)
    2. FTM_DATASOURCE_USERNAME -> the username, you should create it in database (default: **postgres**)
    3. FTM_DATASOURCE_PASSWORD -> password for user (set up when user was created)
    4. PORT -> select port for server (ex. 8080)

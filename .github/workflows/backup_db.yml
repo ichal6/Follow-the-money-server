@@ -1,0 +1,42 @@
+name: FTM-DB-Backup
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      PGPASSWORD: ${{ secrets.PG_PASSWORD }}
+
+    steps:
+      - name: Checkout changes
+        uses: actions/checkout@v3
+
+      - name: Create backup
+        id: create-backup
+        run: |
+          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
+          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
+          echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
+
+      - name: Sent backup to mikr.us
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.KEY_ED25519 }}
+          port: ${{ secrets.PORT }}
+          local: ${{ steps.create-backup.outputs.FILENAME }}
+          remote: "${{ secrets.PG_SERVER_PATH }}/${{ steps.create-backup.outputs.FILENAME }}"
+
+      - name: Remove old backups
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY_ED25519 }}
+          port: ${{ secrets.PORT }}
+          script: (cd "${{ secrets.PG_SERVER_PATH }}" && sh ${{ secrets.PG_REMOVE_OLD_BACKUPS_SCRIPT }})
