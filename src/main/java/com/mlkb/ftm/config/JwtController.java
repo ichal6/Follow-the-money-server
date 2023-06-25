@@ -44,7 +44,7 @@ public class JwtController {
                     responseCookieBuilder
                             .secure(false);
                 }
-        ResponseCookie responseCookie = responseCookieBuilder.build();
+        ResponseCookie responseCookie = responseCookieBuilder.path("/").build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
