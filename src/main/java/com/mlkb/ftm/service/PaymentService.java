@@ -8,6 +8,7 @@ import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -206,6 +207,11 @@ public class PaymentService {
         } else {
             throw new ResourceNotFoundException("Couldn't create new transfer. AccountFrom or/and AccountTo with given ids don't exist.");
         }
+    }
+
+    @Transactional
+    public void updateTransaction(TransactionDTO updateTransactionDTO) {
+
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {
