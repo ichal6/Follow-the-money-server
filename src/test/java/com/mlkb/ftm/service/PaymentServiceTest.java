@@ -298,5 +298,19 @@ public class PaymentServiceTest {
         // then
         assertEquals("Transaction for this id does not exist", thrown.getMessage());
     }
+
+    @Test
+    @Disabled
+    void should_throw_exception_if_user_try_update_transaction_belonging_to_other_user() {
+        // given
+        var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        String email = "user@user.pl";
+        // when
+        when(transactionRepository.existsByTransactionIdAndUserEmail(transactionDto.getId(), email)).thenReturn(false);
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransaction(transactionDto, anyString()));
+        // then
+        assertEquals("Transaction for this id does not exist", thrown.getMessage());
+    }
 }
 
