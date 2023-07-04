@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Set;
-
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, CustomTransactionRepository {
     @Override
@@ -15,6 +13,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("DELETE FROM Transaction t where t.id = ?1")
     void deleteById(Long aLong);
 
-    Set<Transaction> findByCategoryId(Long id);
+    @Query("SELECT CASE WHEN COUNT(tr) > 0 THEN true ELSE false END " +
+            "FROM Account ac JOIN Transaction tr JOIN User u WHERE tr.id = ?1 AND u.email = ?2")
+    Boolean existsByTransactionIdAndUserEmail(Long Id, String email);
 
 }

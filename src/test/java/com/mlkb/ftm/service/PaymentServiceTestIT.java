@@ -76,4 +76,43 @@ public class PaymentServiceTestIT extends IntegrationTest {
             }
         }
     }
+
+    @Test
+    void should_return_false_if_existsByTransactionIdAndUserEmail_run_with_incorrect_email() {
+        // given
+        String email = "no@user.pl";
+        Long transactionId = 1L;
+
+        // when
+        var isTransactionBelongToUser = transactionRepository.existsByTransactionIdAndUserEmail(transactionId, email);
+
+        // then
+        assertThat(isTransactionBelongToUser).isFalse();
+    }
+
+    @Test
+    void should_return_false_if_existsByTransactionIdAndUserEmail_run_with_incorrect_id() {
+        // given
+        String email = "no@user.pl";
+        Long transactionId = 6L;
+
+        // when
+        var isTransactionBelongToUser = transactionRepository.existsByTransactionIdAndUserEmail(transactionId, email);
+
+        // then
+        assertThat(isTransactionBelongToUser).isFalse();
+    }
+
+    @Test
+    void should_return_true_if_existsByTransactionIdAndUserEmail_run_with_correct_parameters() {
+        // given
+        String email = "user@user.pl";
+        Long transactionId = 1L;
+
+        // when
+        var isTransactionBelongToUser = transactionRepository.existsByTransactionIdAndUserEmail(transactionId, email);
+
+        // then
+        assertThat(isTransactionBelongToUser).isTrue();
+    }
 }
