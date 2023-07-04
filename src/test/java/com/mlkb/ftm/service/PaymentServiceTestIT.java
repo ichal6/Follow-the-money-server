@@ -13,6 +13,7 @@ import java.sql.*;
 import java.time.Clock;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @Sql({
         "classpath:/sql/user.sql",
@@ -60,7 +61,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
         // when
-        paymentService.updateTransaction(transactionDto);
+        paymentService.updateTransaction(transactionDto, anyString());
         // then
         // Connect to the database
         try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {

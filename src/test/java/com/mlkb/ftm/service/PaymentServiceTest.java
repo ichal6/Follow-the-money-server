@@ -288,15 +288,15 @@ public class PaymentServiceTest {
     @Test
     @Disabled
     void should_throw_exception_if_transaction_does_not_exist() {
-        // given/when
+        // given
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        // when
         when(payeeRepository.findById(1L)).thenReturn(Optional.empty());
         ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
-                this.paymentService.updateTransaction(transactionDto));
+                this.paymentService.updateTransaction(transactionDto, anyString()));
 
         // then
         assertEquals("Transaction for this id does not exist", thrown.getMessage());
-
     }
 }
 

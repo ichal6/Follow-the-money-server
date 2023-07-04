@@ -210,7 +210,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void updateTransaction(TransactionDTO updateTransactionDTO) {
+    public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
 
     }
 
