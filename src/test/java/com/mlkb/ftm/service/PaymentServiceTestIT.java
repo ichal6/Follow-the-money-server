@@ -2,9 +2,9 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.IntegrationTest;
 import com.mlkb.ftm.fixture.TransactionDTOFixture;
+import com.mlkb.ftm.fixture.UserEntityFixture;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -13,7 +13,6 @@ import java.sql.*;
 import java.time.Clock;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 
 @Sql({
         "classpath:/sql/user.sql",
@@ -46,7 +45,6 @@ public class PaymentServiceTestIT extends IntegrationTest {
     private Clock clock;
 
     @Test
-    @Disabled
     void should_rename_transaction_if_transaction_exists() throws SQLException {
         // given
         this.paymentService = new PaymentService(
@@ -60,8 +58,9 @@ public class PaymentServiceTestIT extends IntegrationTest {
                 clock);
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        String email = UserEntityFixture.userUserowy().getEmail();
         // when
-        paymentService.updateTransaction(transactionDto, anyString());
+        paymentService.updateTransaction(transactionDto, email);
         // then
         // Connect to the database
         try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {

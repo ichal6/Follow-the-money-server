@@ -215,8 +215,9 @@ public class PaymentService {
             throw new ResourceNotFoundException(
                     String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
         }
-
-
+        Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
+        transaction.setTitle(updateTransactionDTO.getTitle());
+        this.transactionRepository.save(transaction);
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {
