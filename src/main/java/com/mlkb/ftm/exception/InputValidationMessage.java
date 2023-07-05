@@ -9,7 +9,8 @@ public enum InputValidationMessage {
     BALANCE_POSITIVE("Balance should be a valid number above 0."),
     DATE("Date shouldn't be empty - choose a valid date format."),
     EMAIL("Email should be in format: user@domain.pl. No special signs allowed."),
-    PASSWORD("Password incorrect. Should be at least...");
+    PASSWORD("Password incorrect. Should be at least..."),
+    NULL("Object is null");
 
     public final String message;
 

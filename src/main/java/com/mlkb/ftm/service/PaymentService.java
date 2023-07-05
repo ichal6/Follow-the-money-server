@@ -2,6 +2,7 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
@@ -158,6 +159,14 @@ public class PaymentService {
                 && inputValidator.checkId(transactionDTO.getCategoryId())
                 && inputValidator.checkId(transactionDTO.getPayeeId())
                 && inputValidator.checkDate(transactionDTO.getDate());
+    }
+
+    public void isValidUpdateTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
+        if(transactionDTO == null) {
+            throw new InputIncorrectException(InputValidationMessage.NULL);
+        }
+        inputValidator.checkId(transactionDTO.getId());
+        inputValidator.checkName(transactionDTO.getTitle());
     }
 
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {

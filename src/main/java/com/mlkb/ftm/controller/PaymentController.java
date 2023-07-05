@@ -85,4 +85,15 @@ public class PaymentController {
         paymentService.removeTransfer(idTransfer, email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/transaction")
+    public ResponseEntity<Object> updateTransaction(@RequestBody TransactionDTO updateTransaction,
+                                                    @CookieValue(value = "e-mail", defaultValue = "none") String email)
+            throws InputIncorrectException {
+        accessValidator.checkPermit(email);
+        paymentService.isValidUpdateTransaction(updateTransaction);
+        paymentService.updateTransaction(updateTransaction, email);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
