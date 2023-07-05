@@ -211,6 +211,11 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
+        if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
+            throw new ResourceNotFoundException(
+                    String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
+        }
+
 
     }
 
