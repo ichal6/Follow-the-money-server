@@ -13,8 +13,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("DELETE FROM Transaction t where t.id = ?1")
     void deleteById(Long aLong);
 
-    @Query("SELECT CASE WHEN COUNT(tr) > 0 THEN true ELSE false END " +
-            "FROM Account ac JOIN Transaction tr JOIN User u WHERE tr.id = ?1 AND u.email = ?2")
-    Boolean existsByTransactionIdAndUserEmail(Long Id, String email);
+    @Query("SELECT CASE WHEN EXISTS " +
+            "( SELECT 1 " +
+                "FROM User u INNER JOIN u.accounts ac INNER JOIN ac.transactions tr WHERE tr.id = ?1 AND u.email = ?2" +
+            ") THEN true ELSE false END")
+    boolean existsByTransactionIdAndUserEmail(Long Id, String email);
 
 }
