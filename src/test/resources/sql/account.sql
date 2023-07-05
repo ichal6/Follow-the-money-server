@@ -12,3 +12,6 @@ VALUES (4, 'CASH', 'USD', 900.0, 'Savings in sock', 0.0, 1);
 
 INSERT INTO "account" (id, account_type, currency, current_balance, name, starting_balance, user_id)
 VALUES (5, 'BANK', 'USD', -50000.0, 'House morgage', 300.0, 1);
+
+INSERT INTO "account" (id, account_type, currency, current_balance, name, starting_balance, user_id)
+VALUES (6, 'BANK', 'USD', -50000.0, 'House morgage', 300.0, 2);

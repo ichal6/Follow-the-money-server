@@ -15,3 +15,6 @@ VALUES (5, TO_DATE('2022-05-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
 VALUES (6, TO_DATE('2022-04-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
+
+INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
+VALUES (7, TO_DATE('2023-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 10, 2, 6);
