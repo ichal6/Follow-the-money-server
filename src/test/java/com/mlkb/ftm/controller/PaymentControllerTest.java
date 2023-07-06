@@ -1,28 +1,42 @@
 package com.mlkb.ftm.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mlkb.ftm.common.ApplicationConfig;
+import com.mlkb.ftm.exception.IllegalAccessRuntimeException;
+import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.fixture.PaymentDTOFixture;
+import com.mlkb.ftm.fixture.TransactionDTOFixture;
+import com.mlkb.ftm.fixture.UserEntityFixture;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
+import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.service.PaymentService;
+import com.mlkb.ftm.validation.AccessValidator;
 import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import jakarta.servlet.http.Cookie;
 
 import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -41,9 +55,14 @@ class PaymentControllerTest {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private AccessValidator accessValidator;
+
     @BeforeEach
     public void setUp() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        reset(this.accessValidator);
+        reset(this.paymentService);
     }
 
     @Test
@@ -220,5 +239,108 @@ class PaymentControllerTest {
                 .andReturn();
 
         verify(paymentService, atLeast(1)).getPaymentsWithParameters(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void should_update_transaction_for_correct_data() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transactionUpdateDto = TransactionDTOFixture.buyCarTransaction();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+
+        // when/then
+        mockMvc.perform(
+                put("/api/payment/transaction")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(cookie)
+                    .content(objectMapper.writeValueAsString(transactionUpdateDto))
+                    .accept(MediaType.APPLICATION_JSON)
+                    )
+                .andExpect(status().isNoContent());
+
+        verify(paymentService, atLeastOnce()).isValidUpdateTransaction(transactionUpdateDto);
+        verify(paymentService, atLeastOnce()).updateTransaction(transactionUpdateDto, email);
+    }
+
+    @Test
+    void should_throw_exception_when_update_transaction_for_incorrect_data() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transactionUpdateDto = new TransactionDTO();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+        // when/then
+        doThrow(new InputIncorrectException(InputValidationMessage.NULL))
+                .when(paymentService)
+                .isValidUpdateTransaction(transactionUpdateDto);
+
+        mockMvc.perform(
+                        put("/api/payment/transaction")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transactionUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof InputIncorrectException))
+                .andExpect(result -> assertEquals(InputValidationMessage.NULL.message,
+                        Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        verify(paymentService, atLeastOnce()).isValidUpdateTransaction(transactionUpdateDto);
+    }
+
+    @Test
+    void should_throw_exception_when_update_transaction_for_incorrect_user() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transactionUpdateDto = new TransactionDTO();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+        // when/then
+        doThrow(new IllegalAccessRuntimeException("Access denied"))
+                .when(accessValidator)
+                .checkPermit(email);
+
+        mockMvc.perform(
+                        put("/api/payment/transaction")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transactionUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isForbidden())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof IllegalAccessRuntimeException))
+                .andExpect(result -> assertEquals("Access denied",
+                        Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        verify(accessValidator, atLeastOnce()).checkPermit(email);
+    }
+
+    @Test
+    void should_throw_exception_when_update_transaction_when_user_not_login() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transactionUpdateDto = new TransactionDTO();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+        // when/then
+        doThrow(new UsernameNotFoundException("You have to log in before access"))
+                .when(accessValidator)
+                .checkPermit(email);
+
+        mockMvc.perform(
+                        put("/api/payment/transaction")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transactionUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UsernameNotFoundException))
+                .andExpect(result -> assertEquals("You have to log in before access",
+                        Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        verify(accessValidator, atLeastOnce()).checkPermit(email);
     }
 }
