@@ -2,12 +2,14 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.exception.InputIncorrectException;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -159,6 +161,14 @@ public class PaymentService {
                 && inputValidator.checkDate(transactionDTO.getDate());
     }
 
+    public void isValidUpdateTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
+        if(transactionDTO == null) {
+            throw new InputIncorrectException(InputValidationMessage.NULL);
+        }
+        inputValidator.checkId(transactionDTO.getId());
+        inputValidator.checkName(transactionDTO.getTitle());
+    }
+
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
         return transferDTO != null
                 && inputValidator.checkName(transferDTO.getTitle())
@@ -206,6 +216,17 @@ public class PaymentService {
         } else {
             throw new ResourceNotFoundException("Couldn't create new transfer. AccountFrom or/and AccountTo with given ids don't exist.");
         }
+    }
+
+    @Transactional
+    public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
+        if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
+            throw new ResourceNotFoundException(
+                    String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
+        }
+        Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
+        transaction.setTitle(updateTransactionDTO.getTitle());
+        this.transactionRepository.save(transaction);
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {
