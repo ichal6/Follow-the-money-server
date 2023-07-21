@@ -53,12 +53,12 @@ jobs:
           local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
           remote: ftmServerJar/ftm-server.jar
 
-#      - name: Run server on mikr.us prod
-#        if: github.ref == 'refs/heads/dev'
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.HOST }}
-#          username: ${{ secrets.USERNAME }}
-#          key: ${{ secrets.KEY_ED25519 }}
-#          port: ${{ secrets.PORT }}
-#          script: sh run-ftm-server.sh
+      - name: Run server on mikr.us prod
+        if: github.ref == 'refs/heads/FTM-180-BE-Move-deploy-from-Railway-to-Mikrus'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_j155 }}
+          username: ${{ secrets.USERNAME_j155 }}
+          key: ${{ secrets.KEY_ED25519_j155 }}
+          port: ${{ secrets.PORT_j155 }}
+          script: sh run-ftm-server.sh
