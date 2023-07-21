@@ -43,12 +43,22 @@ jobs:
           script: sh run-ftm-server.sh
 
       - name: Deploy jar to mikr.us prod
-        if: github.ref == 'refs/heads/FTM-180-BE-Move-deploy-from-Railway-to-Mikrus'
+        if: github.ref == 'refs/heads/dev'
         uses: garygrossgarten/github-action-scp@release
         with:
           host: ${{ secrets.HOST_j155 }}
           username: ${{ secrets.USERNAME_j155 }}
-          privateKey: ${{ secrets.KEY_ED25519 }}
+          privateKey: ${{ secrets.KEY_ED25519_j155 }}
           port: ${{ secrets.PORT_j155 }}
           local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
           remote: ftmServerJar/ftm-server.jar
+
+      - name: Run server on mikr.us prod
+        if: github.ref == 'refs/heads/dev'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY_ED25519 }}
+          port: ${{ secrets.PORT }}
+          script: sh run-ftm-server.sh
