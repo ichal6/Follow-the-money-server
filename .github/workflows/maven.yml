@@ -43,7 +43,7 @@ jobs:
           script: sh run-ftm-server.sh
 
       - name: Deploy jar to mikr.us prod
-        if: github.ref == 'refs/heads/FTM-180-BE-Move-deploy-from-Railway-to-Mikrus'
+        if: github.ref == 'refs/heads/dev'
         uses: garygrossgarten/github-action-scp@release
         with:
           host: ${{ secrets.HOST_j155 }}
@@ -54,7 +54,7 @@ jobs:
           remote: ftmServerJar/ftm-server.jar
 
       - name: Run server on mikr.us prod
-        if: github.ref == 'refs/heads/FTM-180-BE-Move-deploy-from-Railway-to-Mikrus'
+        if: github.ref == 'refs/heads/dev'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_j155 }}
