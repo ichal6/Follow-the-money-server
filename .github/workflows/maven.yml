@@ -41,3 +41,14 @@ jobs:
           key: ${{ secrets.KEY_ED25519 }}
           port: ${{ secrets.PORT }}
           script: sh run-ftm-server.sh
+
+      - name: Deploy jar to mikr.us prod
+        if: github.ref == 'refs/heads/FTM-180-BE-Move-deploy-from-Railway-to-Mikrus'
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.KEY_ED25519 }}
+          port: ${{ secrets.PORT }}
+          local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
+          remote: ftmServerJar/ftm-server.jar
