@@ -46,9 +46,9 @@ jobs:
         if: github.ref == 'refs/heads/FTM-180-BE-Move-deploy-from-Railway-to-Mikrus'
         uses: garygrossgarten/github-action-scp@release
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
+          host: ${{ secrets.HOST_j155 }}
+          username: ${{ secrets.USERNAME_j155 }}
           privateKey: ${{ secrets.KEY_ED25519 }}
-          port: ${{ secrets.PORT }}
+          port: ${{ secrets.PORT_j155 }}
           local: target/follow-the-money-server-0.0.1-SNAPSHOT.jar
           remote: ftmServerJar/ftm-server.jar
