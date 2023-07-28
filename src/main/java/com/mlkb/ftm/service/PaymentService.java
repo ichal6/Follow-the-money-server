@@ -167,10 +167,6 @@ public class PaymentService {
         }
         inputValidator.checkId(transactionDTO.getId());
         inputValidator.checkName(transactionDTO.getTitle());
-        inputValidator.checkBalance(transactionDTO.getValue());
-        inputValidator.checkIfPaymentTypeInEnum(transactionDTO.getType());
-        var paymentType = PaymentType.valueOf(transactionDTO.getType().toUpperCase());
-        inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, transactionDTO.getValue());
     }
 
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
@@ -224,30 +220,13 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account account = this.accountRepository.
-                findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
-                .orElseThrow(() ->  new ResourceNotFoundException(
-                        String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
-                                updateTransactionDTO.getId(),
-                                updateTransactionDTO.getAccountId()))
-                );
-
         if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
             throw new ResourceNotFoundException(
                     String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
         }
         Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
         transaction.setTitle(updateTransactionDTO.getTitle());
-        updateAccountValueAfterEditTransaction(account, transaction.getValue(), updateTransactionDTO.getValue());
-        transaction.setValue(updateTransactionDTO.getValue());
-        transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
-
         this.transactionRepository.save(transaction);
-    }
-
-    private void updateAccountValueAfterEditTransaction(Account account, double oldValue, double newValue) {
-        account.setCurrentBalance(account.getCurrentBalance() - oldValue + newValue);
-        this.accountRepository.save(account);
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {
