@@ -153,7 +153,7 @@ public class PaymentService {
     public boolean isValidNewTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
         return transactionDTO != null
                 && inputValidator.checkName(transactionDTO.getTitle())
-                && inputValidator.checkIfGeneralTypeInEnum(transactionDTO.getType())
+                && inputValidator.checkIfPaymentTypeInEnum(transactionDTO.getType())
                 && inputValidator.checkBalance(transactionDTO.getValue())
                 && inputValidator.checkId(transactionDTO.getAccountId())
                 && inputValidator.checkId(transactionDTO.getCategoryId())
