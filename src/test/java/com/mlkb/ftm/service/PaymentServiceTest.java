@@ -5,10 +5,7 @@ import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
-import com.mlkb.ftm.fixture.PaymentDTOFixture;
-import com.mlkb.ftm.fixture.TransactionDTOFixture;
-import com.mlkb.ftm.fixture.TransactionEntityFixture;
-import com.mlkb.ftm.fixture.TransferEntityFixture;
+import com.mlkb.ftm.fixture.*;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
@@ -286,12 +283,15 @@ public class PaymentServiceTest {
     }
 
     @Test
-    void should_throw_exception_if_transaction_does_not_exist_or_belonging_to_other_user_when_try_update() {
+    void should_throw_exception_if_transaction_does_not_exist_user_when_try_update() {
         // given
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        var account = AccountEntityFixture.allegroPay();
         String email = "user@user.pl";
         // when
         when(transactionRepository.existsByTransactionIdAndUserEmail(transactionDto.getId(), email)).thenReturn(false);
+        when(accountRepository.findByAccountIdAndUserEmail(anyLong(), anyString()))
+                .thenReturn(Optional.of(account));
         ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 this.paymentService.updateTransaction(transactionDto, email));
 
@@ -300,5 +300,24 @@ public class PaymentServiceTest {
                 String.format("Transaction for id = %d does not exist", transactionDto.getId()),
                 thrown.getMessage());
     }
-}
 
+    @Test
+    void should_throw_exception_if_transaction_belonging_to_other_user_when_try_update() {
+        // given
+        var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        String email = "user@user.pl";
+        // when
+        when(transactionRepository.existsByTransactionIdAndUserEmail(transactionDto.getId(), email)).thenReturn(false);
+        when(accountRepository.findByAccountIdAndUserEmail(anyLong(), anyString()))
+                .thenReturn(Optional.empty());
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransaction(transactionDto, email));
+
+        // then
+        assertEquals(
+                String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
+                        transactionDto.getId(),
+                        transactionDto.getAccountId()),
+                thrown.getMessage());
+    }
+}

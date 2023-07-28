@@ -75,4 +75,90 @@ public class PaymentServiceTestIT extends IntegrationTest {
             }
         }
     }
+
+    @Test
+    void should_update_value_in_transaction_if_transaction_exists() throws SQLException {
+        // given
+        this.paymentService = new PaymentService(
+                userRepository,
+                inputValidator,
+                transactionRepository,
+                accountRepository,
+                categoryRepository,
+                payeeRepository,
+                transferRepository,
+                clock);
+
+        var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        String email = UserEntityFixture.userUserowy().getEmail();
+
+        // when
+        paymentService.updateTransaction(transactionDto, email);
+        // then
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT value FROM transaction WHERE id = %d", transactionDto.getId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getDouble(1)).isEqualTo(transactionDto.getValue());
+            }
+
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", transactionDto.getAccountId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getDouble(1)).isEqualTo(2100.0);
+            }
+        }
+    }
+
+    @Test
+    void should_update_value_and_payment_type_in_transaction_if_transaction_exists() throws SQLException {
+        // given
+        this.paymentService = new PaymentService(
+                userRepository,
+                inputValidator,
+                transactionRepository,
+                accountRepository,
+                categoryRepository,
+                payeeRepository,
+                transferRepository,
+                clock);
+
+        var transactionDto = TransactionDTOFixture.buyCarTransactionReturn();
+        String email = UserEntityFixture.userUserowy().getEmail();
+
+        // when
+        paymentService.updateTransaction(transactionDto, email);
+        // then
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT value FROM transaction WHERE id = %d", transactionDto.getId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getDouble(1)).isEqualTo(transactionDto.getValue());
+            }
+
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", transactionDto.getAccountId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getDouble(1)).isEqualTo(6900.0);
+            }
+        }
+    }
 }
