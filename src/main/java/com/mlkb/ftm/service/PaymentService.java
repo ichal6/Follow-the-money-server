@@ -225,7 +225,7 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account account = this.accountRepository.
+        Account updateAccount = this.accountRepository.
                 findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
                 .orElseThrow(() ->  new ResourceNotFoundException(
                         String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
@@ -238,13 +238,38 @@ public class PaymentService {
                     String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
         }
         Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
+        Optional<Account> possibleActualAccount = this.accountRepository.findByTransactionsContains(transaction);
+        possibleActualAccount.ifPresentOrElse(
+                actualAccount -> modifyAccountForEditTransaction(actualAccount, updateAccount, transaction, updateTransactionDTO),
+                ResourceNotFoundException::new);
+
         transaction.setTitle(updateTransactionDTO.getTitle());
-        updateAccountValueAfterEditTransaction(account, transaction.getValue(), updateTransactionDTO.getValue());
         transaction.setValue(updateTransactionDTO.getValue());
         transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
         transaction.setDate(updateTransactionDTO.getDate());
 
         this.transactionRepository.save(transaction);
+    }
+
+    private void modifyAccountForEditTransaction(Account oldAccount, Account newAccount,
+                                                 Transaction transaction, TransactionDTO updateTransactionDTO) {
+        if(!newAccount.getId().equals(oldAccount.getId())) {
+            var transactionsFromOldAccount = oldAccount.getTransactions().stream()
+                    .filter(t -> !t.getId().equals(transaction.getId()))
+                    .collect(Collectors.toSet());
+            oldAccount.setTransactions(transactionsFromOldAccount);
+            modifyTotalBalanceForAccount(oldAccount, -1*transaction.getValue());
+
+            var isAdded = newAccount.getTransactions().add(transaction);
+            if (!isAdded) {
+                throw new ResourceNotFoundException(
+                        String.format("Transaction id = %d cannot add to account id = %d",
+                                transaction.getId(), newAccount.getId()));
+            }
+            modifyTotalBalanceForAccount(newAccount, updateTransactionDTO.getValue());
+        } else {
+            updateAccountValueAfterEditTransaction(newAccount, transaction.getValue(), updateTransactionDTO.getValue());
+        }
     }
 
     private void updateAccountValueAfterEditTransaction(Account account, double oldValue, double newValue) {

@@ -1,6 +1,7 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.IntegrationTest;
+import com.mlkb.ftm.fixture.AccountEntityFixture;
 import com.mlkb.ftm.fixture.TransactionDTOFixture;
 import com.mlkb.ftm.fixture.UserEntityFixture;
 import com.mlkb.ftm.repository.*;
@@ -196,6 +197,60 @@ public class PaymentServiceTestIT extends IntegrationTest {
                     assertThat(new java.util.Date(timestamp.getTime())).isEqualTo(transactionDto.getDate());
                 else
                     fail("timestamp doesn't exist");
+            }
+        }
+    }
+
+    @Test
+    void should_update_account_in_transaction_if_transaction_exists() throws SQLException {
+        // given
+        this.paymentService = new PaymentService(
+                userRepository,
+                inputValidator,
+                transactionRepository,
+                accountRepository,
+                categoryRepository,
+                payeeRepository,
+                transferRepository,
+                clock);
+
+        var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        transactionDto.setAccountId(AccountEntityFixture.myWallet().getId());
+        String email = UserEntityFixture.userUserowy().getEmail();
+
+        // when
+        paymentService.updateTransaction(transactionDto, email);
+        // then
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT account_id FROM transaction WHERE id = %d", transactionDto.getId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getLong(1)).isEqualTo(transactionDto.getAccountId());
+            }
+        }
+
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d",
+                        AccountEntityFixture.millennium().getId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getDouble(1)).isEqualTo(4500.00);
+
+                rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d",
+                        AccountEntityFixture.myWallet().getId()));
+
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getDouble(1)).isEqualTo(-3400.00);
             }
         }
     }
