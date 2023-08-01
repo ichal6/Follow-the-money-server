@@ -171,6 +171,7 @@ public class PaymentService {
         inputValidator.checkIfPaymentTypeInEnum(transactionDTO.getType());
         var paymentType = PaymentType.valueOf(transactionDTO.getType().toUpperCase());
         inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, transactionDTO.getValue());
+        inputValidator.checkDate(transactionDTO.getDate());
     }
 
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
@@ -241,6 +242,7 @@ public class PaymentService {
         updateAccountValueAfterEditTransaction(account, transaction.getValue(), updateTransactionDTO.getValue());
         transaction.setValue(updateTransactionDTO.getValue());
         transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
+        transaction.setDate(updateTransactionDTO.getDate());
 
         this.transactionRepository.save(transaction);
     }
