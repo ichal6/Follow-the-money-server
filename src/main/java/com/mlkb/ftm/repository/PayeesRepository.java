@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import jakarta.transaction.Transactional;
+
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -28,5 +30,8 @@ public interface PayeesRepository extends JpaRepository<Payee, Long> {
     @Modifying
     @Query(value = "UPDATE payee SET name = ? WHERE id = ?", nativeQuery = true)
     void updatePayee(String name, Long payeeId);
+
+    @Query("SELECT pa FROM User u INNER JOIN u.payees pa WHERE pa.id = ?1 AND u.email = ?2")
+    Optional<Payee> findByPayeeIdAndUserEmail(Long payeeId, String email);
 
 }

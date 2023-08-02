@@ -1,9 +1,7 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.IntegrationTest;
-import com.mlkb.ftm.fixture.AccountEntityFixture;
-import com.mlkb.ftm.fixture.TransactionDTOFixture;
-import com.mlkb.ftm.fixture.UserEntityFixture;
+import com.mlkb.ftm.fixture.*;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 import org.junit.jupiter.api.Test;
@@ -40,7 +38,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
-    private PayeeRepository payeeRepository;
+    private PayeesRepository payeeRepository;
     @Autowired
     private TransferRepository transferRepository;
     @Autowired

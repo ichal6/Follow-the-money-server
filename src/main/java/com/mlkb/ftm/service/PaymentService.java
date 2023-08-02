@@ -30,12 +30,12 @@ public class PaymentService {
     private final TransferRepository transferRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
-    private final PayeeRepository payeeRepository;
+    private final PayeesRepository payeeRepository;
     private final Clock clock;
 
     public PaymentService(UserRepository userRepository, InputValidator inputValidator,
                           TransactionRepository transactionRepository, AccountRepository accountRepository,
-                          CategoryRepository categoryRepository, PayeeRepository payeeRepository,
+                          CategoryRepository categoryRepository, PayeesRepository payeeRepository,
                           TransferRepository transferRepository, Clock clock) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
@@ -225,13 +225,9 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account updateAccount = this.accountRepository.
-                findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
-                .orElseThrow(() ->  new ResourceNotFoundException(
-                        String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
-                                updateTransactionDTO.getId(),
-                                updateTransactionDTO.getAccountId()))
-                );
+        Account updateAccount = getAccountForTransactionDTO(updateTransactionDTO, email);
+        Payee payee = getPayeeForTransactionDTO(updateTransactionDTO, email);
+        Category category = getCategoryForTransactionDTO(updateTransactionDTO, email);
 
         if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
             throw new ResourceNotFoundException(
@@ -247,8 +243,37 @@ public class PaymentService {
         transaction.setValue(updateTransactionDTO.getValue());
         transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
         transaction.setDate(updateTransactionDTO.getDate());
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
 
         this.transactionRepository.save(transaction);
+    }
+
+    private Category getCategoryForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
+        return this.categoryRepository.findByCategoryIdAndUserEmail(updateTransactionDTO.getCategoryId(), email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Couldn't update transaction id = %d, because category for id = %d doesn't exist",
+                                updateTransactionDTO.getId(),
+                                updateTransactionDTO.getCategoryId()))
+                );
+    }
+
+    private Payee getPayeeForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
+        return this.payeeRepository.findByPayeeIdAndUserEmail(updateTransactionDTO.getPayeeId(), email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Couldn't update transaction id = %d, because payee for id = %d doesn't exist",
+                                updateTransactionDTO.getId(),
+                                updateTransactionDTO.getPayeeId()))
+                );
+    }
+
+    private Account getAccountForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
+        return this.accountRepository.findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
+                .orElseThrow(() ->  new ResourceNotFoundException(
+                        String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
+                                updateTransactionDTO.getId(),
+                                updateTransactionDTO.getAccountId()))
+                );
     }
 
     private void modifyAccountForEditTransaction(Account oldAccount, Account newAccount,

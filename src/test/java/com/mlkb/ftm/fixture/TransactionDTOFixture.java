@@ -14,6 +14,8 @@ public class TransactionDTOFixture {
         transaction.setValue(-2400.0);
         transaction.setType("Expense");
         transaction.setDate(getDate(2022, 6, 23, 14, 23));
+        transaction.setPayeeId(PayeeEntityFixture.MariuszTransKomis().getId());
+        transaction.setCategoryId(CategoryEntityFixture.getTransport().getId());
 
         return transaction;
     }
@@ -26,6 +28,8 @@ public class TransactionDTOFixture {
         transaction.setValue(2400.0);
         transaction.setType("Income");
         transaction.setDate(getDate(2023, 8, 1, 16, 43));
+        transaction.setPayeeId(PayeeEntityFixture.MariuszTransKomis().getId());
+        transaction.setCategoryId(CategoryEntityFixture.getTransport().getId());
 
         return transaction;
     }

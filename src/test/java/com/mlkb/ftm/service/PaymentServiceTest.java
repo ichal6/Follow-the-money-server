@@ -15,8 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -34,30 +37,26 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class PaymentServiceTest {
     private PaymentService paymentService;
-    @Autowired
+    @MockBean
     private Clock clock;
-    @Autowired
+    @MockBean
     private UserRepository userRepository;
-    @Autowired
+    @MockBean
     private InputValidator inputValidator;
-    @Autowired
+    @MockBean
     private TransactionRepository transactionRepository;
-    @Autowired
+    @MockBean
     private TransferRepository transferRepository;
-    @Autowired
+    @MockBean
     private AccountRepository accountRepository;
-    @Autowired
+    @MockBean
     private CategoryRepository categoryRepository;
-    @Autowired
-    private PayeeRepository payeeRepository;
+    @MockBean
+    private PayeesRepository payeeRepository;
 
     @BeforeEach
     void setUp() {
         paymentService = new PaymentService(userRepository, inputValidator, transactionRepository, accountRepository, categoryRepository, payeeRepository, transferRepository, clock);
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     @Test
@@ -287,11 +286,17 @@ public class PaymentServiceTest {
         // given
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
         var account = AccountEntityFixture.allegroPay();
+        var payee = PayeeEntityFixture.MariuszTransKomis();
+        var category = CategoryEntityFixture.getTransport();
         String email = "user@user.pl";
         // when
         when(transactionRepository.existsByTransactionIdAndUserEmail(transactionDto.getId(), email)).thenReturn(false);
         when(accountRepository.findByAccountIdAndUserEmail(anyLong(), anyString()))
                 .thenReturn(Optional.of(account));
+        when(payeeRepository.findByPayeeIdAndUserEmail(anyLong(), anyString()))
+                .thenReturn(Optional.of(payee));
+        when(categoryRepository.findByCategoryIdAndUserEmail(anyLong(), anyString()))
+                .thenReturn(Optional.of(category));
         ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 this.paymentService.updateTransaction(transactionDto, email));
 
