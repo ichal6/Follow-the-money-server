@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PayeeRepositoryTestIT extends IntegrationTest {
 
     @Autowired
-    private PayeesRepository payeeRepository;
+    private PayeeRepository payeeRepository;
 
     @Test
     void should_find_payee_for_user_email_and_payee_id() {

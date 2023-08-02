@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface PayeesRepository extends JpaRepository<Payee, Long> {
+public interface PayeeRepository extends JpaRepository<Payee, Long> {
     @Query("SELECT payees FROM User WHERE email = ?1")
     Set<Payee> getPayees(String userMail);
 

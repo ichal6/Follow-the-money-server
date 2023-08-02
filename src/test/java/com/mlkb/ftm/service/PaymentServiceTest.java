@@ -13,13 +13,10 @@ import com.mlkb.ftm.validation.InputValidator;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -52,7 +49,7 @@ public class PaymentServiceTest {
     @MockBean
     private CategoryRepository categoryRepository;
     @MockBean
-    private PayeesRepository payeeRepository;
+    private PayeeRepository payeeRepository;
 
     @BeforeEach
     void setUp() {

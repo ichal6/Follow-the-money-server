@@ -38,7 +38,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
-    private PayeesRepository payeeRepository;
+    private PayeeRepository payeeRepository;
     @Autowired
     private TransferRepository transferRepository;
     @Autowired

@@ -30,12 +30,12 @@ public class PaymentService {
     private final TransferRepository transferRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
-    private final PayeesRepository payeeRepository;
+    private final PayeeRepository payeeRepository;
     private final Clock clock;
 
     public PaymentService(UserRepository userRepository, InputValidator inputValidator,
                           TransactionRepository transactionRepository, AccountRepository accountRepository,
-                          CategoryRepository categoryRepository, PayeesRepository payeeRepository,
+                          CategoryRepository categoryRepository, PayeeRepository payeeRepository,
                           TransferRepository transferRepository, Clock clock) {
         this.userRepository = userRepository;
         this.inputValidator = inputValidator;
