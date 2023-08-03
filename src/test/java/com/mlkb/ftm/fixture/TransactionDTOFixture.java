@@ -20,6 +20,20 @@ public class TransactionDTOFixture {
         return transaction;
     }
 
+    public static TransactionDTO buyCarTransactionBeforeUpdate() {
+        final var transaction = new TransactionDTO();
+        transaction.setId(1L);
+        transaction.setTitle("Buy Car");
+        transaction.setAccountId(AccountEntityFixture.millennium().getId());
+        transaction.setValue(-2500.0);
+        transaction.setType("EXPENSE");
+        transaction.setDate(getDate(2023, Calendar.JANUARY, 19, 0, 0));
+        transaction.setPayeeId(PayeeEntityFixture.MariuszTransKomis().getId());
+        transaction.setCategoryId(CategoryEntityFixture.getTransport().getId());
+
+        return transaction;
+    }
+
     public static TransactionDTO buyCarTransactionReturn() {
         final var transaction = new TransactionDTO();
         transaction.setId(1L);
@@ -41,6 +55,8 @@ public class TransactionDTOFixture {
         cal.set(Calendar.DAY_OF_MONTH, day);
         cal.set(Calendar.HOUR_OF_DAY, hour);
         cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
 }

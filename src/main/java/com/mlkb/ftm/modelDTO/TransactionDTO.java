@@ -8,7 +8,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Data
 public class TransactionDTO {
     private Long id;
     private String title;

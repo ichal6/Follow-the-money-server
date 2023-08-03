@@ -7,6 +7,7 @@ import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.*;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
+import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 
@@ -321,5 +322,42 @@ public class PaymentServiceTest {
                         transactionDto.getId(),
                         transactionDto.getAccountId()),
                 thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_user_email_or_transaction_id_is_wrong_when_try_get_single_transaction() {
+        // given
+        String email = "wrong@email.com";
+        long id = 1L;
+
+        // when
+        when(transactionRepository.existsByTransactionIdAndUserEmail(id, email)).thenReturn(false);
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.getTransaction(email, id));
+
+        // then
+        assertEquals(
+                String.format("Transaction for id = %d does not exist", id),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_return_transactionDTO_when_try_get_single_transaction() {
+        // given
+        String email = "correct@email.com";
+        long id = 1L;
+        Transaction transactionEntity = TransactionEntityFixture.buyCarTransaction();
+        Account accountEntity = AccountEntityFixture.millennium();
+        TransactionDTO expectedDto = TransactionDTOFixture.buyCarTransactionBeforeUpdate();
+
+        // when
+        when(transactionRepository.existsByTransactionIdAndUserEmail(id, email)).thenReturn(true);
+        when(transactionRepository.findById(id)).thenReturn(Optional.of(transactionEntity));
+        when(accountRepository.findByTransactionsContains(transactionEntity)).thenReturn(Optional.of(accountEntity));
+
+        TransactionDTO transactionDTO = this.paymentService.getTransaction(email, id);
+
+        // then
+        assertEquals(expectedDto, transactionDTO);
     }
 }

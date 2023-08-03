@@ -343,4 +343,29 @@ class PaymentControllerTest {
 
         verify(accessValidator, atLeastOnce()).checkPermit(email);
     }
+
+    @Test
+    void should_return_transaction_for_correct_id_and_email() throws Exception {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransactionBeforeUpdate();
+
+        // when/then
+        when(paymentService.getTransaction(anyString(), anyLong())).thenReturn(transactionDTO);
+
+        mockMvc.perform(get("/api/payment/transaction/anyEmail/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.title").value("Buy Car"))
+                .andExpect(jsonPath("$.value").value("-2500.0"))
+                .andExpect(jsonPath("$.accountId").value("1"))
+                .andExpect(jsonPath("$.type").value("EXPENSE"))
+                .andExpect(jsonPath("$.payeeId").value("4"))
+                .andExpect(jsonPath("$.categoryId").value("5"))
+                .andExpect(jsonPath("$.date").value(
+                        new GregorianCalendar(2023, Calendar.JANUARY, 19).getTime().getTime()))
+                .andReturn();
+
+        verify(paymentService, atLeast(1)).getTransaction(anyString(), anyLong());
+    }
 }

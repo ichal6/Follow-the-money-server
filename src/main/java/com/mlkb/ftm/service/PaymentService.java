@@ -508,5 +508,31 @@ public class PaymentService {
         return true;
     }
 
-}
+    public TransactionDTO getTransaction(String email, long id) {
+        boolean isTransactionExist = this.transactionRepository.existsByTransactionIdAndUserEmail(id, email);
+        if(!isTransactionExist) {
+            throw new ResourceNotFoundException(
+                    String.format("Transaction for id = %d does not exist", id));
+        }
+        Transaction transaction = this.transactionRepository.findById(id).orElseThrow();
+        Account account = this.accountRepository.findByTransactionsContains(transaction).orElseThrow(
+                ResourceNotFoundException::new
+        );
+        return this.makeTransactionDtoFromTransactionEntity(transaction, account.getId());
+    }
 
+    private TransactionDTO makeTransactionDtoFromTransactionEntity(Transaction transaction, long accountId) {
+        TransactionDTO transactionDTO = new TransactionDTO();
+
+        transactionDTO.setId(transaction.getId());
+        transactionDTO.setTitle(transaction.getTitle());
+        transactionDTO.setValue(transaction.getValue());
+        transactionDTO.setType(transaction.getType().toString());
+        transactionDTO.setDate(transaction.getDate());
+        transactionDTO.setPayeeId(transaction.getPayee().getId());
+        transactionDTO.setCategoryId(transaction.getCategory().getId());
+        transactionDTO.setAccountId(accountId);
+
+        return transactionDTO;
+    }
+}
