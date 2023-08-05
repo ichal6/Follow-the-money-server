@@ -74,8 +74,8 @@ public class CategoryController {
     public ResponseEntity<Object> addSubcategory(@PathVariable String email, @PathVariable Long id,
                                               @RequestBody SubcategoryDTO newSubcategory) throws InputIncorrectException {
         accessValidator.checkPermit(email);
-        categoryService.addSubcategory(email, id, newSubcategory);
         categoryService.isValidNewSubcategory(newSubcategory);
+        categoryService.addSubcategory(email, id, newSubcategory);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 }
