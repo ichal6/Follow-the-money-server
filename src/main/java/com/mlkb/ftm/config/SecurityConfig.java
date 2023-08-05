@@ -14,12 +14,15 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
@@ -67,33 +70,39 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable().authorizeHttpRequests()
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/login", "/register", "/logoutUser").permitAll()
-                .requestMatchers("/swagger-ui.html", "/v2/api-docs", "/webjars/**", "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs").permitAll()
-                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
-                .requestMatchers("/isLogin").hasRole("USER")
-                .requestMatchers(HttpMethod.GET, "/api/**").hasRole("USER")
-                .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("USER")
-                .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("USER")
-                .requestMatchers(HttpMethod.POST, "/api/**").hasRole("USER")
-                .requestMatchers(HttpMethod.DELETE,"/**").denyAll()
-                .requestMatchers(HttpMethod.GET,"/**").denyAll()
-                .requestMatchers(HttpMethod.PUT,"/**").denyAll()
-                .requestMatchers(HttpMethod.POST,"/**").denyAll()
-                .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+        MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+
+        return http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(auth -> auth
+                .requestMatchers(mvcMatcherBuilder.pattern("/")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/login")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/register")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/logoutUser")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/swagger-ui.html")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/v2/api-docs")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/webjars/**")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/swagger-resources/**")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/swagger-ui/**")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/v3/api-docs")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/swagger-ui/**")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/v3/api-docs/**")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.OPTIONS, "/api/**")).permitAll()
+                .requestMatchers(mvcMatcherBuilder.pattern("/isLogin")).hasRole("USER")
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET, "/api/**")).hasRole("USER")
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT, "/api/**")).hasRole("USER")
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE, "/api/**")).hasRole("USER")
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST, "/api/**")).hasRole("USER")
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.DELETE,"/**")).denyAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.GET,"/**")).denyAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.PUT,"/**")).denyAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.POST,"/**")).denyAll()
+                .requestMatchers(mvcMatcherBuilder.pattern(HttpMethod.OPTIONS,"/**")).permitAll()
+                .anyRequest().authenticated())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilter(authenticationFilter())
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(this.authenticationConfiguration), userDetailsService(), secret, new JwtController()))
-                .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                .and()
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .build();
     }
 
