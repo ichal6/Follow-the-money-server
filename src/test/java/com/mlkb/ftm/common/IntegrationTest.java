@@ -20,7 +20,7 @@ public abstract class IntegrationTest {
     protected static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:14.6");
 
     @DynamicPropertySource
-    static void registerMySQLProperties(DynamicPropertyRegistry registry) {
+    static void registerDatabaseProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", container::getJdbcUrl);
         registry.add("spring.datasource.username", container::getUsername);
         registry.add("spring.datasource.password", container::getPassword);
