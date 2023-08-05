@@ -35,4 +35,12 @@ public class AccountEntityFixture {
 
         return account;
     }
+
+    public static Account myWallet() {
+        Account account = new Account();
+        account.setName("My wallet");
+        account.setId(2L);
+
+        return account;
+    }
 }

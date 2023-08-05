@@ -75,6 +75,9 @@ VALUES (3,  'Biedronka', 1);
 INSERT INTO "payee" (id,  name, user_id)
 VALUES (4,  'Mariusz-trans komis', 1);
 
+INSERT INTO "payee" (id,  name, user_id)
+VALUES (5,  'Bank', 1);
+
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
 VALUES (1, TO_DATE('2022-05-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 5, 4, 4);
 
@@ -94,16 +97,16 @@ INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, 
 VALUES (6, TO_DATE('2022-04-01','YYYY-MM-DD'), 'salary', 'INCOME', 1200.00, 3, 1, 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (7, TO_DATE('2022-04-07','YYYY-MM-DD'), 'Morgage october', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (7, TO_DATE('2022-04-07','YYYY-MM-DD'), 'Morgage october', 'EXPENSE', -1000.00, 1, 5, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (8, TO_DATE('2022-09-07','YYYY-MM-DD'), 'Morgage september', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (8, TO_DATE('2022-09-07','YYYY-MM-DD'), 'Morgage september', 'EXPENSE', -1000.00, 1, 5, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (9, TO_DATE('2023-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (9, TO_DATE('2023-01-07','YYYY-MM-DD'), 'Morgage january', 'EXPENSE', -1000.00, 1, 5, 5);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (10, TO_DATE('2023-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 2, 5);
+VALUES (10, TO_DATE('2023-02-07','YYYY-MM-DD'), 'Morgage february', 'EXPENSE', -1000.00, 1, 5, 5);
 
 INSERT INTO "transfer" (id, date, title, value, account_from_id, account_to_id)
 VALUES (1, TO_DATE('2022-09-02','YYYY-MM-DD'), 'wplatomat wrzesien', 280.0, 2, 1);

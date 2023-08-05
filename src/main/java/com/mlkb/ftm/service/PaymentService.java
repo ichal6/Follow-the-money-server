@@ -153,7 +153,7 @@ public class PaymentService {
     public boolean isValidNewTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
         return transactionDTO != null
                 && inputValidator.checkName(transactionDTO.getTitle())
-                && inputValidator.checkIfGeneralTypeInEnum(transactionDTO.getType())
+                && inputValidator.checkIfPaymentTypeInEnum(transactionDTO.getType())
                 && inputValidator.checkBalance(transactionDTO.getValue())
                 && inputValidator.checkId(transactionDTO.getAccountId())
                 && inputValidator.checkId(transactionDTO.getCategoryId())
@@ -167,6 +167,11 @@ public class PaymentService {
         }
         inputValidator.checkId(transactionDTO.getId());
         inputValidator.checkName(transactionDTO.getTitle());
+        inputValidator.checkBalance(transactionDTO.getValue());
+        inputValidator.checkIfPaymentTypeInEnum(transactionDTO.getType());
+        var paymentType = PaymentType.valueOf(transactionDTO.getType().toUpperCase());
+        inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, transactionDTO.getValue());
+        inputValidator.checkDate(transactionDTO.getDate());
     }
 
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
@@ -220,13 +225,81 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
+        Account updateAccount = getAccountForTransactionDTO(updateTransactionDTO, email);
+        Payee payee = getPayeeForTransactionDTO(updateTransactionDTO, email);
+        Category category = getCategoryForTransactionDTO(updateTransactionDTO, email);
+
         if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
             throw new ResourceNotFoundException(
                     String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
         }
         Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
+        Optional<Account> possibleActualAccount = this.accountRepository.findByTransactionsContains(transaction);
+        possibleActualAccount.ifPresentOrElse(
+                actualAccount -> modifyAccountForEditTransaction(actualAccount, updateAccount, transaction, updateTransactionDTO),
+                ResourceNotFoundException::new);
+
         transaction.setTitle(updateTransactionDTO.getTitle());
+        transaction.setValue(updateTransactionDTO.getValue());
+        transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
+        transaction.setDate(updateTransactionDTO.getDate());
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+
         this.transactionRepository.save(transaction);
+    }
+
+    private Category getCategoryForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
+        return this.categoryRepository.findByCategoryIdAndUserEmail(updateTransactionDTO.getCategoryId(), email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Couldn't update transaction id = %d, because category for id = %d doesn't exist",
+                                updateTransactionDTO.getId(),
+                                updateTransactionDTO.getCategoryId()))
+                );
+    }
+
+    private Payee getPayeeForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
+        return this.payeeRepository.findByPayeeIdAndUserEmail(updateTransactionDTO.getPayeeId(), email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Couldn't update transaction id = %d, because payee for id = %d doesn't exist",
+                                updateTransactionDTO.getId(),
+                                updateTransactionDTO.getPayeeId()))
+                );
+    }
+
+    private Account getAccountForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
+        return this.accountRepository.findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
+                .orElseThrow(() ->  new ResourceNotFoundException(
+                        String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
+                                updateTransactionDTO.getId(),
+                                updateTransactionDTO.getAccountId()))
+                );
+    }
+
+    private void modifyAccountForEditTransaction(Account oldAccount, Account newAccount,
+                                                 Transaction transaction, TransactionDTO updateTransactionDTO) {
+        if(!newAccount.getId().equals(oldAccount.getId())) {
+            var transactionsFromOldAccount = oldAccount.getTransactions().stream()
+                    .filter(t -> !t.getId().equals(transaction.getId()))
+                    .collect(Collectors.toSet());
+            oldAccount.setTransactions(transactionsFromOldAccount);
+            modifyTotalBalanceForAccount(oldAccount, -1*transaction.getValue());
+
+            var isAdded = newAccount.getTransactions().add(transaction);
+            if (!isAdded) {
+                throw new ResourceNotFoundException(
+                        String.format("Transaction id = %d cannot add to account id = %d",
+                                transaction.getId(), newAccount.getId()));
+            }
+            modifyTotalBalanceForAccount(newAccount, updateTransactionDTO.getValue());
+        } else {
+            updateAccountValueAfterEditTransaction(newAccount, transaction.getValue(), updateTransactionDTO.getValue());
+        }
+    }
+
+    private void updateAccountValueAfterEditTransaction(Account account, double oldValue, double newValue) {
+        account.setCurrentBalance(account.getCurrentBalance() - oldValue + newValue);
+        this.accountRepository.save(account);
     }
 
     private void addTransactionToAccountInDB(Account account, Transaction transaction) {
@@ -435,5 +508,31 @@ public class PaymentService {
         return true;
     }
 
-}
+    public TransactionDTO getTransaction(String email, long id) {
+        boolean isTransactionExist = this.transactionRepository.existsByTransactionIdAndUserEmail(id, email);
+        if(!isTransactionExist) {
+            throw new ResourceNotFoundException(
+                    String.format("Transaction for id = %d does not exist", id));
+        }
+        Transaction transaction = this.transactionRepository.findById(id).orElseThrow();
+        Account account = this.accountRepository.findByTransactionsContains(transaction).orElseThrow(
+                ResourceNotFoundException::new
+        );
+        return this.makeTransactionDtoFromTransactionEntity(transaction, account.getId());
+    }
 
+    private TransactionDTO makeTransactionDtoFromTransactionEntity(Transaction transaction, long accountId) {
+        TransactionDTO transactionDTO = new TransactionDTO();
+
+        transactionDTO.setId(transaction.getId());
+        transactionDTO.setTitle(transaction.getTitle());
+        transactionDTO.setValue(transaction.getValue());
+        transactionDTO.setType(transaction.getType().toString());
+        transactionDTO.setDate(transaction.getDate());
+        transactionDTO.setPayeeId(transaction.getPayee().getId());
+        transactionDTO.setCategoryId(transaction.getCategory().getId());
+        transactionDTO.setAccountId(accountId);
+
+        return transactionDTO;
+    }
+}

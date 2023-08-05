@@ -15,10 +15,11 @@ public class TransactionEntityFixture {
     public static Transaction buyCarTransaction() {
         Payee payee = mock(Payee.class);
         when(payee.getName()).thenReturn("Złomex");
+        when(payee.getId()).thenReturn(4L);
 
         Category category = mock(Category.class);
         when(category.getName()).thenReturn("Car");
-
+        when(category.getId()).thenReturn(5L);
 
         final var transaction = new Transaction();
         transaction.setId(1L);

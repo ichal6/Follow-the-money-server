@@ -41,12 +41,32 @@ public class InputValidator {
         }
     }
 
-    public boolean checkIfGeneralTypeInEnum(String type) throws InputIncorrectException {
+    public boolean checkIfPaymentTypeInEnum(String type) throws InputIncorrectException {
+        if(type == null) {
+            throw new InputIncorrectException(InputValidationMessage.PAYMENT_TYPE);
+        }
+
         List<PaymentType> types = Arrays.asList(PaymentType.values());
         try {
             return types.contains(PaymentType.valueOf(type.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            throw new InputIncorrectException(InputValidationMessage.GENERAL_TYPE);
+            throw new InputIncorrectException(InputValidationMessage.PAYMENT_TYPE);
+        }
+    }
+
+    public void checkIfPaymentTypeCorrectWithValue(PaymentType type, double value) throws InputIncorrectException {
+        switch (type) {
+            case INCOME -> {
+                if(value <= 0.0) {
+                    throw new InputIncorrectException(InputValidationMessage.INCORRECT_TYPE);
+                }
+            }
+            case EXPENSE -> {
+                if(value >= 0.0) {
+                    throw new InputIncorrectException(InputValidationMessage.INCORRECT_TYPE);
+                }
+            }
+            default -> throw new InputIncorrectException(InputValidationMessage.PAYMENT_TYPE);
         }
     }
 

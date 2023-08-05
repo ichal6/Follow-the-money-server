@@ -101,11 +101,6 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public PayeeRepository payeeRepository() {
-        return Mockito.mock(PayeeRepository.class);
-    }
-
-    @Bean
     public Clock clock() {
         return Mockito.mock(Clock.class);
     }

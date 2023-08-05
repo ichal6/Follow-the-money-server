@@ -1,6 +1,7 @@
 package com.mlkb.ftm.validation;
 
 import com.mlkb.ftm.common.ApplicationConfig;
+import com.mlkb.ftm.entity.PaymentType;
 import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.InputValidationMessage;
 import org.junit.jupiter.api.Assertions;
@@ -125,8 +126,8 @@ class InputValidatorTest {
         String typeExpense = "Expense";
 
         // when
-        boolean isIncomeOk = this.inputValidator.checkIfGeneralTypeInEnum(typeIncome);
-        boolean isExpenseOk = this.inputValidator.checkIfGeneralTypeInEnum(typeExpense);
+        boolean isIncomeOk = this.inputValidator.checkIfPaymentTypeInEnum(typeIncome);
+        boolean isExpenseOk = this.inputValidator.checkIfPaymentTypeInEnum(typeExpense);
 
         // then
         assertTrue(isIncomeOk);
@@ -140,10 +141,10 @@ class InputValidatorTest {
 
         // when
         InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
-                inputValidator.checkIfGeneralTypeInEnum(type));
+                inputValidator.checkIfPaymentTypeInEnum(type));
 
         // then
-        assertEquals(InputValidationMessage.GENERAL_TYPE.message, thrown.getMessage());
+        assertEquals(InputValidationMessage.PAYMENT_TYPE.message, thrown.getMessage());
     }
 
     @Test
@@ -295,5 +296,55 @@ class InputValidatorTest {
 
         // then
         assertEquals(InputValidationMessage.DATE.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_an_exception_if_payment_type_is_income_for_minus_value() {
+        // given
+        PaymentType paymentType = PaymentType.INCOME;
+        double value = -123.0;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, value));
+
+        // then
+        assertEquals(InputValidationMessage.INCORRECT_TYPE.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_an_exception_if_payment_type_is_expense_for_positive_value() {
+        // given
+        PaymentType paymentType = PaymentType.EXPENSE;
+        double value = 123.0;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, value));
+
+        // then
+        assertEquals(InputValidationMessage.INCORRECT_TYPE.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_not_throw_an_exception_if_payment_type_is_expense_for_minus_value() {
+        // given
+        PaymentType paymentType = PaymentType.EXPENSE;
+        double value = -123.0;
+
+        // when / then
+       Assertions.assertDoesNotThrow(() ->
+                inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, value));
+    }
+
+    @Test
+    void should_not_throw_an_exception_if_payment_type_is_income_for_positive_value() {
+        // given
+        PaymentType paymentType = PaymentType.INCOME;
+        double value = 123.0;
+
+        // when / then
+        Assertions.assertDoesNotThrow(() ->
+                inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, value));
     }
 }

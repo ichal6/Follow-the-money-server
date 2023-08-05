@@ -52,6 +52,17 @@ public class PaymentController {
         return new ResponseEntity<>(paymentsDTOList, HttpStatus.OK);
     }
 
+    @GetMapping("/transaction/{email}/{id}")
+    @Operation(summary = "Get a single transaction by id")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TransactionDTO> getTransaction(@PathVariable String email, @PathVariable Long id) {
+        this.accessValidator.checkPermit(email);
+
+        TransactionDTO transactionDTO = this.paymentService.getTransaction(email, id);
+
+        return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+    }
+
     @PostMapping("/transaction/{email}")
     public ResponseEntity<Object> createTransaction(@PathVariable("email") String email,
                                                     @RequestBody TransactionDTO transactionDTO) throws InputIncorrectException {
@@ -87,7 +98,9 @@ public class PaymentController {
     }
 
     @PutMapping("/transaction")
-    public ResponseEntity<Object> updateTransaction(@RequestBody TransactionDTO updateTransaction,
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update transaction")
+    public ResponseEntity<?> updateTransaction(@RequestBody TransactionDTO updateTransaction,
                                                     @CookieValue(value = "e-mail", defaultValue = "none") String email)
             throws InputIncorrectException {
         accessValidator.checkPermit(email);

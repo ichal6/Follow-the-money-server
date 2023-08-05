@@ -32,7 +32,7 @@ public class User {
     @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private Set<Category> categories;
-    @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private Set<Payee> payees;
 

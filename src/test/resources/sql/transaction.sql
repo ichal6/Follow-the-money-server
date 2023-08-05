@@ -1,5 +1,5 @@
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
-VALUES (1, TO_DATE('2022-05-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 5, 4, 4);
+VALUES (1, TO_DATE('2022-05-02','YYYY-MM-DD'), 'buy car', 'EXPENSE', -2500.00, 5, 4, 1);
 
 INSERT INTO "transaction" (id, date, title, type, value, category_id, payee_id, account_id)
 VALUES (2, TO_DATE('2022-04-21','YYYY-MM-DD'), 'buy another car', 'EXPENSE', -2500.00, 5, 4, 4);
