@@ -1,10 +1,7 @@
 package com.mlkb.ftm.entity;
 
 import jakarta.validation.constraints.Digits;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import jakarta.persistence.*;
 
@@ -17,6 +14,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@NamedEntityGraph(
+    name = "Account.transactions",
+    attributeNodes = { @NamedAttributeNode("transactions") }
+)
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +36,7 @@ public class Account {
     private Currency currency;
     @Column(columnDefinition = "boolean default true")
     private Boolean isEnabled = true;
-    @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Transaction.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     private Set<Transaction> transactions;
     @OneToMany

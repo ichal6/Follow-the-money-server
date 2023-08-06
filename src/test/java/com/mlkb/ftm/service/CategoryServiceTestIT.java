@@ -181,7 +181,7 @@ class CategoryServiceTestIT extends IntegrationTest {
         categoryService.addSubcategory(email, categoryId, subcategoryDto);
 
         // then
-        Optional<Category> category = categoryRepository.findById(categoryId);
+        Optional<Category> category = categoryRepository.findByCategoryIdAndUserEmail(categoryId, email);
         category.ifPresentOrElse(c -> assertEquals(1, c.getSubcategories().size()), Assertions::fail);
 
         try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {

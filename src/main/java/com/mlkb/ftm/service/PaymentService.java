@@ -47,6 +47,34 @@ public class PaymentService {
         this.clock = clock;
     }
 
+    public TransactionDTO getTransaction(String email, long id) {
+        boolean isTransactionExist = this.transactionRepository.existsByTransactionIdAndUserEmail(id, email);
+        if(!isTransactionExist) {
+            throw new ResourceNotFoundException(
+                    String.format("Transaction for id = %d does not exist", id));
+        }
+        Transaction transaction = this.transactionRepository.findById(id).orElseThrow();
+
+        return this.makeTransactionDtoFromTransactionEntity(transaction);
+    }
+
+    public List<PaymentDTO> getPayments(String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if (possibleUser.isPresent()) {
+            User user = possibleUser.get();
+            var accounts = user.getAccounts();
+            List<PaymentDTO> payments = new ArrayList<>();
+            for(Account account: accounts) {
+                payments.addAll(extractPayments(account));
+            }
+            return payments.stream()
+                    .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
+                    .collect(Collectors.toList());
+        } else {
+            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
+        }
+    }
+
     public List<PaymentDTO> getPaymentsWithParameters(String email, String accountId, String period) {
         try {
             Long accountIdLong = Long.parseLong(accountId);
@@ -114,42 +142,6 @@ public class PaymentService {
         }
     }
 
-    public List<PaymentDTO> getPayments(String email) {
-        Optional<User> possibleUser = userRepository.findByEmail(email);
-        if (possibleUser.isPresent()) {
-            User user = possibleUser.get();
-            var accounts = user.getAccounts();
-            List<PaymentDTO> payments = new ArrayList<>();
-            for(Account account: accounts) {
-                payments.addAll(extractPayments(account));
-            }
-            return payments.stream()
-                    .filter(paymentDTO -> !paymentDTO.getIsInternal() ||  paymentDTO.getValue() >= 0.0)
-                    .collect(Collectors.toList());
-        } else {
-            throw new ResourceNotFoundException(format("Couldn't find user with email %s", email));
-        }
-    }
-
-    private List<PaymentDTO> extractPayments(Account account){
-
-        List<PaymentDTO> payments = account.getTransactions().stream()
-                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
-                .collect(Collectors.toList());
-
-        payments.addAll(account.getTransfersFrom().stream()
-                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
-                .collect(Collectors.toList()));
-
-        payments.addAll(account.getTransfersTo().stream()
-                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
-                .collect(Collectors.toList()));
-
-        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
-
-        return payments;
-    }
-
     public boolean isValidNewTransaction(TransactionDTO transactionDTO) throws InputIncorrectException {
         return transactionDTO != null
                 && inputValidator.checkName(transactionDTO.getTitle())
@@ -198,7 +190,7 @@ public class PaymentService {
 
             transactionRepository.save(transaction);
             addTransactionToAccountInDB(accountOptional.get(), transaction);
-            modifyTotalBalanceForAccount(accountOptional.get(), transactionDTO.getValue());
+            modifyCurrentBalanceForAccount(accountOptional.get(), transactionDTO.getValue());
         } else {
             throw new ResourceNotFoundException("Couldn't create new transaction. Category, account or payee with given id don't exist");
         }
@@ -234,19 +226,63 @@ public class PaymentService {
                     String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
         }
         Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
-        Optional<Account> possibleActualAccount = this.accountRepository.findByTransactionsContains(transaction);
-        possibleActualAccount.ifPresentOrElse(
-                actualAccount -> modifyAccountForEditTransaction(actualAccount, updateAccount, transaction, updateTransactionDTO),
-                ResourceNotFoundException::new);
-
+        modifyCurrentBalanceInAccounts(updateAccount, transaction, updateTransactionDTO);
         transaction.setTitle(updateTransactionDTO.getTitle());
         transaction.setValue(updateTransactionDTO.getValue());
         transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
         transaction.setDate(updateTransactionDTO.getDate());
         transaction.setPayee(payee);
         transaction.setCategory(category);
+        transaction.setAccount(updateAccount);
 
         this.transactionRepository.save(transaction);
+    }
+
+    public boolean removeTransaction(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+
+        Optional<Transaction> possibleTransaction = findTransaction(possibleUser, id);
+        Optional<Account> possibleAccountToUpdate = findAccount(possibleUser, id);
+
+        if(possibleAccountToUpdate.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't exist update.");
+        }
+        if(possibleTransaction.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transaction. Transaction doesn't exist");
+        }
+
+        modifyCurrentBalanceForAccount(possibleAccountToUpdate.get(), (possibleTransaction.get().getValue()*-1));
+
+        System.out.print("Delete - ");
+        System.out.println(id);
+        transactionRepository.deleteById(id);
+
+        return true;
+    }
+
+    public boolean removeTransfer(Long id, String email) {
+        Optional<User> possibleUser = userRepository.findByEmail(email);
+        if(possibleUser.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transfer. User for this email does not exist");
+        }
+        Optional<Transfer> possibleTransfer = possibleUser.get().getAccounts().stream()
+                .flatMap(account -> account.getTransfersTo().stream())
+                .filter(transfer -> transfer.getId().equals(id))
+                .findFirst();
+        if(possibleTransfer.isEmpty()){
+            possibleTransfer = possibleUser.get().getAccounts().stream()
+                    .flatMap(account -> account.getTransfersFrom().stream())
+                    .filter(transfer -> transfer.getId().equals(id))
+                    .findFirst();
+        }
+        if(possibleTransfer.isEmpty()){
+            throw new ResourceNotFoundException("Couldn't delete this transfer. Transfer doesn't exist");
+        }
+        System.out.print("Delete - ");
+        System.out.println(id);
+        transferRepository.deleteById(id);
+
+        return true;
     }
 
     private Category getCategoryForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
@@ -276,39 +312,29 @@ public class PaymentService {
                 );
     }
 
-    private void modifyAccountForEditTransaction(Account oldAccount, Account newAccount,
-                                                 Transaction transaction, TransactionDTO updateTransactionDTO) {
-        if(!newAccount.getId().equals(oldAccount.getId())) {
-            var transactionsFromOldAccount = oldAccount.getTransactions().stream()
-                    .filter(t -> !t.getId().equals(transaction.getId()))
-                    .collect(Collectors.toSet());
-            oldAccount.setTransactions(transactionsFromOldAccount);
-            modifyTotalBalanceForAccount(oldAccount, -1*transaction.getValue());
-
-            var isAdded = newAccount.getTransactions().add(transaction);
-            if (!isAdded) {
-                throw new ResourceNotFoundException(
-                        String.format("Transaction id = %d cannot add to account id = %d",
-                                transaction.getId(), newAccount.getId()));
-            }
-            modifyTotalBalanceForAccount(newAccount, updateTransactionDTO.getValue());
+    private void modifyCurrentBalanceInAccounts(Account newAccount, Transaction transaction,
+                                                TransactionDTO updateTransactionDTO) {
+        if(!newAccount.getId().equals(transaction.getAccount().getId())) {
+            modifyCurrentBalanceForAccount(transaction.getAccount(), -1*transaction.getValue());
+            modifyCurrentBalanceForAccount(newAccount, updateTransactionDTO.getValue());
         } else {
-            updateAccountValueAfterEditTransaction(newAccount, transaction.getValue(), updateTransactionDTO.getValue());
+            modifyCurrentBalanceForAccount(newAccount, transaction.getValue(), updateTransactionDTO.getValue());
         }
     }
 
-    private void updateAccountValueAfterEditTransaction(Account account, double oldValue, double newValue) {
+    private void modifyCurrentBalanceForAccount(Account account, double oldValue, double newValue) {
         account.setCurrentBalance(account.getCurrentBalance() - oldValue + newValue);
         this.accountRepository.save(account);
     }
 
-    private void addTransactionToAccountInDB(Account account, Transaction transaction) {
-        account.getTransactions().add(transaction);
+    private void modifyCurrentBalanceForAccount(Account account, Double value) {
+        account.setCurrentBalance(account.getCurrentBalance() + value);
         accountRepository.save(account);
     }
 
-    private void modifyTotalBalanceForAccount(Account account, Double value) {
-        account.setCurrentBalance(account.getCurrentBalance() + value);
+
+    private void addTransactionToAccountInDB(Account account, Transaction transaction) {
+        account.getTransactions().add(transaction);
         accountRepository.save(account);
     }
 
@@ -435,28 +461,6 @@ public class PaymentService {
         }
     }
 
-    public boolean removeTransaction(Long id, String email) {
-        Optional<User> possibleUser = userRepository.findByEmail(email);
-
-        Optional<Transaction> possibleTransaction = findTransaction(possibleUser, id);
-        Optional<Account> possibleAccountToUpdate = findAccount(possibleUser, id);
-
-        if(possibleAccountToUpdate.isEmpty()){
-            throw new ResourceNotFoundException("Couldn't delete this transaction. Account doesn't exist update.");
-        }
-        if(possibleTransaction.isEmpty()){
-            throw new ResourceNotFoundException("Couldn't delete this transaction. Transaction doesn't exist");
-        }
-
-        modifyTotalBalanceForAccount(possibleAccountToUpdate.get(), (possibleTransaction.get().getValue()*-1));
-
-        System.out.print("Delete - ");
-        System.out.println(id);
-        transactionRepository.deleteById(id);
-
-        return true;
-    }
-
     private Optional<Account> findAccount(Optional<User> possibleUser, Long transactionId){
         if(possibleUser.isEmpty()){
             throw new ResourceNotFoundException("User for this email does not exist");
@@ -483,45 +487,7 @@ public class PaymentService {
                 .findFirst();
     }
 
-    public boolean removeTransfer(Long id, String email) {
-        Optional<User> possibleUser = userRepository.findByEmail(email);
-        if(possibleUser.isEmpty()){
-            throw new ResourceNotFoundException("Couldn't delete this transfer. User for this email does not exist");
-        }
-        Optional<Transfer> possibleTransfer = possibleUser.get().getAccounts().stream()
-                .flatMap(account -> account.getTransfersTo().stream())
-                .filter(transfer -> transfer.getId().equals(id))
-                .findFirst();
-        if(possibleTransfer.isEmpty()){
-            possibleTransfer = possibleUser.get().getAccounts().stream()
-                    .flatMap(account -> account.getTransfersFrom().stream())
-                    .filter(transfer -> transfer.getId().equals(id))
-                    .findFirst();
-        }
-        if(possibleTransfer.isEmpty()){
-            throw new ResourceNotFoundException("Couldn't delete this transfer. Transfer doesn't exist");
-        }
-        System.out.print("Delete - ");
-        System.out.println(id);
-        transferRepository.deleteById(id);
-
-        return true;
-    }
-
-    public TransactionDTO getTransaction(String email, long id) {
-        boolean isTransactionExist = this.transactionRepository.existsByTransactionIdAndUserEmail(id, email);
-        if(!isTransactionExist) {
-            throw new ResourceNotFoundException(
-                    String.format("Transaction for id = %d does not exist", id));
-        }
-        Transaction transaction = this.transactionRepository.findById(id).orElseThrow();
-        Account account = this.accountRepository.findByTransactionsContains(transaction).orElseThrow(
-                ResourceNotFoundException::new
-        );
-        return this.makeTransactionDtoFromTransactionEntity(transaction, account.getId());
-    }
-
-    private TransactionDTO makeTransactionDtoFromTransactionEntity(Transaction transaction, long accountId) {
+    private TransactionDTO makeTransactionDtoFromTransactionEntity(Transaction transaction) {
         TransactionDTO transactionDTO = new TransactionDTO();
 
         transactionDTO.setId(transaction.getId());
@@ -531,8 +497,27 @@ public class PaymentService {
         transactionDTO.setDate(transaction.getDate());
         transactionDTO.setPayeeId(transaction.getPayee().getId());
         transactionDTO.setCategoryId(transaction.getCategory().getId());
-        transactionDTO.setAccountId(accountId);
+        transactionDTO.setAccountId(transaction.getAccount().getId());
 
         return transactionDTO;
+    }
+
+    private List<PaymentDTO> extractPayments(Account account){
+
+        List<PaymentDTO> payments = account.getTransactions().stream()
+                .map(transaction -> makePaymentDTOFromTransaction(transaction, account.getName()))
+                .collect(Collectors.toList());
+
+        payments.addAll(account.getTransfersFrom().stream()
+                .map(transfer -> makePaymentDTOFromTransferFrom(transfer, account.getName()))
+                .collect(Collectors.toList()));
+
+        payments.addAll(account.getTransfersTo().stream()
+                .map(transfer -> makePaymentDTOFromTransferTo(transfer, account.getName()))
+                .collect(Collectors.toList()));
+
+        payments.sort((p1, p2) -> Long.compare(p2.getDate().getTime(), p1.getDate().getTime()));
+
+        return payments;
     }
 }

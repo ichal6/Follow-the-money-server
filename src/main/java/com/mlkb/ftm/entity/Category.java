@@ -13,6 +13,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@NamedEntityGraph(
+        name = "Category.subcategories",
+        attributeNodes = { @NamedAttributeNode("subcategories") }
+)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +26,7 @@ public class Category {
     @JoinColumn(name = "category_id")
     private Category parentCategory;
     private Boolean isEnabled = true;
-    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private Set<Category> subcategories;
 

@@ -148,20 +148,17 @@ public class CategoryService {
     }
 
     public void addSubcategory(String email, Long id, SubcategoryDTO newSubcategory) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            Set<Category> userCategories = user.getCategories();
-            Category categoryToEdit = userCategories.stream()
-                    .filter(category -> category.getId().equals(id))
-                    .findFirst().get();
-            categoryToEdit.getSubcategories()
-                    .add(new Category(newSubcategory.getName(), user));
-            userCategories.add(categoryToEdit);
-            userRepository.save(user);
-        } else {
-            throw new ResourceNotFoundException("Couldn't find user with given email");
-        }
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        String.format("Couldn't find user for email = %s", email))
+        );
+        Optional<Category> possibleMainCategory = this.categoryRepository.findByCategoryIdAndUserEmail(id, email);
+        Category category = possibleMainCategory.orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                String.format("Couldn't find category for id = %d and email = %s", id, email))
+                );
+        category.getSubcategories().add(new Category(newSubcategory.getName(), user));
+        categoryRepository.save(category);
     }
 
     public boolean isValidNewCategory(CategoryDTO categoryDTO) throws InputIncorrectException {

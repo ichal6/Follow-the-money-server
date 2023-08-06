@@ -347,13 +347,11 @@ public class PaymentServiceTest {
         String email = "correct@email.com";
         long id = 1L;
         Transaction transactionEntity = TransactionEntityFixture.buyCarTransaction();
-        Account accountEntity = AccountEntityFixture.millennium();
         TransactionDTO expectedDto = TransactionDTOFixture.buyCarTransactionBeforeUpdate();
 
         // when
         when(transactionRepository.existsByTransactionIdAndUserEmail(id, email)).thenReturn(true);
         when(transactionRepository.findById(id)).thenReturn(Optional.of(transactionEntity));
-        when(accountRepository.findByTransactionsContains(transactionEntity)).thenReturn(Optional.of(accountEntity));
 
         TransactionDTO transactionDTO = this.paymentService.getTransaction(email, id);
 
