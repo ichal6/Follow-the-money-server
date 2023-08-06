@@ -1,6 +1,8 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.IntegrationTest;
+import com.mlkb.ftm.entity.Account;
+import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.fixture.*;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
@@ -10,6 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.sql.*;
 import java.time.Clock;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
@@ -213,15 +216,24 @@ public class PaymentServiceTestIT extends IntegrationTest {
                 clock);
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
+        var oldAccountID = transactionDto.getAccountId();
         transactionDto.setAccountId(AccountEntityFixture.myWallet().getId());
         String email = UserEntityFixture.userUserowy().getEmail();
 
         // when
         paymentService.updateTransaction(transactionDto, email);
+        Optional<Account> oldAccount = accountRepository.findByAccountIdAndUserEmail(oldAccountID, email);
+        Optional<Transaction> transactionInOldAccount = oldAccount.orElseThrow().getTransactions()
+                .stream()
+                .filter(t -> t.getId().equals(transactionDto.getId()))
+                .findFirst();
+
         // then
+        // check is transactions was removed from old Account
+        assertThat(transactionInOldAccount.isPresent()).isFalse();
         // Connect to the database
         try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
-            // Create a statement to query the database
+            // Create a statement to query the database for check transaction id has changed
             try (Statement stmt = conn.createStatement()) {
                 // Query the database for the data
                 ResultSet rs = stmt.executeQuery(String.format("SELECT account_id FROM transaction WHERE id = %d", transactionDto.getId()));
@@ -230,11 +242,8 @@ public class PaymentServiceTestIT extends IntegrationTest {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getLong(1)).isEqualTo(transactionDto.getAccountId());
             }
-        }
 
-        // Connect to the database
-        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
-            // Create a statement to query the database
+            // Create a statement to query the database to check current balance is changed
             try (Statement stmt = conn.createStatement()) {
                 // Query the database for the data
                 ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d",

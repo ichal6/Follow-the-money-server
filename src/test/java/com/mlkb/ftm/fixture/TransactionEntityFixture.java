@@ -29,6 +29,7 @@ public class TransactionEntityFixture {
         transaction.setPayee(payee);
         transaction.setCategory(category);
         transaction.setType(PaymentType.EXPENSE);
+        transaction.setAccount(AccountEntityFixture.millennium());
         return transaction;
     }
 

@@ -29,10 +29,10 @@ public class User {
     @OneToMany(targetEntity = Account.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<Account> accounts;
-    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Category.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<Category> categories;
-    @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Payee.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<Payee> payees;
 
