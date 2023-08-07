@@ -379,7 +379,7 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Transaction for id = %d does not exist", transferDTO.getId()),
+                String.format("Transfer for id = %d does not exist", transferDTO.getId()),
                 thrown.getMessage());
     }
 

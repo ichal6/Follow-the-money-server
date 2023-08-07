@@ -255,7 +255,7 @@ public class PaymentService {
     public void updateTransfer(TransferDTO updateTransferDTO, String email) {
         if(!this.transferRepository.existsByTransferIdAndUserEmail(updateTransferDTO.getId(), email)) {
             throw new ResourceNotFoundException(
-                    String.format("Transaction for id = %d does not exist", updateTransferDTO.getId()));
+                    String.format("Transfer for id = %d does not exist", updateTransferDTO.getId()));
         }
 
         if(updateTransferDTO.getAccountIdTo().equals(updateTransferDTO.getAccountIdFrom())) {
