@@ -2,7 +2,6 @@ package com.mlkb.ftm.fixture;
 
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.AccountType;
-import com.mlkb.ftm.entity.Transfer;
 
 import java.util.Set;
 
@@ -40,6 +39,22 @@ public class AccountEntityFixture {
         Account account = new Account();
         account.setName("My wallet");
         account.setId(2L);
+
+        return account;
+    }
+
+    public static Account getSavingInSock() {
+        Account account = new Account();
+        account.setName("Savings in sock");
+        account.setId(4L);
+
+        return account;
+    }
+
+    public static Account getPekaoBank() {
+        Account account= new Account();
+        account.setName("Pekao");
+        account.setId(3L);
 
         return account;
     }

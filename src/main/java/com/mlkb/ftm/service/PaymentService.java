@@ -250,6 +250,10 @@ public class PaymentService {
         Transfer transfer = this.transferRepository.findById(updateTransferDTO.getId()).orElseThrow();
 
         transfer.setTitle(updateTransferDTO.getTitle());
+        modifyCurrentBalanceInAccountsAfterUpdateTransfer(accountFrom, accountTo, transfer, updateTransferDTO);
+        transfer.setValue(updateTransferDTO.getValue());
+        transfer.setAccountFrom(accountFrom);
+        transfer.setAccountTo(accountTo);
 
         this.transferRepository.save(transfer);
     }
@@ -325,6 +329,24 @@ public class PaymentService {
                         String.format("Account for id = %d doesn't exist",
                                 accountId))
                 );
+    }
+
+    private void modifyCurrentBalanceInAccountsAfterUpdateTransfer(
+            Account fromAccount, Account toAccount, Transfer transfer, TransferDTO updateTransferDTO) {
+        if(fromAccount.getId().equals(transfer.getAccountFrom().getId())
+                || toAccount.getId().equals(transfer.getAccountTo().getId())) {
+            modifyCurrentBalanceForAccount(fromAccount, -1*transfer.getValue(), -1*updateTransferDTO.getValue());
+            modifyCurrentBalanceForAccount(toAccount, transfer.getValue(), updateTransferDTO.getValue());
+        } else {
+            restorePreviousValuesInAccountsAfterUpdateTransfer(
+                    transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getValue());
+            modifyTotalBalanceForBothAccountsAfterTransfer(fromAccount, toAccount, updateTransferDTO.getValue());
+        }
+    }
+
+    private void restorePreviousValuesInAccountsAfterUpdateTransfer(
+            Account fromAccount, Account toAccount, double value) {
+        modifyTotalBalanceForBothAccountsAfterTransfer(toAccount, fromAccount, value);
     }
 
     private void modifyCurrentBalanceInAccounts(Account newAccount, Transaction transaction,

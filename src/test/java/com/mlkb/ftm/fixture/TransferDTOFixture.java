@@ -19,6 +19,18 @@ public class TransferDTOFixture {
         return transfer;
     }
 
+    public static TransferDTO cashDepositTransferFromSavingsInSockToPekao() {
+        final var transfer = new TransferDTO();
+        transfer.setId(3L);
+        transfer.setTitle("Cash Deposit January");
+        transfer.setDate(getDate(2023, 8, 7, 17, 55));
+        transfer.setValue(100.0);
+        transfer.setAccountIdFrom(AccountEntityFixture.getSavingInSock().getId());
+        transfer.setAccountIdTo(AccountEntityFixture.getPekaoBank().getId());
+
+        return transfer;
+    }
+
     private static Date getDate(int year, int month, int day, int hour, int minute) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.YEAR, year);
