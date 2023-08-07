@@ -257,6 +257,11 @@ public class PaymentService {
             throw new ResourceNotFoundException(
                     String.format("Transaction for id = %d does not exist", updateTransferDTO.getId()));
         }
+
+        if(updateTransferDTO.getAccountIdTo().equals(updateTransferDTO.getAccountIdFrom())) {
+            throw new IllegalArgumentException(InputValidationMessage.TRANSFER_ACCOUNTS_ID.message);
+        }
+
         Account accountFrom = getAccountForAccountId(updateTransferDTO.getAccountIdFrom(), email);
         Account accountTo = getAccountForAccountId(updateTransferDTO.getAccountIdTo(), email);
 

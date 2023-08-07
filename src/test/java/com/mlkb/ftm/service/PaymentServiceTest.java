@@ -4,6 +4,7 @@ import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.*;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
@@ -380,6 +381,23 @@ public class PaymentServiceTest {
         assertEquals(
                 String.format("Transaction for id = %d does not exist", transferDTO.getId()),
                 thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_transfer_contain_the_same_accounts() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        transferDTO.setAccountIdTo(1L);
+        transferDTO.setAccountIdFrom(1L);
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(true);
+
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(InputValidationMessage.TRANSFER_ACCOUNTS_ID.message, thrown.getMessage());
     }
 
     @Test
