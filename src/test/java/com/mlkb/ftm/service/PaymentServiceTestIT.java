@@ -239,91 +239,6 @@ public class PaymentServiceTestIT extends IntegrationTest {
         }
     }
 
-    private void checkIsValueIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT value FROM transfer WHERE id = %d", transferDTO.getId()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getDouble(1)).isEqualTo(transferDTO.getValue());
-        }
-    }
-
-    private void checkIsCurrentBalanceIsRestoreToPreviousValueAfterChangeAccountFrom(Connection conn, TransferDTO oldTransferDto) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", oldTransferDto.getAccountIdFrom()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getDouble(1)).isEqualTo(2200.0);
-        }
-    }
-
-    private void checkIsCurrentBalanceIsRestoreToPreviousValueAfterChangeAccountTo(Connection conn, TransferDTO oldTransferDto) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", oldTransferDto.getAccountIdTo()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getDouble(1)).isEqualTo(-1200.0);
-        }
-    }
-
-    private void checkIsCurrentBalanceIsEditedForAccountTo(Connection conn, TransferDTO transferDTO) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", transferDTO.getAccountIdTo()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getDouble(1)).isEqualTo(4100.0);
-        }
-    }
-
-    private void checkIsCurrentBalanceIsEditedForAccountFrom(Connection conn, TransferDTO transferDTO) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", transferDTO.getAccountIdFrom()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getDouble(1)).isEqualTo(800.0);
-        }
-    }
-
-    private void checkIsAccountIdFromIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT account_from_id FROM transfer WHERE id = %d", transferDTO.getId()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getLong(1)).isEqualTo(transferDTO.getAccountIdFrom());
-        }
-    }
-
-    private void checkIsAccountIdToIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {
-        // Create a statement to query the database
-        try (Statement stmt = conn.createStatement()) {
-            // Query the database for the data
-            ResultSet rs = stmt.executeQuery(String.format("SELECT account_to_id FROM transfer WHERE id = %d", transferDTO.getId()));
-
-            // Check if the data is edited
-            assertThat(rs.next()).isTrue();
-            assertThat(rs.getLong(1)).isEqualTo(transferDTO.getAccountIdTo());
-        }
-    }
-
-
     @Test
     void should_update_value_and_payment_type_in_transaction_if_transaction_exists() throws SQLException {
         // given
@@ -498,6 +413,90 @@ public class PaymentServiceTestIT extends IntegrationTest {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getDouble(1)).isEqualTo(-3400.00);
             }
+        }
+    }
+
+    private void checkIsValueIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT value FROM transfer WHERE id = %d", transferDTO.getId()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getDouble(1)).isEqualTo(transferDTO.getValue());
+        }
+    }
+
+    private void checkIsCurrentBalanceIsRestoreToPreviousValueAfterChangeAccountFrom(Connection conn, TransferDTO oldTransferDto) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", oldTransferDto.getAccountIdFrom()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getDouble(1)).isEqualTo(2200.0);
+        }
+    }
+
+    private void checkIsCurrentBalanceIsRestoreToPreviousValueAfterChangeAccountTo(Connection conn, TransferDTO oldTransferDto) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", oldTransferDto.getAccountIdTo()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getDouble(1)).isEqualTo(-1200.0);
+        }
+    }
+
+    private void checkIsCurrentBalanceIsEditedForAccountTo(Connection conn, TransferDTO transferDTO) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", transferDTO.getAccountIdTo()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getDouble(1)).isEqualTo(4100.0);
+        }
+    }
+
+    private void checkIsCurrentBalanceIsEditedForAccountFrom(Connection conn, TransferDTO transferDTO) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT current_balance FROM account WHERE id = %d", transferDTO.getAccountIdFrom()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getDouble(1)).isEqualTo(800.0);
+        }
+    }
+
+    private void checkIsAccountIdFromIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT account_from_id FROM transfer WHERE id = %d", transferDTO.getId()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getLong(1)).isEqualTo(transferDTO.getAccountIdFrom());
+        }
+    }
+
+    private void checkIsAccountIdToIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {
+        // Create a statement to query the database
+        try (Statement stmt = conn.createStatement()) {
+            // Query the database for the data
+            ResultSet rs = stmt.executeQuery(String.format("SELECT account_to_id FROM transfer WHERE id = %d", transferDTO.getId()));
+
+            // Check if the data is edited
+            assertThat(rs.next()).isTrue();
+            assertThat(rs.getLong(1)).isEqualTo(transferDTO.getAccountIdTo());
         }
     }
 }
