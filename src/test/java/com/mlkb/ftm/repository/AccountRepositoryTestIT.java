@@ -56,7 +56,7 @@ public class AccountRepositoryTestIT extends IntegrationTest {
     @Test
     void should_not_find_account_for_wrong_user_email_and_wrong_account_id() {
         // given
-        Long accountId = 7L;
+        Long accountId = 8L;
         String email = "jan.kowalski@gmail.com";
         // when
         Optional<Account> possibleAccount = this.accountRepository.findByAccountIdAndUserEmail(accountId, email);
