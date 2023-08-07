@@ -7,9 +7,11 @@ import com.mlkb.ftm.exception.InputIncorrectException;
 import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.fixture.PaymentDTOFixture;
 import com.mlkb.ftm.fixture.TransactionDTOFixture;
+import com.mlkb.ftm.fixture.TransferDTOFixture;
 import com.mlkb.ftm.fixture.UserEntityFixture;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
+import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.service.PaymentService;
 import com.mlkb.ftm.validation.AccessValidator;
 import org.hamcrest.core.IsNull;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ContextConfiguration;
@@ -367,5 +370,108 @@ class PaymentControllerTest {
                 .andReturn();
 
         verify(paymentService, atLeast(1)).getTransaction(anyString(), anyLong());
+    }
+
+    @Test
+    void should_update_transfer_for_correct_data() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transferUpdateDto = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+
+        // when/then
+        mockMvc.perform(
+                        put("/api/payment/transfer")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transferUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNoContent());
+
+        verify(paymentService, atLeastOnce()).isValidUpdateTransfer(transferUpdateDto);
+        verify(paymentService, atLeastOnce()).updateTransfer(transferUpdateDto, email);
+    }
+
+    @Test
+    void should_throw_exception_when_update_transfer_for_incorrect_data() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transferUpdateDto = new TransferDTO();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+        // when/then
+        doThrow(new InputIncorrectException(InputValidationMessage.NULL))
+                .when(paymentService)
+                .isValidUpdateTransfer(transferUpdateDto);
+
+        mockMvc.perform(
+                        put("/api/payment/transfer")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transferUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof InputIncorrectException))
+                .andExpect(result -> assertEquals(InputValidationMessage.NULL.message,
+                        Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        verify(paymentService, atLeastOnce()).isValidUpdateTransfer(transferUpdateDto);
+    }
+
+    @Test
+    void should_throw_exception_when_update_transfer_for_incorrect_user() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transferUpdateDto = new TransferDTO();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+        // when/then
+        doThrow(new IllegalAccessRuntimeException("Access denied"))
+                .when(accessValidator)
+                .checkPermit(email);
+
+        mockMvc.perform(
+                        put("/api/payment/transfer")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transferUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isForbidden())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof IllegalAccessRuntimeException))
+                .andExpect(result -> assertEquals("Access denied",
+                        Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        verify(accessValidator, atLeastOnce()).checkPermit(email);
+    }
+
+    @Test
+    void should_throw_exception_when_update_transfer_when_user_not_login() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        var transferUpdateDto = new TransferDTO();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        var cookie = new Cookie("e-mail", email);
+        // when/then
+        doThrow(new UsernameNotFoundException("You have to log in before access"))
+                .when(accessValidator)
+                .checkPermit(email);
+
+        mockMvc.perform(
+                        put("/api/payment/transfer")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .cookie(cookie)
+                                .content(objectMapper.writeValueAsString(transferUpdateDto))
+                                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof UsernameNotFoundException))
+                .andExpect(result -> assertEquals("You have to log in before access",
+                        Objects.requireNonNull(result.getResolvedException()).getMessage()));
+
+        verify(accessValidator, atLeastOnce()).checkPermit(email);
     }
 }

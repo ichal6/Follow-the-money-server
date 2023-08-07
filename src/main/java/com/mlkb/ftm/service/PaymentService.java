@@ -166,6 +166,18 @@ public class PaymentService {
         inputValidator.checkDate(transactionDTO.getDate());
     }
 
+    public void isValidUpdateTransfer(TransferDTO transferDTO) throws InputIncorrectException {
+        if(transferDTO == null) {
+            throw new InputIncorrectException(InputValidationMessage.NULL);
+        }
+        inputValidator.checkId(transferDTO.getId());
+        inputValidator.checkName(transferDTO.getTitle());
+        inputValidator.checkBalancePositive(transferDTO.getValue());
+        inputValidator.checkDate(transferDTO.getDate());
+        inputValidator.checkId(transferDTO.getAccountIdTo());
+        inputValidator.checkId(transferDTO.getAccountIdTo());
+    }
+
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
         return transferDTO != null
                 && inputValidator.checkName(transferDTO.getTitle())
