@@ -318,9 +318,50 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
-                        transactionDto.getId(),
+                String.format("Account for id = %d doesn't exist",
                         transactionDto.getAccountId()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_account_to_belonging_to_other_user_when_try_update_transfer() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(true);
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdTo(), email))
+                .thenReturn(Optional.empty());
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdFrom(), email))
+                .thenReturn(Optional.of(new Account()));
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(
+                String.format("Account for id = %d doesn't exist",
+                        transferDTO.getAccountIdTo()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_account_from_belonging_to_other_user_when_try_update_transfer() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(true);
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdTo(), email))
+                .thenReturn(Optional.of(new Account()));
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdFrom(), email))
+                .thenReturn(Optional.empty());
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(
+                String.format("Account for id = %d doesn't exist",
+                        transferDTO.getAccountIdFrom()),
                 thrown.getMessage());
     }
 

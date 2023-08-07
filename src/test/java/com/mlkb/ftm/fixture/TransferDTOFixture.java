@@ -1,13 +1,9 @@
 package com.mlkb.ftm.fixture;
 
-import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class TransferDTOFixture {
 

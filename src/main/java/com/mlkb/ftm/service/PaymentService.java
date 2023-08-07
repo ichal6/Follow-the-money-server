@@ -217,7 +217,7 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account updateAccount = getAccountForTransactionDTO(updateTransactionDTO, email);
+        Account updateAccount = getAccountForAccountId(updateTransactionDTO.getAccountId(), email);
         Payee payee = getPayeeForTransactionDTO(updateTransactionDTO, email);
         Category category = getCategoryForTransactionDTO(updateTransactionDTO, email);
 
@@ -244,6 +244,8 @@ public class PaymentService {
             throw new ResourceNotFoundException(
                     String.format("Transaction for id = %d does not exist", updateTransferDTO.getId()));
         }
+        Account accountFrom = getAccountForAccountId(updateTransferDTO.getAccountIdFrom(), email);
+        Account accountTo = getAccountForAccountId(updateTransferDTO.getAccountIdTo(), email);
     }
 
     public boolean removeTransaction(Long id, String email) {
@@ -311,12 +313,11 @@ public class PaymentService {
                 );
     }
 
-    private Account getAccountForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
-        return this.accountRepository.findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
+    private Account getAccountForAccountId(long accountId, String email) {
+        return this.accountRepository.findByAccountIdAndUserEmail(accountId, email)
                 .orElseThrow(() ->  new ResourceNotFoundException(
-                        String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
-                                updateTransactionDTO.getId(),
-                                updateTransactionDTO.getAccountId()))
+                        String.format("Account for id = %d doesn't exist",
+                                accountId))
                 );
     }
 
