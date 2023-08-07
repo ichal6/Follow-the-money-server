@@ -238,6 +238,14 @@ public class PaymentService {
         this.transactionRepository.save(transaction);
     }
 
+    @Transactional
+    public void updateTransfer(TransferDTO updateTransferDTO, String email) {
+        if(!this.transferRepository.existsByTransferIdAndUserEmail(updateTransferDTO.getId(), email)) {
+            throw new ResourceNotFoundException(
+                    String.format("Transaction for id = %d does not exist", updateTransferDTO.getId()));
+        }
+    }
+
     public boolean removeTransaction(Long id, String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
 

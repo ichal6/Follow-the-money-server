@@ -325,6 +325,23 @@ public class PaymentServiceTest {
     }
 
     @Test
+    void should_throw_exception_if_transfer_does_not_exist_user_when_try_update() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(false);
+
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(
+                String.format("Transaction for id = %d does not exist", transferDTO.getId()),
+                thrown.getMessage());
+    }
+
+    @Test
     void should_throw_exception_if_user_email_or_transaction_id_is_wrong_when_try_get_single_transaction() {
         // given
         String email = "wrong@email.com";
