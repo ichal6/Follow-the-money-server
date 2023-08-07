@@ -176,6 +176,7 @@ public class PaymentService {
         inputValidator.checkDate(transferDTO.getDate());
         inputValidator.checkId(transferDTO.getAccountIdTo());
         inputValidator.checkId(transferDTO.getAccountIdTo());
+        inputValidator.checkAccountIdIsDifferent(transferDTO.getAccountIdFrom(), transferDTO.getAccountIdTo());
     }
 
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {

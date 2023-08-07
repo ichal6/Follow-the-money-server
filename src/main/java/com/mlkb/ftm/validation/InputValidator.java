@@ -113,4 +113,10 @@ public class InputValidator {
             throw new InputIncorrectException(InputValidationMessage.DATE);
         }
     }
+
+    public void checkAccountIdIsDifferent(long accountIdFrom, long accountIdTo) throws InputIncorrectException {
+        if(accountIdTo == accountIdFrom) {
+            throw new InputIncorrectException(InputValidationMessage.TRANSFER_ACCOUNTS_ID);
+        }
+    }
 }

@@ -11,7 +11,8 @@ public enum InputValidationMessage {
     EMAIL("Email should be in format: user@domain.pl. No special signs allowed."),
     PASSWORD("Password incorrect. Should be at least..."),
     NULL("Object is null"),
-    INCORRECT_TYPE("Incorrect payment type for value");
+    INCORRECT_TYPE("Incorrect payment type for value"),
+    TRANSFER_ACCOUNTS_ID("For transfer account from and account to should be different");
 
     public final String message;
 
