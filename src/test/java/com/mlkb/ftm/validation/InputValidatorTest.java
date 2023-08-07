@@ -54,6 +54,16 @@ class InputValidatorTest {
     }
 
     @Test
+    void should_throw_an_exception_if_id_is_null() {
+        // given /when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkId(null), "Wrong ID");
+
+        // then
+        assertEquals("Id should be a number greater than 0.", thrown.getMessage());
+    }
+
+    @Test
     void should_return_true_if_name_is_ok() throws InputIncorrectException {
         // given
         String name = "Smith";

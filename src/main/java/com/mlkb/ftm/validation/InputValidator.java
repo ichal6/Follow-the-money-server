@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class InputValidator {
 
     public boolean checkId(Long id) throws InputIncorrectException {
-        if (id >= 1) {
+        if (id != null && id >= 1) {
             return true;
         } else {
             throw new InputIncorrectException(InputValidationMessage.ID);
