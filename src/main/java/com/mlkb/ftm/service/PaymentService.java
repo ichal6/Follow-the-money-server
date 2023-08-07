@@ -246,6 +246,12 @@ public class PaymentService {
         }
         Account accountFrom = getAccountForAccountId(updateTransferDTO.getAccountIdFrom(), email);
         Account accountTo = getAccountForAccountId(updateTransferDTO.getAccountIdTo(), email);
+
+        Transfer transfer = this.transferRepository.findById(updateTransferDTO.getId()).orElseThrow();
+
+        transfer.setTitle(updateTransferDTO.getTitle());
+
+        this.transferRepository.save(transfer);
     }
 
     public boolean removeTransaction(Long id, String email) {

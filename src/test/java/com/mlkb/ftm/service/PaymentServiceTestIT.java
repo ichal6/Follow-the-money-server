@@ -22,8 +22,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.fail;
         "classpath:/sql/category.sql",
         "classpath:/sql/account.sql",
         "classpath:/sql/payee.sql",
-        "classpath:/sql/transaction.sql"
-
+        "classpath:/sql/transaction.sql",
+        "classpath:/sql/transfer.sql"
 })
 @Sql(value = "classpath:/sql/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PaymentServiceTestIT extends IntegrationTest {
@@ -75,6 +75,38 @@ public class PaymentServiceTestIT extends IntegrationTest {
                 // Check if the data is edited
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getString(1)).isEqualTo(transactionDto.getTitle());
+            }
+        }
+    }
+
+    @Test
+    void should_rename_transfer_if_transfer_exists() throws SQLException {
+        // given
+        this.paymentService = new PaymentService(
+                userRepository,
+                inputValidator,
+                transactionRepository,
+                accountRepository,
+                categoryRepository,
+                payeeRepository,
+                transferRepository,
+                clock);
+
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        // when
+        paymentService.updateTransfer(transferDTO, email);
+        // then
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT title FROM transfer WHERE id = %d", transferDTO.getId()));
+
+                // Check if the data is edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getString(1)).isEqualTo(transferDTO.getTitle());
             }
         }
     }
