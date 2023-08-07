@@ -254,6 +254,7 @@ public class PaymentService {
         transfer.setValue(updateTransferDTO.getValue());
         transfer.setAccountFrom(accountFrom);
         transfer.setAccountTo(accountTo);
+        transfer.setDate(updateTransferDTO.getDate());
 
         this.transferRepository.save(transfer);
     }

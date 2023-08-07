@@ -405,6 +405,43 @@ public class PaymentServiceTestIT extends IntegrationTest {
     }
 
     @Test
+    void should_update_date_in_transfer_if_transfer_exists() throws SQLException {
+        // given
+        this.paymentService = new PaymentService(
+                userRepository,
+                inputValidator,
+                transactionRepository,
+                accountRepository,
+                categoryRepository,
+                payeeRepository,
+                transferRepository,
+                clock);
+
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = UserEntityFixture.userUserowy().getEmail();
+
+        // when
+        paymentService.updateTransfer(transferDTO, email);
+        // then
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT date FROM transfer WHERE id = %d", transferDTO.getId()));
+
+                // Check if the date is edited
+                assertThat(rs.next()).isTrue();
+                Timestamp timestamp = rs.getTimestamp(1);
+                if (timestamp != null)
+                    assertThat(new java.util.Date(timestamp.getTime())).isEqualTo(transferDTO.getDate());
+                else
+                    fail("timestamp doesn't exist");
+            }
+        }
+    }
+
+    @Test
     void should_update_account_in_transaction_if_transaction_exists() throws SQLException {
         // given
         this.paymentService = new PaymentService(
