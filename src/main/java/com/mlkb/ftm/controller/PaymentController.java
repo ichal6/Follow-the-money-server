@@ -63,6 +63,17 @@ public class PaymentController {
         return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/transfer/{email}/{id}")
+    @Operation(summary = "Get a single transfer by id")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TransferDTO> getTransfer(@PathVariable String email, @PathVariable Long id) {
+        this.accessValidator.checkPermit(email);
+
+        TransferDTO transferDTO = this.paymentService.getTransfer(email, id);
+
+        return new ResponseEntity<>(transferDTO, HttpStatus.OK);
+    }
+
     @PostMapping("/transaction/{email}")
     public ResponseEntity<Object> createTransaction(@PathVariable("email") String email,
                                                     @RequestBody TransactionDTO transactionDTO) throws InputIncorrectException {

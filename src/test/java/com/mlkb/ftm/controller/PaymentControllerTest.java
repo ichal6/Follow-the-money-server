@@ -32,6 +32,7 @@ import jakarta.servlet.http.Cookie;
 
 import java.util.*;
 
+import static com.mlkb.ftm.common.Utils.getDate;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -369,6 +370,29 @@ class PaymentControllerTest {
                 .andReturn();
 
         verify(paymentService, atLeast(1)).getTransaction(anyString(), anyLong());
+    }
+
+    @Test
+    void should_return_transfer_for_correct_id_and_email() throws Exception {
+        // given
+        TransferDTO transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+
+        // when/then
+        when(paymentService.getTransfer(anyString(), anyLong())).thenReturn(transferDTO);
+
+        mockMvc.perform(get("/api/payment/transfer/anyEmail/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("3"))
+                .andExpect(jsonPath("$.title").value("Cash Deposit January"))
+                .andExpect(jsonPath("$.value").value("100.0"))
+                .andExpect(jsonPath("$.accountIdFrom").value("1"))
+                .andExpect(jsonPath("$.accountIdTo").value("2"))
+                .andExpect(jsonPath("$.date").value(
+                        getDate(2023, Calendar.SEPTEMBER, 7, 17, 55)))
+                .andReturn();
+
+        verify(paymentService, atLeast(1)).getTransfer(anyString(), anyLong());
     }
 
     @Test
