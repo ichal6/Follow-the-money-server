@@ -58,6 +58,17 @@ public class PaymentService {
         return this.makeTransactionDtoFromTransactionEntity(transaction);
     }
 
+    public TransferDTO getTransfer(String email, long id) {
+        boolean isTransferExist = this.transferRepository.existsByTransferIdAndUserEmail(id, email);
+        if(!isTransferExist) {
+            throw new ResourceNotFoundException(
+                    String.format("Transfer for id = %d does not exist", id));
+        }
+        Transfer transfer = this.transferRepository.findById(id).orElseThrow();
+
+        return this.makeTransferDtoFromTransferEntity(transfer);
+    }
+
     public List<PaymentDTO> getPayments(String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
         if (possibleUser.isPresent()) {
@@ -556,6 +567,18 @@ public class PaymentService {
         transactionDTO.setAccountId(transaction.getAccount().getId());
 
         return transactionDTO;
+    }
+
+    private TransferDTO makeTransferDtoFromTransferEntity(Transfer transfer) {
+        TransferDTO transferDTO = new TransferDTO();
+        transferDTO.setId(transfer.getId());
+        transferDTO.setTitle(transfer.getTitle());
+        transferDTO.setValue(transfer.getValue());
+        transferDTO.setDate(transfer.getDate());
+        transferDTO.setAccountIdTo(transfer.getAccountTo().getId());
+        transferDTO.setAccountIdFrom(transfer.getAccountFrom().getId());
+
+        return transferDTO;
     }
 
     private List<PaymentDTO> extractPayments(Account account){
