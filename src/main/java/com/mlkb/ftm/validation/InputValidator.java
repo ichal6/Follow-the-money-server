@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class InputValidator {
 
     public boolean checkId(Long id) throws InputIncorrectException {
-        if (id >= 1) {
+        if (id != null && id >= 1) {
             return true;
         } else {
             throw new InputIncorrectException(InputValidationMessage.ID);
@@ -111,6 +111,12 @@ public class InputValidator {
             return true;
         } else {
             throw new InputIncorrectException(InputValidationMessage.DATE);
+        }
+    }
+
+    public void checkAccountIdIsDifferent(long accountIdFrom, long accountIdTo) throws InputIncorrectException {
+        if(accountIdTo == accountIdFrom) {
+            throw new InputIncorrectException(InputValidationMessage.TRANSFER_ACCOUNTS_ID);
         }
     }
 }

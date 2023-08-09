@@ -54,6 +54,16 @@ class InputValidatorTest {
     }
 
     @Test
+    void should_throw_an_exception_if_id_is_null() {
+        // given /when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkId(null), "Wrong ID");
+
+        // then
+        assertEquals("Id should be a number greater than 0.", thrown.getMessage());
+    }
+
+    @Test
     void should_return_true_if_name_is_ok() throws InputIncorrectException {
         // given
         String name = "Smith";
@@ -346,5 +356,29 @@ class InputValidatorTest {
         // when / then
         Assertions.assertDoesNotThrow(() ->
                 inputValidator.checkIfPaymentTypeCorrectWithValue(paymentType, value));
+    }
+
+    @Test
+    void should_throw_an_exception_if_account_from_and_account_to_is_the_same_for_transfer() {
+        // given
+        long account_id = 1L;
+
+        // when
+        InputIncorrectException thrown = Assertions.assertThrows(InputIncorrectException.class, () ->
+                inputValidator.checkAccountIdIsDifferent(account_id, account_id));
+
+        // then
+        assertEquals(InputValidationMessage.TRANSFER_ACCOUNTS_ID.message, thrown.getMessage());
+    }
+
+    @Test
+    void should_not_throw_an_exception_if_account_from_and_account_to_is_not_the_same_for_transfer() {
+        // given
+        long account_id_from = 1L;
+        long account_id_to = 2L;
+
+        // when / then
+        Assertions.assertDoesNotThrow(() ->
+                inputValidator.checkAccountIdIsDifferent(account_id_from, account_id_to));
     }
 }

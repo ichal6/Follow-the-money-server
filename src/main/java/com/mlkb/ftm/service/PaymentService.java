@@ -58,6 +58,17 @@ public class PaymentService {
         return this.makeTransactionDtoFromTransactionEntity(transaction);
     }
 
+    public TransferDTO getTransfer(String email, long id) {
+        boolean isTransferExist = this.transferRepository.existsByTransferIdAndUserEmail(id, email);
+        if(!isTransferExist) {
+            throw new ResourceNotFoundException(
+                    String.format("Transfer for id = %d does not exist", id));
+        }
+        Transfer transfer = this.transferRepository.findById(id).orElseThrow();
+
+        return this.makeTransferDtoFromTransferEntity(transfer);
+    }
+
     public List<PaymentDTO> getPayments(String email) {
         Optional<User> possibleUser = userRepository.findByEmail(email);
         if (possibleUser.isPresent()) {
@@ -166,6 +177,19 @@ public class PaymentService {
         inputValidator.checkDate(transactionDTO.getDate());
     }
 
+    public void isValidUpdateTransfer(TransferDTO transferDTO) throws InputIncorrectException {
+        if(transferDTO == null) {
+            throw new InputIncorrectException(InputValidationMessage.NULL);
+        }
+        inputValidator.checkId(transferDTO.getId());
+        inputValidator.checkName(transferDTO.getTitle());
+        inputValidator.checkBalancePositive(transferDTO.getValue());
+        inputValidator.checkDate(transferDTO.getDate());
+        inputValidator.checkId(transferDTO.getAccountIdTo());
+        inputValidator.checkId(transferDTO.getAccountIdTo());
+        inputValidator.checkAccountIdIsDifferent(transferDTO.getAccountIdFrom(), transferDTO.getAccountIdTo());
+    }
+
     public boolean isValidNewTransfer(TransferDTO transferDTO) throws InputIncorrectException {
         return transferDTO != null
                 && inputValidator.checkName(transferDTO.getTitle())
@@ -217,7 +241,7 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account updateAccount = getAccountForTransactionDTO(updateTransactionDTO, email);
+        Account updateAccount = getAccountForAccountId(updateTransactionDTO.getAccountId(), email);
         Payee payee = getPayeeForTransactionDTO(updateTransactionDTO, email);
         Category category = getCategoryForTransactionDTO(updateTransactionDTO, email);
 
@@ -236,6 +260,32 @@ public class PaymentService {
         transaction.setAccount(updateAccount);
 
         this.transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public void updateTransfer(TransferDTO updateTransferDTO, String email) {
+        if(!this.transferRepository.existsByTransferIdAndUserEmail(updateTransferDTO.getId(), email)) {
+            throw new ResourceNotFoundException(
+                    String.format("Transfer for id = %d does not exist", updateTransferDTO.getId()));
+        }
+
+        if(updateTransferDTO.getAccountIdTo().equals(updateTransferDTO.getAccountIdFrom())) {
+            throw new IllegalArgumentException(InputValidationMessage.TRANSFER_ACCOUNTS_ID.message);
+        }
+
+        Account accountFrom = getAccountForAccountId(updateTransferDTO.getAccountIdFrom(), email);
+        Account accountTo = getAccountForAccountId(updateTransferDTO.getAccountIdTo(), email);
+
+        Transfer transfer = this.transferRepository.findById(updateTransferDTO.getId()).orElseThrow();
+
+        transfer.setTitle(updateTransferDTO.getTitle());
+        modifyCurrentBalanceInAccountsAfterUpdateTransfer(accountFrom, accountTo, transfer, updateTransferDTO);
+        transfer.setValue(updateTransferDTO.getValue());
+        transfer.setAccountFrom(accountFrom);
+        transfer.setAccountTo(accountTo);
+        transfer.setDate(updateTransferDTO.getDate());
+
+        this.transferRepository.save(transfer);
     }
 
     public boolean removeTransaction(Long id, String email) {
@@ -303,13 +353,30 @@ public class PaymentService {
                 );
     }
 
-    private Account getAccountForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
-        return this.accountRepository.findByAccountIdAndUserEmail(updateTransactionDTO.getAccountId(), email)
+    private Account getAccountForAccountId(long accountId, String email) {
+        return this.accountRepository.findByAccountIdAndUserEmail(accountId, email)
                 .orElseThrow(() ->  new ResourceNotFoundException(
-                        String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
-                                updateTransactionDTO.getId(),
-                                updateTransactionDTO.getAccountId()))
+                        String.format("Account for id = %d doesn't exist",
+                                accountId))
                 );
+    }
+
+    private void modifyCurrentBalanceInAccountsAfterUpdateTransfer(
+            Account fromAccount, Account toAccount, Transfer transfer, TransferDTO updateTransferDTO) {
+        if(fromAccount.getId().equals(transfer.getAccountFrom().getId())
+                || toAccount.getId().equals(transfer.getAccountTo().getId())) {
+            modifyCurrentBalanceForAccount(fromAccount, -1*transfer.getValue(), -1*updateTransferDTO.getValue());
+            modifyCurrentBalanceForAccount(toAccount, transfer.getValue(), updateTransferDTO.getValue());
+        } else {
+            restorePreviousValuesInAccountsAfterUpdateTransfer(
+                    transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getValue());
+            modifyTotalBalanceForBothAccountsAfterTransfer(fromAccount, toAccount, updateTransferDTO.getValue());
+        }
+    }
+
+    private void restorePreviousValuesInAccountsAfterUpdateTransfer(
+            Account fromAccount, Account toAccount, double value) {
+        modifyTotalBalanceForBothAccountsAfterTransfer(toAccount, fromAccount, value);
     }
 
     private void modifyCurrentBalanceInAccounts(Account newAccount, Transaction transaction,
@@ -500,6 +567,18 @@ public class PaymentService {
         transactionDTO.setAccountId(transaction.getAccount().getId());
 
         return transactionDTO;
+    }
+
+    private TransferDTO makeTransferDtoFromTransferEntity(Transfer transfer) {
+        TransferDTO transferDTO = new TransferDTO();
+        transferDTO.setId(transfer.getId());
+        transferDTO.setTitle(transfer.getTitle());
+        transferDTO.setValue(transfer.getValue());
+        transferDTO.setDate(transfer.getDate());
+        transferDTO.setAccountIdTo(transfer.getAccountTo().getId());
+        transferDTO.setAccountIdFrom(transfer.getAccountFrom().getId());
+
+        return transferDTO;
     }
 
     private List<PaymentDTO> extractPayments(Account account){

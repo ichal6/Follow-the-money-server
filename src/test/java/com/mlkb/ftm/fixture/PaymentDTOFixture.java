@@ -7,6 +7,8 @@ import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import static com.mlkb.ftm.common.Utils.getDate;
+
 public class PaymentDTOFixture {
     public static PaymentDTO buyCarTransaction() {
         final var transaction = new PaymentDTO();
@@ -31,7 +33,7 @@ public class PaymentDTOFixture {
         transaction.setFrom("Millenium");
         transaction.setCategoryName("Car");
         transaction.setIsInternal(false);
-        transaction.setBalanceAfter(BigDecimal.valueOf(0.0).setScale(2, RoundingMode.HALF_UP));
+        transaction.setBalanceAfter(BigDecimal.valueOf(100.0).setScale(2, RoundingMode.HALF_UP));
         return transaction;
     }
 
@@ -52,7 +54,7 @@ public class PaymentDTOFixture {
         final var transfer = new PaymentDTO();
         transfer.setId(3L);
         transfer.setTitle("Cash Deposit January");
-        transfer.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 5).getTime());
+        transfer.setDate(getDate(2023, Calendar.SEPTEMBER, 7, 17, 55));
         transfer.setValue(100.0);
         transfer.setTo("Wallet");
         transfer.setFrom("Millenium");
@@ -64,12 +66,12 @@ public class PaymentDTOFixture {
         final var transfer = new PaymentDTO();
         transfer.setId(3L);
         transfer.setTitle("Cash Deposit January");
-        transfer.setDate(new GregorianCalendar(2023, Calendar.JANUARY, 5).getTime());
+        transfer.setDate(getDate(2023, Calendar.SEPTEMBER, 7, 17, 55));
         transfer.setValue(-100.0);
         transfer.setTo("Wallet");
         transfer.setFrom("Millenium");
         transfer.setIsInternal(true);
-        transfer.setBalanceAfter(BigDecimal.valueOf(2500.0).setScale(2, RoundingMode.HALF_UP));
+        transfer.setBalanceAfter(BigDecimal.valueOf(0.0).setScale(2, RoundingMode.HALF_UP));
         return transfer;
     }
 }

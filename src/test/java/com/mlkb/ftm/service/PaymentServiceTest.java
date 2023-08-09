@@ -3,11 +3,14 @@ package com.mlkb.ftm.service;
 import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
+import com.mlkb.ftm.entity.Transfer;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.*;
 import com.mlkb.ftm.modelDTO.PaymentDTO;
 import com.mlkb.ftm.modelDTO.TransactionDTO;
+import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
 
@@ -318,10 +321,85 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
-                        transactionDto.getId(),
+                String.format("Account for id = %d doesn't exist",
                         transactionDto.getAccountId()),
                 thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_account_to_belonging_to_other_user_when_try_update_transfer() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(true);
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdTo(), email))
+                .thenReturn(Optional.empty());
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdFrom(), email))
+                .thenReturn(Optional.of(new Account()));
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(
+                String.format("Account for id = %d doesn't exist",
+                        transferDTO.getAccountIdTo()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_account_from_belonging_to_other_user_when_try_update_transfer() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(true);
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdTo(), email))
+                .thenReturn(Optional.of(new Account()));
+        when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdFrom(), email))
+                .thenReturn(Optional.empty());
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(
+                String.format("Account for id = %d doesn't exist",
+                        transferDTO.getAccountIdFrom()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_transfer_does_not_exist_user_when_try_update() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(false);
+
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(
+                String.format("Transfer for id = %d does not exist", transferDTO.getId()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_if_transfer_contain_the_same_accounts() {
+        // given
+        var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
+        transferDTO.setAccountIdTo(1L);
+        transferDTO.setAccountIdFrom(1L);
+        String email = "user@user.pl";
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(transferDTO.getId(), email)).thenReturn(true);
+
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () ->
+                this.paymentService.updateTransfer(transferDTO, email));
+
+        // then
+        assertEquals(InputValidationMessage.TRANSFER_ACCOUNTS_ID.message, thrown.getMessage());
     }
 
     @Test
@@ -357,5 +435,40 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(expectedDto, transactionDTO);
+    }
+
+    @Test
+    void should_throw_exception_if_user_email_or_transfer_id_is_wrong_when_try_get_single_transfer() {
+        // given
+        String email = "wrong@email.com";
+        long id = 1L;
+
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(id, email)).thenReturn(false);
+        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
+                this.paymentService.getTransfer(email, id));
+
+        // then
+        assertEquals(
+                String.format("Transfer for id = %d does not exist", id),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_return_transferDTO_when_try_get_single_transfer() {
+        // given
+        String email = "correct@email.com";
+        long id = 1L;
+        Transfer transferEntity = TransferEntityFixture.cashDepositTransfer();
+        TransferDTO expectedDto = TransferDTOFixture.cashDepositTransferMillennium();
+
+        // when
+        when(transferRepository.existsByTransferIdAndUserEmail(id, email)).thenReturn(true);
+        when(transferRepository.findById(id)).thenReturn(Optional.of(transferEntity));
+
+        TransferDTO transferDTO = this.paymentService.getTransfer(email, id);
+
+        // then
+        assertEquals(expectedDto, transferDTO);
     }
 }
