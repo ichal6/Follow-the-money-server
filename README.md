@@ -41,11 +41,9 @@ List the ready features:
 - Categories CRUD
 - Subcategories CRUD
 - Payees CRUD
-- Payments Create, Read, Delete
+- Payments CRUD
 
 List of improve:
-- Edit payments
-- Edit transfers
 - Add subcategories in payments
 - Add Financial analysis
 
@@ -88,8 +86,6 @@ Project is: _in progress_ .
 ## Room for Improvement
 
 - Repair bug in view
-- Add payments edit
-- Add transfer edit
 - Include subcategories in payments
 - Improve dashboard with loan subsection
 - Add User settings
