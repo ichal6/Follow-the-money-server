@@ -563,7 +563,12 @@ public class PaymentService {
         transactionDTO.setType(transaction.getType().toString());
         transactionDTO.setDate(transaction.getDate());
         transactionDTO.setPayeeId(transaction.getPayee().getId());
-        transactionDTO.setCategoryId(transaction.getCategory().getId());
+        if(transaction.getCategory().getParentCategory() != null) {
+            transactionDTO.setCategoryId(transaction.getCategory().getParentCategory().getId());
+            transactionDTO.setSubcategoryId(transaction.getCategory().getId());
+        } else {
+            transactionDTO.setCategoryId(transaction.getCategory().getId());
+        }
         transactionDTO.setAccountId(transaction.getAccount().getId());
 
         return transactionDTO;

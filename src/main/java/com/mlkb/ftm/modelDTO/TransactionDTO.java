@@ -13,6 +13,7 @@ public class TransactionDTO {
     private String type;
     private Double value;
     private Long categoryId;
+    private Long subcategoryId;
     private Long payeeId;
     private Long accountId;
     private Date date;

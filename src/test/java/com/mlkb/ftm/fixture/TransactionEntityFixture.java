@@ -1,5 +1,6 @@
 package com.mlkb.ftm.fixture;
 
+import com.mlkb.ftm.common.Utils;
 import com.mlkb.ftm.entity.Category;
 import com.mlkb.ftm.entity.PaymentType;
 import com.mlkb.ftm.entity.Payee;
@@ -516,6 +517,19 @@ public class TransactionEntityFixture {
         transaction.setPayee(payee);
         transaction.setCategory(category);
         transaction.setType(PaymentType.INCOME);
+        return transaction;
+    }
+
+    public static Transaction getTaxiTransaction() {
+        final var transaction = new Transaction();
+        transaction.setId(25L);
+        transaction.setTitle("Get Taxi");
+        transaction.setDate(Utils.getDate(2024, Calendar.FEBRUARY, 24, 22, 13));
+        transaction.setValue(-20.00);
+        transaction.setPayee(PayeeEntityFixture.SuperTaxi());
+        transaction.setCategory(CategoryEntityFixture.getTaxi());
+        transaction.setAccount(AccountEntityFixture.millennium());
+        transaction.setType(PaymentType.EXPENSE);
         return transaction;
     }
 }

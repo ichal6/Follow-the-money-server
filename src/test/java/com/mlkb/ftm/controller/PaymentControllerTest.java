@@ -373,6 +373,31 @@ class PaymentControllerTest {
     }
 
     @Test
+    void should_return_transaction_with_subcategory() throws Exception {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.getTaxiTransactionWithSubcategory();
+
+        // when/then
+        when(paymentService.getTransaction(anyString(), anyLong())).thenReturn(transactionDTO);
+
+        mockMvc.perform(get("/api/payment/transaction/anyEmail/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(transactionDTO.getId().toString()))
+                .andExpect(jsonPath("$.title").value(transactionDTO.getTitle()))
+                .andExpect(jsonPath("$.value").value(transactionDTO.getValue().toString()))
+                .andExpect(jsonPath("$.accountId").value(transactionDTO.getAccountId().toString()))
+                .andExpect(jsonPath("$.type").value(transactionDTO.getType()))
+                .andExpect(jsonPath("$.payeeId").value(transactionDTO.getPayeeId().toString()))
+                .andExpect(jsonPath("$.categoryId").value(transactionDTO.getCategoryId().toString()))
+                .andExpect(jsonPath("$.subcategoryId").value(transactionDTO.getSubcategoryId().toString()))
+                .andExpect(jsonPath("$.date").value(transactionDTO.getDate().getTime()))
+                .andReturn();
+
+        verify(paymentService, atLeast(1)).getTransaction(anyString(), anyLong());
+    }
+
+    @Test
     void should_return_transfer_for_correct_id_and_email() throws Exception {
         // given
         TransferDTO transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
