@@ -438,6 +438,24 @@ public class PaymentServiceTest {
     }
 
     @Test
+    void should_return_transactionDTO_when_try_get_single_transaction_with_subcategory() {
+        // given
+        String email = "correct@email.com";
+        Transaction transactionEntity = TransactionEntityFixture.getTaxiTransaction();
+        TransactionDTO expectedDto = TransactionDTOFixture.getTaxiTransactionWithSubcategory();
+        long transactionId = transactionEntity.getId();
+
+        // when
+        when(transactionRepository.existsByTransactionIdAndUserEmail(transactionId, email)).thenReturn(true);
+        when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transactionEntity));
+
+        TransactionDTO actualDto = this.paymentService.getTransaction(email, transactionId);
+
+        // then
+        assertEquals(expectedDto, actualDto);
+    }
+
+    @Test
     void should_throw_exception_if_user_email_or_transfer_id_is_wrong_when_try_get_single_transfer() {
         // given
         String email = "wrong@email.com";

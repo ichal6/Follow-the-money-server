@@ -11,4 +11,14 @@ public class CategoryEntityFixture {
 
         return category;
     }
+
+    public static Category getTaxi() {
+        Category category = new Category();
+        category.setName("Taxi");
+        category.setId(6L);
+        category.setIsEnabled(true);
+        category.setParentCategory(getTransport());
+
+        return category;
+    }
 }
