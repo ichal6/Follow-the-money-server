@@ -15,7 +15,7 @@ public class CategoryEntityFixture {
     public static Category getTaxi() {
         Category category = new Category();
         category.setName("Taxi");
-        category.setId(6L);
+        category.setId(11L);
         category.setIsEnabled(true);
         category.setParentCategory(getTransport());
 

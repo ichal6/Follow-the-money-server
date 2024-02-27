@@ -4,6 +4,7 @@ import com.mlkb.ftm.common.IntegrationTest;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.fixture.*;
+import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
@@ -51,15 +52,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_rename_transaction_if_transaction_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -83,15 +76,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_rename_transfer_if_transfer_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -115,15 +100,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_value_in_transaction_if_transaction_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -157,15 +134,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_value_in_transfer_if_transfer_exists_and_accounts_is_the_same() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -210,15 +179,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_value_in_transfer_if_transfer_exists_and_accounts_is_not_the_same() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var oldTransferDto = TransferDTOFixture.cashDepositTransferMillennium();
         var transferDTO = TransferDTOFixture.cashDepositTransferFromSavingsInSockToPekao();
@@ -242,15 +203,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_value_and_payment_type_in_transaction_if_transaction_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transactionDto = TransactionDTOFixture.buyCarTransactionReturn();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -285,15 +238,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_date_in_transaction_if_transaction_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -322,15 +267,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_date_in_transfer_if_transfer_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transferDTO = TransferDTOFixture.cashDepositTransferMillennium();
         String email = UserEntityFixture.userUserowy().getEmail();
@@ -359,15 +296,7 @@ public class PaymentServiceTestIT extends IntegrationTest {
     @Test
     void should_update_account_in_transaction_if_transaction_exists() throws SQLException {
         // given
-        this.paymentService = new PaymentService(
-                userRepository,
-                inputValidator,
-                transactionRepository,
-                accountRepository,
-                categoryRepository,
-                payeeRepository,
-                transferRepository,
-                clock);
+        initializePaymentService();
 
         var transactionDto = TransactionDTOFixture.buyCarTransaction();
         var oldAccountID = transactionDto.getAccountId();
@@ -414,6 +343,48 @@ public class PaymentServiceTestIT extends IntegrationTest {
                 assertThat(rs.getDouble(1)).isEqualTo(-3400.00);
             }
         }
+    }
+
+    @Test
+    void should_update_subcategory_in_transaction_if_transaction_exists() throws SQLException {
+        // given
+        initializePaymentService();
+        var transactionDto = TransactionDTOFixture.getTaxiTransactionWithSubcategory();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        long category_id = transactionDto.getSubcategoryId();
+
+        // when
+        paymentService.updateTransaction(transactionDto, email);
+
+        // then
+        assertThatCategoryIdHasUpdated(transactionDto, category_id);
+    }
+
+    private static void assertThatCategoryIdHasUpdated(TransactionDTO transactionDto, long category_id) throws SQLException {
+        // Connect to the database
+        try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
+            // Create a statement to query the database for check transaction id has changed
+            try (Statement stmt = conn.createStatement()) {
+                // Query the database for the data
+                ResultSet rs = stmt.executeQuery(String.format("SELECT category_id FROM transaction WHERE id = %d", transactionDto.getId()));
+
+                // Check if the data has edited
+                assertThat(rs.next()).isTrue();
+                assertThat(rs.getLong(1)).isEqualTo(category_id);
+            }
+        }
+    }
+
+    private void initializePaymentService() {
+        this.paymentService = new PaymentService(
+                userRepository,
+                inputValidator,
+                transactionRepository,
+                accountRepository,
+                categoryRepository,
+                payeeRepository,
+                transferRepository,
+                clock);
     }
 
     private void checkIsValueIsEdited(Connection conn, TransferDTO transferDTO) throws SQLException {

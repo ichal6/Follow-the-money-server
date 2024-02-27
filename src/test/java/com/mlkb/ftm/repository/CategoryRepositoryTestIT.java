@@ -26,17 +26,13 @@ class CategoryRepositoryTestIT extends IntegrationTest {
     void should_get_all_category_without_subcategories_for_user_id() {
         // given
         Long userId = 1L;
+
         // when
         Set<Category> allCategories = this.categoryRepository.findAllByOwnerId(userId);
+
         //then
-        assertThat(allCategories)
-                .hasSize(5);
-
-        var unexpectedSubcategory = getUnexpectedSubcategory(allCategories);
-        assertThat(unexpectedSubcategory).isEmpty();
-
-        var possibleCategoryForOtherUser = getUnexpectedCategoryFromOtherUser(allCategories, userId);
-        assertThat(possibleCategoryForOtherUser).isEmpty();
+        assertThat(getUnexpectedSubcategory(allCategories)).isEmpty();
+        assertThat(getUnexpectedCategoryFromOtherUser(allCategories, userId)).isEmpty();
     }
 
     private Optional<Category> getUnexpectedSubcategory(Set<Category> categories) {

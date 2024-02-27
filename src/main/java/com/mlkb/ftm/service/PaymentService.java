@@ -336,7 +336,10 @@ public class PaymentService {
     }
 
     private Category getCategoryForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
-        return this.categoryRepository.findByCategoryIdAndUserEmail(updateTransactionDTO.getCategoryId(), email)
+        long categoryId = updateTransactionDTO.getSubcategoryId() != null ?
+                updateTransactionDTO.getSubcategoryId() :
+                updateTransactionDTO.getCategoryId();
+        return this.categoryRepository.findByCategoryIdAndUserEmail(categoryId, email)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Couldn't update transaction id = %d, because category for id = %d doesn't exist",
                                 updateTransactionDTO.getId(),
