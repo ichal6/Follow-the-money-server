@@ -484,7 +484,12 @@ public class PaymentService {
         newPaymentDTO.setValue(transaction.getValue());
         newPaymentDTO.setDate(transaction.getDate());
         newPaymentDTO.setTitle(transaction.getTitle());
-        newPaymentDTO.setCategoryName(transaction.getCategory().getName());
+        if (transaction.getCategory().getParentCategory() == null) {
+            newPaymentDTO.setCategoryName(transaction.getCategory().getName());
+        } else {
+            newPaymentDTO.setSubcategoryName(transaction.getCategory().getName());
+            newPaymentDTO.setCategoryName(transaction.getCategory().getParentCategory().getName());
+        }
         if (transaction.getValue() > 0) {
             newPaymentDTO.setFrom(transaction.getPayee().getName());
             newPaymentDTO.setTo(accountName);

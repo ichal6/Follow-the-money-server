@@ -74,4 +74,19 @@ public class PaymentDTOFixture {
         transfer.setBalanceAfter(BigDecimal.valueOf(0.0).setScale(2, RoundingMode.HALF_UP));
         return transfer;
     }
+
+    public static PaymentDTO getTaxiTransactionWithSubcategories() {
+        final var transaction = new PaymentDTO();
+        transaction.setIsInternal(false);
+        transaction.setId(TransactionEntityFixture.getTaxiTransaction().getId());
+        transaction.setTitle(TransactionEntityFixture.getTaxiTransaction().getTitle());
+        transaction.setFrom(AccountEntityFixture.millennium().getName());
+        transaction.setValue(TransactionEntityFixture.getTaxiTransaction().getValue());
+        transaction.setDate(TransactionEntityFixture.getTaxiTransaction().getDate());
+        transaction.setTo(PayeeEntityFixture.SuperTaxi().getName());
+        transaction.setCategoryName(CategoryEntityFixture.getTransport().getName());
+        transaction.setSubcategoryName(CategoryEntityFixture.getTaxi().getName());
+
+        return transaction;
+    }
 }
