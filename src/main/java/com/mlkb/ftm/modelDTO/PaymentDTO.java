@@ -17,5 +17,6 @@ public class PaymentDTO {
     private String from;
     private String to;
     private String categoryName;
+    private String subcategoryName;
     private BigDecimal balanceAfter;
 }

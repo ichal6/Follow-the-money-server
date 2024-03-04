@@ -143,6 +143,57 @@ public class PaymentServiceTest {
     }
 
     @Test
+    void should_get_payments_with_no_parameters_with_subcategories() {
+        // arrange
+        final String email = "user@user.pl";
+        final var transactions = List.of(
+                TransactionEntityFixture.getTaxiTransaction(),
+                TransactionEntityFixture.buyMilkTransaction()
+        );
+
+        initializeMocksForTestTransactionsWithSubcategories(transactions);
+
+        // act
+        final var payments = paymentService.getPayments(email);
+
+        // assert
+        expectedContainTwoTransactions(payments);
+        exceptedContainTransactionWithSubcategories(payments);
+    }
+
+    private void initializeMocksForTestTransactionsWithSubcategories(List<Transaction> transactions) {
+        final var getTaxiTransactionAsSet = Set.of(TransactionEntityFixture.getTaxiTransaction());
+        final var buyMilkTransactionAsSet = Set.of(TransactionEntityFixture.buyMilkTransaction());
+        final User user = mock(User.class);
+        final Account millenium = mock(Account.class);
+        final Account wallet = mock(Account.class);
+
+        when(user.getAccounts()).thenReturn(Set.of(millenium, wallet));
+        when(userRepository.findByEmail("user@user.pl")).thenReturn(Optional.of(user));
+        when(transactionRepository.findAll()).thenReturn(transactions);
+        when(millenium.getName()).thenReturn("Millenium");
+        when(millenium.getTransactions()).thenReturn(getTaxiTransactionAsSet);
+        when(wallet.getName()).thenReturn("Wallet");
+        when(wallet.getTransactions()).thenReturn(buyMilkTransactionAsSet);
+    }
+
+    private static void exceptedContainTransactionWithSubcategories(List<PaymentDTO> payments) {
+        assertThat(payments.stream()
+                .filter( p -> p.getSubcategoryName() != null)
+                .findAny())
+                .hasValue(PaymentDTOFixture.getTaxiTransactionWithSubcategories());
+    }
+
+    private static void expectedContainTwoTransactions(List<PaymentDTO> payments) {
+        assertThat(payments)
+                .hasSize(2)
+                .containsExactlyInAnyOrder(
+                        PaymentDTOFixture.buyMilkTransaction(),
+                        PaymentDTOFixture.getTaxiTransactionWithSubcategories()
+                );
+    }
+
+    @Test
     void should_throw_exception_if_user_is_not_found_for_get_all_payments(){
         // given
         final String email = "user@user.pl";

@@ -29,14 +29,14 @@ public class PaymentController {
     }
 
     @GetMapping( value ="/{email}", produces = {MediaType.APPLICATION_JSON_VALUE})
-    @Operation(summary = "Get all transaction for user")
+    @Operation(summary = "Get all payments for user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation")
     })
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> getTransactions(@PathVariable("email") String email,
-                                                  @RequestParam("id") Optional<String> possibleAccountId,
-                                                  @RequestParam("period") Optional<String> possiblePeriod) {
+    public ResponseEntity<Object> getPayments(@PathVariable("email") String email,
+                                              @RequestParam("id") Optional<String> possibleAccountId,
+                                              @RequestParam("period") Optional<String> possiblePeriod) {
         accessValidator.checkPermit(email);
         List<PaymentDTO> paymentsDTOList;
         if (possibleAccountId.isEmpty() && possiblePeriod.isEmpty()){
