@@ -66,11 +66,11 @@ public class AccountService {
     public NewAccountDTO updateAccount(NewAccountDTO updatedAccountDTO) {
         var accountToUpdatePossible = this.accountRepository.findByAccountIdAndUserEmail(updatedAccountDTO.getId(), updatedAccountDTO.getUserEmail());
             if (accountToUpdatePossible.isPresent()) {
-                Double balanceDifference = updatedAccountDTO.getStartingBalance() - accountToUpdatePossible.get().getStartingBalance();
+                var account = accountToUpdatePossible.get();
+                Double balanceDifference = updatedAccountDTO.getStartingBalance() - account.getStartingBalance();
                 changeCurrentBalanceOfAccountDTO(updatedAccountDTO, balanceDifference);
-                Account accountToUpdate = getAccountFromAccountDTO(updatedAccountDTO);
-                accountToUpdate.setId(updatedAccountDTO.getId());
-                accountRepository.save(accountToUpdate);
+                updateAccountFromAccountDTO(updatedAccountDTO, account);
+                accountRepository.save(accountToUpdatePossible.get());
                 return updatedAccountDTO;
             } else {
                 throw new ResourceNotFoundException(
@@ -111,6 +111,13 @@ public class AccountService {
         account.setCurrency(Currency.USD);
 
         return account;
+    }
+
+    private void updateAccountFromAccountDTO(NewAccountDTO newAccountDTO, Account account) {
+        account.setName(newAccountDTO.getName());
+        account.setStartingBalance(newAccountDTO.getStartingBalance());
+        account.setCurrentBalance(newAccountDTO.getCurrentBalance());
+        account.setAccountType(Enum.valueOf(AccountType.class, newAccountDTO.getAccountType().toUpperCase()));
     }
 
     private void addAccountToUserInDB(Account savedAccount, User modifiedUser) {

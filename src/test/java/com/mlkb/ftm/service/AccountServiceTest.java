@@ -81,7 +81,7 @@ class AccountServiceTest {
     @Test
     void should_throw_an_exception_for_incorrect_id_or_email() {
         // given
-        var dto = NewAccountDTOFixture.milleniumNewAccountDTO();
+        var dto = NewAccountDTOFixture.millenniumNewAccountDTO();
         // when
         when(this.accountRepository.findByAccountIdAndUserEmail(dto.getId(), dto.getUserEmail()))
                 .thenReturn(Optional.empty());
