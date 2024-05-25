@@ -64,22 +64,21 @@ public class AccountService {
     }
 
     public NewAccountDTO updateAccount(NewAccountDTO updatedAccountDTO) {
-        Optional<User> user = userRepository.findByEmail(updatedAccountDTO.getUserEmail());
-        if (user.isPresent()) {
-            Optional<Account> accountToUpdateOptional = accountRepository.findById(updatedAccountDTO.getId());
-            if (accountToUpdateOptional.isPresent()) {
-                Double balanceDifference = updatedAccountDTO.getStartingBalance() - accountToUpdateOptional.get().getStartingBalance();
+        var accountToUpdatePossible = this.accountRepository.findByAccountIdAndUserEmail(updatedAccountDTO.getId(), updatedAccountDTO.getUserEmail());
+            if (accountToUpdatePossible.isPresent()) {
+                Double balanceDifference = updatedAccountDTO.getStartingBalance() - accountToUpdatePossible.get().getStartingBalance();
                 changeCurrentBalanceOfAccountDTO(updatedAccountDTO, balanceDifference);
                 Account accountToUpdate = getAccountFromAccountDTO(updatedAccountDTO);
                 accountToUpdate.setId(updatedAccountDTO.getId());
                 accountRepository.save(accountToUpdate);
                 return updatedAccountDTO;
             } else {
-                throw new ResourceNotFoundException("Couldn't update this account. Account with given id does not exist");
+                throw new ResourceNotFoundException(
+                        String.format("Couldn't update this account. Account with given id: %d and user's email: %s doesn't exists.",
+                                updatedAccountDTO.getId(),
+                                updatedAccountDTO.getUserEmail())
+                );
             }
-        } else {
-            throw new ResourceNotFoundException("Couldn't update account of user. User with this email does not exist");
-        }
     }
 
     public boolean deleteAccount(Long id, String email) {

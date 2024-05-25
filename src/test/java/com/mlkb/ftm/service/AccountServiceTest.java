@@ -2,7 +2,9 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.AccountEntityFixture;
+import com.mlkb.ftm.fixture.NewAccountDTOFixture;
 import com.mlkb.ftm.modelDTO.AccountDTO;
 import com.mlkb.ftm.repository.AccountRepository;
 import com.mlkb.ftm.repository.UserRepository;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,5 +76,23 @@ class AccountServiceTest {
                 .findAny();
         assertThat(possibleWrongScale)
                 .isEmpty();
+    }
+
+    @Test
+    void should_throw_an_exception_for_incorrect_id_or_email() {
+        // given
+        var dto = NewAccountDTOFixture.milleniumNewAccountDTO();
+        // when
+        when(this.accountRepository.findByAccountIdAndUserEmail(dto.getId(), dto.getUserEmail()))
+                .thenReturn(Optional.empty());
+        final var exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> accountService.updateAccount(dto)
+        );
+        // then
+        assertThat(exception.getMessage()).isEqualTo(
+                String.format("Couldn't update this account. Account with given id: %d and user's email: %s doesn't exists.",
+                dto.getId(),
+                dto.getUserEmail()));
     }
 }
