@@ -19,11 +19,13 @@ jobs:
         id: create-backup
         run: |
           echo "${{ secrets.PG_DB_URI }}"
-          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
-          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
-          echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
+# disable for test
+#          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
+#          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
+#          echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
 
       - name: Sent backup to mikr.us
+        if: false # disable step for test
         uses: garygrossgarten/github-action-scp@release
         with:
           host: ${{ secrets.HOST }}
@@ -34,6 +36,7 @@ jobs:
           remote: "${{ secrets.PG_SERVER_PATH }}/${{ steps.create-backup.outputs.FILENAME }}"
 
       - name: Remove old backups
+        if: false # disable step for test
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
