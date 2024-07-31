@@ -1,0 +1,8 @@
+services:
+  spring-app:
+    extends:
+      file: docker-compose.base.yml
+      service: spring-app
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      FTM_SECRET: devSecretPassword
