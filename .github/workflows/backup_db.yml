@@ -19,10 +19,9 @@ jobs:
         id: create-backup
         run: |
           echo "${{ secrets.PG_DB_URI }}"
-# disable for test
-#          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
-#          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
-#          echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
+          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
+          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
+          echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
 
       - name: Sent backup to mikr.us
         if: false # disable step for test
