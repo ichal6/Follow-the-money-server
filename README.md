@@ -57,6 +57,9 @@ List of improve:
 
 
 ## Setup
+
+### Manual setup
+
 1. Install Java 17
 2. Install [PostgreSQL](https://www.postgresql.org/download/) 
 3. Set up a new system environment: [tutorial for Windows](https://docs.oracle.com/en/database/oracle/machine-learning/oml4r/1.5.1/oread/creating-and-modifying-environment-variables-on-windows.html)
@@ -78,6 +81,27 @@ List of improve:
       2. prod -> enable security connection
       3. [none] -> run app on default port and only connect with db
 4. Now program should work
+
+### Docker and Docker compose
+
+It's possible to run app with Docker.
+
+A. There is  a _Dockerfile_ in main directory. You can use it to run server and connect with own database. But you need set up environment.
+
+B. However, for development, better solution is use Docker Compose. There is preparing two options:
+   1. Development environment:
+      ```bash
+      docker-compose -f docker-compose.base.yml -f docker-compose.dev.yml up
+      ```
+   2. Production environment:
+      ```bash
+      docker-compose -f docker-compose.base.yml -f docker-compose.prod.yml up
+      ```
+      
+If you want to run this from Intellij you must add base docker compose file to config:
+![img.png](img/setupDockerCompose.png)
+You should set up it for all configurations. after it, you should, can use Docker Compose from Intellij
+
 
 ## Project Status
 Project is: _in progress_ .
