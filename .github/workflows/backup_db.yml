@@ -3,7 +3,7 @@ name: FTM-DB-Backup
 on:
   pull_request:
     branches:
-      - main
+      - dev
 
 jobs:
   backup:
