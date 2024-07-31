@@ -8,34 +8,21 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
-    env:
-      PGPASSWORD: ${{ secrets.PG_PASSWORD }}
 
     steps:
       - name: Checkout changes
         uses: actions/checkout@v3
 
-      - name: Create backup
-        id: create-backup
-        run: |
-          echo "${{ secrets.PG_DB_URI }}"
-          DATE=$(date +"%Y-%m-%d_%H:%M:%S")
-          pg_dump ${{ secrets.PG_DB_URI }} > ftm_$DATE.sql
-          echo "FILENAME=ftm_$DATE.sql" >> "$GITHUB_OUTPUT"
-
-      - name: Sent backup to mikr.us
-        if: false # disable step for test
-        uses: garygrossgarten/github-action-scp@release
+      - name: Create and send backup
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          privateKey: ${{ secrets.KEY_ED25519 }}
-          port: ${{ secrets.PORT }}
-          local: ${{ steps.create-backup.outputs.FILENAME }}
-          remote: "${{ secrets.PG_SERVER_PATH }}/${{ steps.create-backup.outputs.FILENAME }}"
+          host: ${{ secrets.HOST_j155 }}
+          username: ${{ secrets.USERNAME_j155 }}
+          key: ${{ secrets.KEY_ED25519_j155 }}
+          port: ${{ secrets.PORT_j155 }}
+          script: (cd "${{ secrets.PG_SERVER_PATH }}" && sh ${{ secrets.PG_CREATE_AND_SEND_BACKUP }})
 
       - name: Remove old backups
-        if: false # disable step for test
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
