@@ -1,6 +1,6 @@
 # Follow the money
 > There is an application for controlling your money. 
-> Live demo [_server_](https://ftm-server-prod.up.railway.app).
+> Live demo [_server_](https://ftmserver.bieda.it).
 > Live demo [_client_](https://ichal6.github.io/Follow-the-money-Client).
 
 ## Table of Contents
