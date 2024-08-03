@@ -1,8 +1,5 @@
 FROM maven:3.9.8-eclipse-temurin-21-alpine AS maven_build
 
-# copy the pom and src code to the container
-COPY ./ ./
-
 RUN mkdir /opt/app
 COPY . /opt/app
 
