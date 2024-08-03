@@ -3,14 +3,37 @@ FROM maven:3.9.8-eclipse-temurin-21-alpine AS maven_build
 # copy the pom and src code to the container
 COPY ./ ./
 
+RUN mkdir /opt/app
+COPY . /opt/app
+
+WORKDIR /opt/app
+
+ENV MAVEN_VERSION 3.9.8
+ENV MAVEN_HOME /usr/lib/mvn
+ENV PATH $MAVEN_HOME/bin:$PATH
+
 # Install binutils, required by jlink
-RUN apk update &&  \
-    apk add binutils
+RUN apk update && \
+    apk add --no-cache tar binutils
+
+RUN wget http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  mv apache-maven-$MAVEN_VERSION /usr/lib/mvn
+
+RUN mvn package -DskipTests
+RUN jar xvf target/follow-the-money-server-0.0.1-SNAPSHOT.jar
+RUN jdeps --ignore-missing-deps -q  \
+    --recursive  \
+    --multi-release 21  \
+    --print-module-deps  \
+    --class-path 'BOOT-INF/lib/*'  \
+    target/follow-the-money-server-0.0.1-SNAPSHOT.jar > modules.txt
 
 # Build small JRE image
 RUN $JAVA_HOME/bin/jlink \
          --verbose \
-         --add-modules ALL-MODULE-PATH \
+         --add-modules $(cat modules.txt) \
          --strip-debug \
          --no-man-pages \
          --no-header-files \
