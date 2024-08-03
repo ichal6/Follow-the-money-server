@@ -25,13 +25,21 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 # copy JRE from the base image
 COPY --from=maven_build /optimized-jdk-21 $JAVA_HOME
 
+# Add app user
+ARG APPLICATION_USER=spring
+
+# Create a user to run the application, don't run as root
+RUN addgroup --system $APPLICATION_USER &&  adduser --system $APPLICATION_USER --ingroup $APPLICATION_USER
+
 # Create the application directory
-RUN mkdir /app
+RUN mkdir /app && chown -R $APPLICATION_USER /app
 
 # Copy jar to destination directory
-COPY target/*.jar /app/ftm.jar
+COPY --chown=$APPLICATION_USER:$APPLICATION_USER target/*.jar /app/ftm.jar
 
 WORKDIR /app
+
+USER $APPLICATION_USER
 
 # set the startup command to execute the jar
 CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/ftm.jar"]
