@@ -42,4 +42,4 @@ WORKDIR /app
 USER $APPLICATION_USER
 
 # set the startup command to execute the jar
-CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/ftm.jar"]
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/ftm.jar"]
