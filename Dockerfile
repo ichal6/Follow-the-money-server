@@ -67,7 +67,7 @@ RUN addgroup --system $APPLICATION_USER &&  adduser --system $APPLICATION_USER -
 RUN mkdir /app && chown -R $APPLICATION_USER /app
 
 # Copy jar to destination directory
-COPY --chown=$APPLICATION_USER:$APPLICATION_USER target/*.jar /app/ftm.jar
+COPY --from=maven_build /opt/app/target/*.jar /app/ftm.jar
 
 WORKDIR /app
 
