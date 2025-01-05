@@ -128,6 +128,7 @@ public class DashboardService {
 
     private Double getTotalBalance() {
         return user.getAccounts().stream()
+                .filter(Account::getIsEnabled)
                 .filter(Predicate.not(a -> a.getAccountType().equals(AccountType.LOAN)))
                 .mapToDouble(Account::getCurrentBalance)
                 .reduce(0, Double::sum);

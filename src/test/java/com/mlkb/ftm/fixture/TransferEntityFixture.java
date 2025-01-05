@@ -15,9 +15,7 @@ public class TransferEntityFixture {
         Account accountFrom = mock(Account.class);
         when(accountFrom.getId()).thenReturn(1L);
         when(accountFrom.getName()).thenReturn("Millenium");
-        Account accountTo = mock(Account.class);
-        when(accountTo.getId()).thenReturn(2L);
-        when(accountTo.getName()).thenReturn("Wallet");
+        Account accountTo = AccountEntityFixture.myWallet();
 
         final var transfer = new Transfer();
         transfer.setId(3L);

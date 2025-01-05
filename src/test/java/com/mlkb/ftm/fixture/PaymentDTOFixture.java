@@ -68,7 +68,7 @@ public class PaymentDTOFixture {
         transfer.setTitle("Cash Deposit January");
         transfer.setDate(getDate(2023, Calendar.SEPTEMBER, 7, 17, 55));
         transfer.setValue(-100.0);
-        transfer.setTo("Wallet");
+        transfer.setTo(AccountEntityFixture.myWallet().getName());
         transfer.setFrom("Millenium");
         transfer.setIsInternal(true);
         transfer.setBalanceAfter(BigDecimal.valueOf(0.0).setScale(2, RoundingMode.HALF_UP));

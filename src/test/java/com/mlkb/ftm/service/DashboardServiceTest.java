@@ -2,6 +2,7 @@ package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.ApplicationConfig;
 import com.mlkb.ftm.entity.Account;
+import com.mlkb.ftm.entity.AccountType;
 import com.mlkb.ftm.entity.User;
 import com.mlkb.ftm.fixture.AccountEntityFixture;
 import com.mlkb.ftm.fixture.TransactionEntityFixture;
@@ -206,5 +207,37 @@ class DashboardServiceTest {
         );
 
         assertThat(dashboard.getIncomeFunds()).isEqualTo(expected);
+    }
+
+    @Test
+    void should_calculate_correct_total_balance_if_exists_disabled_accounts() {
+        // given
+        String email = "user@user.pl";
+        User user = new User();
+        user.setEmail(email);
+
+        Account allegroPay = AccountEntityFixture.allegroPay();
+        Account millennium = AccountEntityFixture.millennium();
+        Account disabled = AccountEntityFixture.getDisabledAccount();
+        Account wallet = AccountEntityFixture.myWallet();
+
+        user.setAccounts(Set.of(millennium, allegroPay, disabled, wallet));
+
+        Instant instant = Instant.now(
+                Clock.fixed(
+                        Instant.parse("2023-01-23T12:34:56Z"), ZoneOffset.UTC
+                )
+        );
+// when
+        when(clock.instant()).thenReturn(instant);
+        when(millennium.getCurrentBalance()).thenReturn(33.00);
+        when(allegroPay.getCurrentBalance()).thenReturn(143.00);
+        when(disabled.getCurrentBalance()).thenReturn(43.00);
+        when(wallet.getCurrentBalance()).thenReturn(23.00);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        var dashboard = this.dashboardService.getDashboard(email);
+        // then
+        assertThat(dashboard.getTotalBalance()).isEqualTo(56.00);
     }
 }
