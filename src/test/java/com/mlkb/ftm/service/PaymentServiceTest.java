@@ -1,10 +1,7 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.ApplicationConfig;
-import com.mlkb.ftm.entity.Account;
-import com.mlkb.ftm.entity.Transaction;
-import com.mlkb.ftm.entity.Transfer;
-import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.*;
@@ -539,5 +536,73 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(expectedDto, transferDTO);
+    }
+
+    @Test
+    void should_create_new_transaction_successfully() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        Category category = CategoryEntityFixture.getTransport();
+        Account account = AccountEntityFixture.allegroPay();
+        Payee payee = PayeeEntityFixture.MariuszTransKomis();
+
+        // when
+        when(categoryRepository.findById(transactionDTO.getCategoryId())).thenReturn(Optional.of(category));
+        when(accountRepository.findById(transactionDTO.getAccountId())).thenReturn(Optional.of(account));
+        when(payeeRepository.findById(transactionDTO.getPayeeId())).thenReturn(Optional.of(payee));
+
+        paymentService.createNewTransaction(transactionDTO);
+
+        // then
+        verify(transactionRepository, times(1)).save(any(Transaction.class));
+        verify(accountRepository, times(2)).save(account);
+    }
+
+    @Test
+    void should_throw_exception_when_category_not_found() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+
+        // when
+        when(categoryRepository.findById(transactionDTO.getCategoryId())).thenReturn(Optional.empty());
+
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
+                paymentService.createNewTransaction(transactionDTO));
+        assertEquals("Couldn't create new transaction. Category, account or payee with given id don't exist", thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_when_account_not_found() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        Category category = CategoryEntityFixture.getTransport();
+
+        // when
+        when(categoryRepository.findById(transactionDTO.getCategoryId())).thenReturn(Optional.of(category));
+        when(accountRepository.findById(transactionDTO.getAccountId())).thenReturn(Optional.empty());
+
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
+                paymentService.createNewTransaction(transactionDTO));
+        assertEquals("Couldn't create new transaction. Category, account or payee with given id don't exist", thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_when_payee_not_found() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        Category category = CategoryEntityFixture.getTransport();
+        Account account = AccountEntityFixture.allegroPay();
+
+        // when
+        when(categoryRepository.findById(transactionDTO.getCategoryId())).thenReturn(Optional.of(category));
+        when(accountRepository.findById(transactionDTO.getAccountId())).thenReturn(Optional.of(account));
+        when(payeeRepository.findById(transactionDTO.getPayeeId())).thenReturn(Optional.empty());
+
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
+                paymentService.createNewTransaction(transactionDTO));
+        assertEquals("Couldn't create new transaction. Category, account or payee with given id don't exist", thrown.getMessage());
     }
 }
