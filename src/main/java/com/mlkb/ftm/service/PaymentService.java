@@ -51,7 +51,7 @@ public class PaymentService {
         boolean isTransactionExist = this.transactionRepository.existsByTransactionIdAndUserEmail(id, email);
         if(!isTransactionExist) {
             throw new ResourceNotFoundException(
-                    String.format("Transaction for id = %d does not exist", id));
+                    format("Transaction for id = %d does not exist", id));
         }
         Transaction transaction = this.transactionRepository.findById(id).orElseThrow();
 
@@ -62,7 +62,7 @@ public class PaymentService {
         boolean isTransferExist = this.transferRepository.existsByTransferIdAndUserEmail(id, email);
         if(!isTransferExist) {
             throw new ResourceNotFoundException(
-                    String.format("Transfer for id = %d does not exist", id));
+                    format("Transfer for id = %d does not exist", id));
         }
         Transfer transfer = this.transferRepository.findById(id).orElseThrow();
 
@@ -241,40 +241,23 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account updateAccount;
-        Payee payee;
-        Category category;
+        Account updateAccount = null;
+        Payee payee = null;
+        Category category = null;
 
         try {
             updateAccount = getAccountForAccountId(updateTransactionDTO.getAccountId(), email);
             payee = getPayeeForTransactionDTO(updateTransactionDTO.getPayeeId(), email);
-            long categoryId = updateTransactionDTO.getSubcategoryId() != null ?
-                    updateTransactionDTO.getSubcategoryId() :
-                    updateTransactionDTO.getCategoryId();
+            long categoryId = resolveCategoryId(updateTransactionDTO);
             category = getCategoryForTransactionDTO(categoryId, email);
         } catch (ResourceNotFoundException e) {
-            throw new ResourceNotFoundException(
-                    String.format(
-                            "Couldn't update transaction id = %d, because %s",
-                            updateTransactionDTO.getId(),
-                            e.getMessage()
-                    ));
+            handleResourceNotFoundException(updateTransactionDTO, e);
         }
 
-
-        if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
-            throw new ResourceNotFoundException(
-                    String.format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
-        }
+        validateTransactionExistence(updateTransactionDTO, email);
         Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
         modifyCurrentBalanceInAccounts(updateAccount, transaction, updateTransactionDTO);
-        transaction.setTitle(updateTransactionDTO.getTitle());
-        transaction.setValue(updateTransactionDTO.getValue());
-        transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
-        transaction.setDate(updateTransactionDTO.getDate());
-        transaction.setPayee(payee);
-        transaction.setCategory(category);
-        transaction.setAccount(updateAccount);
+        updateTransactionDetails(updateTransactionDTO, transaction, payee, category, updateAccount);
 
         this.transactionRepository.save(transaction);
     }
@@ -283,7 +266,7 @@ public class PaymentService {
     public void updateTransfer(TransferDTO updateTransferDTO, String email) {
         if(!this.transferRepository.existsByTransferIdAndUserEmail(updateTransferDTO.getId(), email)) {
             throw new ResourceNotFoundException(
-                    String.format("Transfer for id = %d does not exist", updateTransferDTO.getId()));
+                    format("Transfer for id = %d does not exist", updateTransferDTO.getId()));
         }
 
         if(updateTransferDTO.getAccountIdTo().equals(updateTransferDTO.getAccountIdFrom())) {
@@ -352,10 +335,42 @@ public class PaymentService {
         return true;
     }
 
+    private void handleResourceNotFoundException(TransactionDTO updateTransactionDTO, ResourceNotFoundException e) {
+        throw new ResourceNotFoundException(
+                format(
+                        "Couldn't update transaction id = %d, because %s",
+                        updateTransactionDTO.getId(),
+                        e.getMessage()
+                ));
+    }
+
+    private long resolveCategoryId(TransactionDTO updateTransactionDTO) {
+        return updateTransactionDTO.getSubcategoryId() != null ?
+                updateTransactionDTO.getSubcategoryId() :
+                updateTransactionDTO.getCategoryId();
+    }
+
+    private void validateTransactionExistence(TransactionDTO updateTransactionDTO, String email) {
+        if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
+            throw new ResourceNotFoundException(
+                    format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
+        }
+    }
+
+    private void updateTransactionDetails(TransactionDTO updateTransactionDTO, Transaction transaction, Payee payee, Category category, Account updateAccount) {
+        transaction.setTitle(updateTransactionDTO.getTitle());
+        transaction.setValue(updateTransactionDTO.getValue());
+        transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
+        transaction.setDate(updateTransactionDTO.getDate());
+        transaction.setPayee(payee);
+        transaction.setCategory(category);
+        transaction.setAccount(updateAccount);
+    }
+
     private Category getCategoryForTransactionDTO(long categoryId, String email) {
         return this.categoryRepository.findByCategoryIdAndUserEmail(categoryId, email)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("category for id = %d doesn't exist",
+                        format("category for id = %d doesn't exist",
                                 categoryId))
                 );
     }
@@ -363,7 +378,7 @@ public class PaymentService {
     private Payee getPayeeForTransactionDTO(long payeeId, String email) {
         return this.payeeRepository.findByPayeeIdAndUserEmail(payeeId, email)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("payee for id = %d doesn't exist",
+                        format("payee for id = %d doesn't exist",
                                 payeeId))
                 );
     }
@@ -371,7 +386,7 @@ public class PaymentService {
     private Account getAccountForAccountId(long accountId, String email) {
         return this.accountRepository.findByAccountIdAndUserEmail(accountId, email)
                 .orElseThrow(() ->  new ResourceNotFoundException(
-                        String.format("account for id = %d doesn't exist",
+                        format("account for id = %d doesn't exist",
                                 accountId))
                 );
     }
