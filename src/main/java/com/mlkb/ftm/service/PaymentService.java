@@ -200,26 +200,20 @@ public class PaymentService {
     }
 
     @Transactional
-    public void createNewTransaction(TransactionDTO transactionDTO, String email) {
-        Account account = null;
-        Payee payee = null;
-        Category category = null;
-
-        try {
-            account = getAccountForAccountId(transactionDTO.getAccountId(), email);
-            payee = getPayeeForTransactionDTO(transactionDTO.getPayeeId(), email);
-            long categoryId = resolveCategoryId(transactionDTO);
-            category = getCategoryForTransactionDTO(categoryId, email);
-        } catch (ResourceNotFoundException e) {
-            handleResourceNotFoundException(transactionDTO, e);
-        }
+    public long createNewTransaction(TransactionDTO transactionDTO, String email) {
+        Account account = getAccountForTransactionDTO(transactionDTO, email);
+        Payee payee = getPayeeForTransactionDTO(transactionDTO, email);
+        Category category = getCategoryForTransactionDTO(transactionDTO, email);
 
         Transaction transaction = new Transaction();
-        updateTransactionDetails(transactionDTO, transaction, payee, category, account);
+        setTransactionDetails(transactionDTO, transaction, payee, category, account);
 
-        transactionRepository.save(transaction);
+        long newTransactionId = transactionRepository.save(transaction).getId();
+        //noinspection ConstantConditions this is checked in getAccountForTransaction
         addTransactionToAccountInDB(account, transaction);
         modifyCurrentBalanceForAccount(account, transactionDTO.getValue());
+
+        return newTransactionId;
     }
 
     public void createNewTransfer(TransferDTO transferDTO) {
@@ -243,23 +237,15 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO transactionDTO, String email) {
-        Account account = null;
-        Payee payee = null;
-        Category category = null;
-
-        try {
-            account = getAccountForAccountId(transactionDTO.getAccountId(), email);
-            payee = getPayeeForTransactionDTO(transactionDTO.getPayeeId(), email);
-            long categoryId = resolveCategoryId(transactionDTO);
-            category = getCategoryForTransactionDTO(categoryId, email);
-        } catch (ResourceNotFoundException e) {
-            handleResourceNotFoundException(transactionDTO, e);
-        }
+        Account account = getAccountForTransactionDTO(transactionDTO, email);
+        Payee payee = getPayeeForTransactionDTO(transactionDTO, email);
+        Category category = getCategoryForTransactionDTO(transactionDTO, email);
 
         validateTransactionExistence(transactionDTO, email);
         Transaction transaction = this.transactionRepository.findById(transactionDTO.getId()).orElseThrow();
+        //noinspection ConstantConditions this is checked in getAccountForTransaction
         modifyCurrentBalanceInAccounts(account, transaction, transactionDTO);
-        updateTransactionDetails(transactionDTO, transaction, payee, category, account);
+        setTransactionDetails(transactionDTO, transaction, payee, category, account);
 
         this.transactionRepository.save(transaction);
     }
@@ -337,6 +323,43 @@ public class PaymentService {
         return true;
     }
 
+    private Account getAccountForTransactionDTO(TransactionDTO transactionDTO, String email) {
+        try {
+            return getAccountForAccountId(transactionDTO.getAccountId(), email);
+        } catch (ResourceNotFoundException e) {
+            handleResourceNotFoundException(transactionDTO, e);
+            return null; // This line will never be reached because handleResourceNotFoundException throws an exception
+        }
+    }
+
+    private Payee getPayeeForTransactionDTO(TransactionDTO transactionDTO, String email) {
+        try {
+            return this.payeeRepository.findByPayeeIdAndUserEmail(transactionDTO.getPayeeId(), email)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            format("payee for id = %d doesn't exist",
+                                    transactionDTO.getPayeeId()))
+                    );
+        } catch (ResourceNotFoundException e) {
+            handleResourceNotFoundException(transactionDTO, e);
+            return null; // This line will never be reached because handleResourceNotFoundException throws an exception
+        }
+    }
+
+    private Category getCategoryForTransactionDTO(TransactionDTO transactionDTO, String email) {
+        try {
+            long categoryId = resolveCategoryId(transactionDTO);
+
+            return this.categoryRepository.findByCategoryIdAndUserEmail(categoryId, email)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            format("category for id = %d doesn't exist",
+                                    categoryId))
+                    );
+        } catch (ResourceNotFoundException e) {
+            handleResourceNotFoundException(transactionDTO, e);
+            return null; // This line will never be reached because handleResourceNotFoundException throws an exception
+        }
+    }
+
     private void handleResourceNotFoundException(TransactionDTO transactionDTO, ResourceNotFoundException e) {
         throw new ResourceNotFoundException(
                 format(
@@ -359,7 +382,7 @@ public class PaymentService {
         }
     }
 
-    private void updateTransactionDetails(TransactionDTO transactionDTO, Transaction transaction, Payee payee, Category category, Account updateAccount) {
+    private void setTransactionDetails(TransactionDTO transactionDTO, Transaction transaction, Payee payee, Category category, Account updateAccount) {
         transaction.setTitle(transactionDTO.getTitle());
         transaction.setValue(transactionDTO.getValue());
         transaction.setType(PaymentType.valueOf(transactionDTO.getType().toUpperCase()));
@@ -367,22 +390,6 @@ public class PaymentService {
         transaction.setPayee(payee);
         transaction.setCategory(category);
         transaction.setAccount(updateAccount);
-    }
-
-    private Category getCategoryForTransactionDTO(long categoryId, String email) {
-        return this.categoryRepository.findByCategoryIdAndUserEmail(categoryId, email)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        format("category for id = %d doesn't exist",
-                                categoryId))
-                );
-    }
-
-    private Payee getPayeeForTransactionDTO(long payeeId, String email) {
-        return this.payeeRepository.findByPayeeIdAndUserEmail(payeeId, email)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        format("payee for id = %d doesn't exist",
-                                payeeId))
-                );
     }
 
     private Account getAccountForAccountId(long accountId, String email) {

@@ -182,7 +182,7 @@ class CategoryServiceTestIT extends IntegrationTest {
 
         // then
         Optional<Category> category = categoryRepository.findByCategoryIdAndUserEmail(categoryId, email);
-        category.ifPresentOrElse(c -> assertEquals(1, c.getSubcategories().size()), Assertions::fail);
+        category.ifPresentOrElse(c -> assertEquals(2, c.getSubcategories().size()), Assertions::fail);
 
         try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
             // Create a statement to query the database

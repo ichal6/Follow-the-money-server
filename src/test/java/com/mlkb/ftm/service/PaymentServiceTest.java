@@ -548,6 +548,7 @@ public class PaymentServiceTest {
         Category category = CategoryEntityFixture.getTransport();
         Account account = AccountEntityFixture.allegroPay();
         Payee payee = PayeeEntityFixture.MariuszTransKomis();
+        Transaction newTransaction = TransactionEntityFixture.buyCarTransaction();
 
         // when
         when(categoryRepository.findByCategoryIdAndUserEmail(transactionDTO.getCategoryId(), email))
@@ -556,6 +557,8 @@ public class PaymentServiceTest {
                 .thenReturn(Optional.of(account));
         when(payeeRepository.findByPayeeIdAndUserEmail(transactionDTO.getPayeeId(), email))
                 .thenReturn(Optional.of(payee));
+        when(transactionRepository.save(any()))
+                .thenReturn(newTransaction);
 
         paymentService.createNewTransaction(transactionDTO, email);
 

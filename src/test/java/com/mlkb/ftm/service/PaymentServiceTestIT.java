@@ -4,7 +4,6 @@ import com.mlkb.ftm.common.IntegrationTest;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.Transaction;
 import com.mlkb.ftm.fixture.*;
-import com.mlkb.ftm.modelDTO.TransactionDTO;
 import com.mlkb.ftm.modelDTO.TransferDTO;
 import com.mlkb.ftm.repository.*;
 import com.mlkb.ftm.validation.InputValidator;
@@ -357,20 +356,35 @@ public class PaymentServiceTestIT extends IntegrationTest {
         paymentService.updateTransaction(transactionDto, email);
 
         // then
-        assertThatCategoryIdHasUpdated(transactionDto, category_id);
+        assertThatCategoryIdHasUpdated(transactionDto.getId(), category_id);
     }
 
-    private static void assertThatCategoryIdHasUpdated(TransactionDTO transactionDto, long category_id) throws SQLException {
+    @Test
+    void should_set_subcategory_in_transaction_if_transaction_added() throws SQLException {
+        // given
+        initializePaymentService();
+        var transactionDto = TransactionDTOFixture.getTaxiTransactionWithSubcategory();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        long category_id = transactionDto.getSubcategoryId();
+
+        // when
+        long newTransactionId = paymentService.createNewTransaction(transactionDto, email);
+
+        // then
+        assertThatCategoryIdHasUpdated(newTransactionId, category_id);
+    }
+
+    private static void assertThatCategoryIdHasUpdated(long transactionId, long categoryId) throws SQLException {
         // Connect to the database
         try (Connection conn = DriverManager.getConnection(container.getJdbcUrl(), container.getUsername(), container.getPassword())) {
             // Create a statement to query the database for check transaction id has changed
             try (Statement stmt = conn.createStatement()) {
                 // Query the database for the data
-                ResultSet rs = stmt.executeQuery(String.format("SELECT category_id FROM transaction WHERE id = %d", transactionDto.getId()));
+                ResultSet rs = stmt.executeQuery(String.format("SELECT category_id FROM transaction WHERE id = %d", transactionId));
 
                 // Check if the data has edited
                 assertThat(rs.next()).isTrue();
-                assertThat(rs.getLong(1)).isEqualTo(category_id);
+                assertThat(rs.getLong(1)).isEqualTo(categoryId);
             }
         }
     }
