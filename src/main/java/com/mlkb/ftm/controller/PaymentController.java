@@ -79,7 +79,7 @@ public class PaymentController {
                                                     @RequestBody TransactionDTO transactionDTO) throws InputIncorrectException {
         accessValidator.checkPermit(email);
         paymentService.isValidNewTransaction(transactionDTO);
-        paymentService.createNewTransaction(transactionDTO);
+        paymentService.createNewTransaction(transactionDTO, email);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

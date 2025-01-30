@@ -199,25 +199,27 @@ public class PaymentService {
                 && inputValidator.checkDate(transferDTO.getDate());
     }
 
-    public void createNewTransaction(TransactionDTO transactionDTO) {
-        Optional<Category> categoryOptional = categoryRepository.findById(transactionDTO.getCategoryId());
-        Optional<Account> accountOptional = accountRepository.findById(transactionDTO.getAccountId());
-        Optional<Payee> payeeOptional = payeeRepository.findById(transactionDTO.getPayeeId());
-        if (categoryOptional.isPresent() && accountOptional.isPresent() && payeeOptional.isPresent()) {
-            Transaction transaction = new Transaction();
-            transaction.setType(PaymentType.valueOf(transactionDTO.getType()));
-            transaction.setValue(transactionDTO.getValue());
-            transaction.setDate(transactionDTO.getDate());
-            transaction.setTitle(transactionDTO.getTitle());
-            transaction.setPayee(payeeOptional.get());
-            transaction.setCategory(categoryOptional.get());
+    @Transactional
+    public void createNewTransaction(TransactionDTO transactionDTO, String email) {
+        Account account = null;
+        Payee payee = null;
+        Category category = null;
 
-            transactionRepository.save(transaction);
-            addTransactionToAccountInDB(accountOptional.get(), transaction);
-            modifyCurrentBalanceForAccount(accountOptional.get(), transactionDTO.getValue());
-        } else {
-            throw new ResourceNotFoundException("Couldn't create new transaction. Category, account or payee with given id don't exist");
+        try {
+            account = getAccountForAccountId(transactionDTO.getAccountId(), email);
+            payee = getPayeeForTransactionDTO(transactionDTO.getPayeeId(), email);
+            long categoryId = resolveCategoryId(transactionDTO);
+            category = getCategoryForTransactionDTO(categoryId, email);
+        } catch (ResourceNotFoundException e) {
+            handleResourceNotFoundException(transactionDTO, e);
         }
+
+        Transaction transaction = new Transaction();
+        updateTransactionDetails(transactionDTO, transaction, payee, category, account);
+
+        transactionRepository.save(transaction);
+        addTransactionToAccountInDB(account, transaction);
+        modifyCurrentBalanceForAccount(account, transactionDTO.getValue());
     }
 
     public void createNewTransfer(TransferDTO transferDTO) {
@@ -240,24 +242,24 @@ public class PaymentService {
     }
 
     @Transactional
-    public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account updateAccount = null;
+    public void updateTransaction(TransactionDTO transactionDTO, String email) {
+        Account account = null;
         Payee payee = null;
         Category category = null;
 
         try {
-            updateAccount = getAccountForAccountId(updateTransactionDTO.getAccountId(), email);
-            payee = getPayeeForTransactionDTO(updateTransactionDTO.getPayeeId(), email);
-            long categoryId = resolveCategoryId(updateTransactionDTO);
+            account = getAccountForAccountId(transactionDTO.getAccountId(), email);
+            payee = getPayeeForTransactionDTO(transactionDTO.getPayeeId(), email);
+            long categoryId = resolveCategoryId(transactionDTO);
             category = getCategoryForTransactionDTO(categoryId, email);
         } catch (ResourceNotFoundException e) {
-            handleResourceNotFoundException(updateTransactionDTO, e);
+            handleResourceNotFoundException(transactionDTO, e);
         }
 
-        validateTransactionExistence(updateTransactionDTO, email);
-        Transaction transaction = this.transactionRepository.findById(updateTransactionDTO.getId()).orElseThrow();
-        modifyCurrentBalanceInAccounts(updateAccount, transaction, updateTransactionDTO);
-        updateTransactionDetails(updateTransactionDTO, transaction, payee, category, updateAccount);
+        validateTransactionExistence(transactionDTO, email);
+        Transaction transaction = this.transactionRepository.findById(transactionDTO.getId()).orElseThrow();
+        modifyCurrentBalanceInAccounts(account, transaction, transactionDTO);
+        updateTransactionDetails(transactionDTO, transaction, payee, category, account);
 
         this.transactionRepository.save(transaction);
     }
@@ -335,33 +337,33 @@ public class PaymentService {
         return true;
     }
 
-    private void handleResourceNotFoundException(TransactionDTO updateTransactionDTO, ResourceNotFoundException e) {
+    private void handleResourceNotFoundException(TransactionDTO transactionDTO, ResourceNotFoundException e) {
         throw new ResourceNotFoundException(
                 format(
                         "Couldn't update transaction id = %d, because %s",
-                        updateTransactionDTO.getId(),
+                        transactionDTO.getId(),
                         e.getMessage()
                 ));
     }
 
-    private long resolveCategoryId(TransactionDTO updateTransactionDTO) {
-        return updateTransactionDTO.getSubcategoryId() != null ?
-                updateTransactionDTO.getSubcategoryId() :
-                updateTransactionDTO.getCategoryId();
+    private long resolveCategoryId(TransactionDTO transactionDTO) {
+        return transactionDTO.getSubcategoryId() != null ?
+                transactionDTO.getSubcategoryId() :
+                transactionDTO.getCategoryId();
     }
 
-    private void validateTransactionExistence(TransactionDTO updateTransactionDTO, String email) {
-        if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
+    private void validateTransactionExistence(TransactionDTO transactionDTO, String email) {
+        if (!this.transactionRepository.existsByTransactionIdAndUserEmail(transactionDTO.getId(), email)) {
             throw new ResourceNotFoundException(
-                    format("Transaction for id = %d does not exist", updateTransactionDTO.getId()));
+                    format("Transaction for id = %d does not exist", transactionDTO.getId()));
         }
     }
 
-    private void updateTransactionDetails(TransactionDTO updateTransactionDTO, Transaction transaction, Payee payee, Category category, Account updateAccount) {
-        transaction.setTitle(updateTransactionDTO.getTitle());
-        transaction.setValue(updateTransactionDTO.getValue());
-        transaction.setType(PaymentType.valueOf(updateTransactionDTO.getType().toUpperCase()));
-        transaction.setDate(updateTransactionDTO.getDate());
+    private void updateTransactionDetails(TransactionDTO transactionDTO, Transaction transaction, Payee payee, Category category, Account updateAccount) {
+        transaction.setTitle(transactionDTO.getTitle());
+        transaction.setValue(transactionDTO.getValue());
+        transaction.setType(PaymentType.valueOf(transactionDTO.getType().toUpperCase()));
+        transaction.setDate(transactionDTO.getDate());
         transaction.setPayee(payee);
         transaction.setCategory(category);
         transaction.setAccount(updateAccount);
@@ -410,12 +412,12 @@ public class PaymentService {
     }
 
     private void modifyCurrentBalanceInAccounts(Account newAccount, Transaction transaction,
-                                                TransactionDTO updateTransactionDTO) {
+                                                TransactionDTO transactionDTO) {
         if(!newAccount.getId().equals(transaction.getAccount().getId())) {
             modifyCurrentBalanceForAccount(transaction.getAccount(), -1*transaction.getValue());
-            modifyCurrentBalanceForAccount(newAccount, updateTransactionDTO.getValue());
+            modifyCurrentBalanceForAccount(newAccount, transactionDTO.getValue());
         } else {
-            modifyCurrentBalanceForAccount(newAccount, transaction.getValue(), updateTransactionDTO.getValue());
+            modifyCurrentBalanceForAccount(newAccount, transaction.getValue(), transactionDTO.getValue());
         }
     }
 
