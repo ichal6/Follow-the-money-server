@@ -241,9 +241,26 @@ public class PaymentService {
 
     @Transactional
     public void updateTransaction(TransactionDTO updateTransactionDTO, String email) {
-        Account updateAccount = getAccountForAccountId(updateTransactionDTO.getAccountId(), email);
-        Payee payee = getPayeeForTransactionDTO(updateTransactionDTO, email);
-        Category category = getCategoryForTransactionDTO(updateTransactionDTO, email);
+        Account updateAccount;
+        Payee payee;
+        Category category;
+
+        try {
+            updateAccount = getAccountForAccountId(updateTransactionDTO.getAccountId(), email);
+            payee = getPayeeForTransactionDTO(updateTransactionDTO.getPayeeId(), email);
+            long categoryId = updateTransactionDTO.getSubcategoryId() != null ?
+                    updateTransactionDTO.getSubcategoryId() :
+                    updateTransactionDTO.getCategoryId();
+            category = getCategoryForTransactionDTO(categoryId, email);
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(
+                    String.format(
+                            "Couldn't update transaction id = %d, because %s",
+                            updateTransactionDTO.getId(),
+                            e.getMessage()
+                    ));
+        }
+
 
         if (!this.transactionRepository.existsByTransactionIdAndUserEmail(updateTransactionDTO.getId(), email)) {
             throw new ResourceNotFoundException(
@@ -335,31 +352,26 @@ public class PaymentService {
         return true;
     }
 
-    private Category getCategoryForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
-        long categoryId = updateTransactionDTO.getSubcategoryId() != null ?
-                updateTransactionDTO.getSubcategoryId() :
-                updateTransactionDTO.getCategoryId();
+    private Category getCategoryForTransactionDTO(long categoryId, String email) {
         return this.categoryRepository.findByCategoryIdAndUserEmail(categoryId, email)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Couldn't update transaction id = %d, because category for id = %d doesn't exist",
-                                updateTransactionDTO.getId(),
-                                updateTransactionDTO.getCategoryId()))
+                        String.format("category for id = %d doesn't exist",
+                                categoryId))
                 );
     }
 
-    private Payee getPayeeForTransactionDTO(TransactionDTO updateTransactionDTO, String email) {
-        return this.payeeRepository.findByPayeeIdAndUserEmail(updateTransactionDTO.getPayeeId(), email)
+    private Payee getPayeeForTransactionDTO(long payeeId, String email) {
+        return this.payeeRepository.findByPayeeIdAndUserEmail(payeeId, email)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Couldn't update transaction id = %d, because payee for id = %d doesn't exist",
-                                updateTransactionDTO.getId(),
-                                updateTransactionDTO.getPayeeId()))
+                        String.format("payee for id = %d doesn't exist",
+                                payeeId))
                 );
     }
 
     private Account getAccountForAccountId(long accountId, String email) {
         return this.accountRepository.findByAccountIdAndUserEmail(accountId, email)
                 .orElseThrow(() ->  new ResourceNotFoundException(
-                        String.format("Account for id = %d doesn't exist",
+                        String.format("account for id = %d doesn't exist",
                                 accountId))
                 );
     }

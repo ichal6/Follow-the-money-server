@@ -369,7 +369,8 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Account for id = %d doesn't exist",
+                String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
+                        transactionDto.getId(),
                         transactionDto.getAccountId()),
                 thrown.getMessage());
     }
@@ -385,12 +386,13 @@ public class PaymentServiceTest {
                 .thenReturn(Optional.empty());
         when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdFrom(), email))
                 .thenReturn(Optional.of(new Account()));
+
         ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 this.paymentService.updateTransfer(transferDTO, email));
 
         // then
         assertEquals(
-                String.format("Account for id = %d doesn't exist",
+                String.format("account for id = %d doesn't exist",
                         transferDTO.getAccountIdTo()),
                 thrown.getMessage());
     }
@@ -411,7 +413,7 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Account for id = %d doesn't exist",
+                String.format("account for id = %d doesn't exist",
                         transferDTO.getAccountIdFrom()),
                 thrown.getMessage());
     }
