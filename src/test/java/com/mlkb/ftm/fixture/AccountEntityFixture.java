@@ -3,6 +3,7 @@ package com.mlkb.ftm.fixture;
 import com.mlkb.ftm.entity.Account;
 import com.mlkb.ftm.entity.AccountType;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.mockito.Mockito.mock;
@@ -57,7 +58,7 @@ public class AccountEntityFixture {
         when(account.getAccountType()).thenReturn(AccountType.LOAN);
         when(account.getCurrentBalance()).thenReturn(0.0);
         when(account.getTransfersTo()).thenReturn(Set.of());
-        when(account.getTransactions()).thenReturn(Set.of());
+        when(account.getTransactions()).thenReturn(new HashSet<>());
         when(account.getIsEnabled()).thenReturn(true);
         when(account.getTransfersFrom()).thenReturn(Set.of());
 

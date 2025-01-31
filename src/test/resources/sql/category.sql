@@ -28,7 +28,7 @@ VALUES (9, 'extra hours', 1, 3);
 INSERT INTO "category" (id, name, user_id)
 VALUES (10, 'Credit', '2');
 
-INSERT INTO "category" (id, name, user_id)
-VALUES (11, 'Taxi', '1');
+INSERT INTO "category" (id, name, user_id, category_id)
+VALUES (11, 'Taxi', '1', 5);
 
 SELECT setval('category_id_seq', 11);
