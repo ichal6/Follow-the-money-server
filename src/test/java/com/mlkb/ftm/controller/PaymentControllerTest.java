@@ -38,8 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -521,5 +520,29 @@ class PaymentControllerTest {
                         Objects.requireNonNull(result.getResolvedException()).getMessage()));
 
         verify(accessValidator, atLeastOnce()).checkPermit(email);
+    }
+
+    @Test
+    void should_return_transaction_id_after_created_transaction() throws Exception {
+        // given
+        var objectMapper = new ObjectMapper();
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+
+        // when/then
+        when(paymentService.createNewTransaction(any(TransactionDTO.class), anyString()))
+                .thenReturn(1L);
+
+        mockMvc.perform(
+                    post("/api/payment/transaction/anyEmail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(transactionDTO))
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$").value("1"))
+                .andReturn();
+
+        verify(paymentService, atLeast(1))
+                .createNewTransaction(any(TransactionDTO.class), anyString());
     }
 }
