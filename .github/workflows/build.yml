@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           overwrite: true
-          name: follow-the-money-server
+          name: ftm.jar
           path: 'target/follow-the-money-server-0.0.1-SNAPSHOT.jar'
 
       - name: Run server on mikr.us dev
