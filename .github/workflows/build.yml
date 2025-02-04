@@ -24,7 +24,6 @@ jobs:
         run: mvn --batch-mode --update-snapshots verify
 
       - name: Upload Artifact
-        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           overwrite: true
