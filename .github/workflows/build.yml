@@ -37,7 +37,7 @@ jobs:
           files: 'target/follow-the-money-server-0.0.1-SNAPSHOT.jar'
           tag_name: test
 
-      - name: Run server on mikr.us dev
+      - name: Run server on mikr.us test
         if: github.event_name == 'pull_request'
         uses: appleboy/ssh-action@master
         with:
