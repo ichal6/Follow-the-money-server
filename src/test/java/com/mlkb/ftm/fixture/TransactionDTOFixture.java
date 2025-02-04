@@ -12,7 +12,7 @@ public class TransactionDTOFixture {
         transaction.setTitle("Buy Car after edit");
         transaction.setAccountId(AccountEntityFixture.millennium().getId());
         transaction.setValue(-2400.0);
-        transaction.setType("Expense");
+        transaction.setType("EXPENSE");
         transaction.setDate(Utils.getDate(2022, 6, 23, 14, 23));
         transaction.setPayeeId(PayeeEntityFixture.MariuszTransKomis().getId());
         transaction.setCategoryId(CategoryEntityFixture.getTransport().getId());

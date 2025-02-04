@@ -1,10 +1,7 @@
 package com.mlkb.ftm.service;
 
 import com.mlkb.ftm.common.ApplicationConfig;
-import com.mlkb.ftm.entity.Account;
-import com.mlkb.ftm.entity.Transaction;
-import com.mlkb.ftm.entity.Transfer;
-import com.mlkb.ftm.entity.User;
+import com.mlkb.ftm.entity.*;
 import com.mlkb.ftm.exception.InputValidationMessage;
 import com.mlkb.ftm.exception.ResourceNotFoundException;
 import com.mlkb.ftm.fixture.*;
@@ -372,7 +369,8 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Account for id = %d doesn't exist",
+                String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
+                        transactionDto.getId(),
                         transactionDto.getAccountId()),
                 thrown.getMessage());
     }
@@ -388,12 +386,13 @@ public class PaymentServiceTest {
                 .thenReturn(Optional.empty());
         when(accountRepository.findByAccountIdAndUserEmail(transferDTO.getAccountIdFrom(), email))
                 .thenReturn(Optional.of(new Account()));
+
         ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () ->
                 this.paymentService.updateTransfer(transferDTO, email));
 
         // then
         assertEquals(
-                String.format("Account for id = %d doesn't exist",
+                String.format("account for id = %d doesn't exist",
                         transferDTO.getAccountIdTo()),
                 thrown.getMessage());
     }
@@ -414,7 +413,7 @@ public class PaymentServiceTest {
 
         // then
         assertEquals(
-                String.format("Account for id = %d doesn't exist",
+                String.format("account for id = %d doesn't exist",
                         transferDTO.getAccountIdFrom()),
                 thrown.getMessage());
     }
@@ -540,4 +539,104 @@ public class PaymentServiceTest {
         // then
         assertEquals(expectedDto, transferDTO);
     }
+
+    @Test
+    void should_create_new_transaction_successfully() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        Category category = CategoryEntityFixture.getTransport();
+        Account account = AccountEntityFixture.allegroPay();
+        Payee payee = PayeeEntityFixture.MariuszTransKomis();
+        Transaction newTransaction = TransactionEntityFixture.buyCarTransaction();
+
+        // when
+        when(categoryRepository.findByCategoryIdAndUserEmail(transactionDTO.getCategoryId(), email))
+                .thenReturn(Optional.of(category));
+        when(accountRepository.findByAccountIdAndUserEmail(transactionDTO.getAccountId(), email))
+                .thenReturn(Optional.of(account));
+        when(payeeRepository.findByPayeeIdAndUserEmail(transactionDTO.getPayeeId(), email))
+                .thenReturn(Optional.of(payee));
+        when(transactionRepository.save(any()))
+                .thenReturn(newTransaction);
+
+        paymentService.createNewTransaction(transactionDTO, email);
+
+        // then
+        verify(transactionRepository, times(1)).save(any(Transaction.class));
+        verify(accountRepository, times(2)).save(account);
+    }
+
+    @Test
+    void should_throw_exception_when_category_not_found() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        Account account = AccountEntityFixture.allegroPay();
+        Payee payee = PayeeEntityFixture.MariuszTransKomis();
+
+        // when
+        when(categoryRepository.findByCategoryIdAndUserEmail(transactionDTO.getCategoryId(), email))
+                .thenReturn(Optional.empty());
+        when(accountRepository.findByAccountIdAndUserEmail(transactionDTO.getAccountId(), email))
+                .thenReturn(Optional.of(account));
+        when(payeeRepository.findByPayeeIdAndUserEmail(transactionDTO.getPayeeId(), email))
+                .thenReturn(Optional.of(payee));
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
+                paymentService.createNewTransaction(transactionDTO, email));
+        assertEquals(
+                String.format("Couldn't update transaction id = %d, because category for id = %d doesn't exist",
+                        transactionDTO.getId(),
+                        transactionDTO.getCategoryId()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_when_account_not_found() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        Category category = CategoryEntityFixture.getTransport();
+        String email = UserEntityFixture.userUserowy().getEmail();
+
+        // when
+        when(categoryRepository.findByCategoryIdAndUserEmail(transactionDTO.getCategoryId(), email))
+                .thenReturn(Optional.of(category));
+        when(accountRepository.findByAccountIdAndUserEmail(transactionDTO.getAccountId(), email))
+                .thenReturn(Optional.empty());
+
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
+                paymentService.createNewTransaction(transactionDTO, email));
+        assertEquals(
+                String.format("Couldn't update transaction id = %d, because account for id = %d doesn't exist",
+                        transactionDTO.getId(),
+                        transactionDTO.getAccountId()),
+                thrown.getMessage());
+    }
+
+    @Test
+    void should_throw_exception_when_payee_not_found() {
+        // given
+        TransactionDTO transactionDTO = TransactionDTOFixture.buyCarTransaction();
+        String email = UserEntityFixture.userUserowy().getEmail();
+        Category category = CategoryEntityFixture.getTransport();
+        Account account = AccountEntityFixture.allegroPay();
+
+        // when
+        when(categoryRepository.findByCategoryIdAndUserEmail(transactionDTO.getCategoryId(), email))
+                .thenReturn(Optional.of(category));
+        when(accountRepository.findByAccountIdAndUserEmail(transactionDTO.getAccountId(), email))
+                .thenReturn(Optional.of(account));
+        when(payeeRepository.findByPayeeIdAndUserEmail(transactionDTO.getPayeeId(), email))
+                .thenReturn(Optional.empty());
+
+        // then
+        ResourceNotFoundException thrown = assertThrows(ResourceNotFoundException.class, () ->
+                paymentService.createNewTransaction(transactionDTO, email));
+        assertEquals(
+                String.format("Couldn't update transaction id = %d, because payee for id = %d doesn't exist",
+                        transactionDTO.getId(),
+                        transactionDTO.getPayeeId()),
+                thrown.getMessage());    }
 }

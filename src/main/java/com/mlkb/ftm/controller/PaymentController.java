@@ -75,12 +75,14 @@ public class PaymentController {
     }
 
     @PostMapping("/transaction/{email}")
-    public ResponseEntity<Object> createTransaction(@PathVariable("email") String email,
+    @Operation(summary = "Create transaction")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Long> createTransaction(@PathVariable("email") String email,
                                                     @RequestBody TransactionDTO transactionDTO) throws InputIncorrectException {
         accessValidator.checkPermit(email);
         paymentService.isValidNewTransaction(transactionDTO);
-        paymentService.createNewTransaction(transactionDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        long newTransactionId = paymentService.createNewTransaction(transactionDTO, email);
+        return new ResponseEntity<>(newTransactionId, HttpStatus.CREATED);
     }
 
     @PostMapping("/transfer/{email}")
